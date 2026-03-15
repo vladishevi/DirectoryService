@@ -3,12 +3,11 @@
 namespace DirectoryService.Presenters.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
-internal class TestController : ControllerBase
+[Route("[controller]")]
+public class TestController : ControllerBase
 {
     [HttpGet]
-    public IActionResult GetTest()
+    public void Test()
     {
-        return Ok("testOk");
     }
 }
