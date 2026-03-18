@@ -1,29 +1,23 @@
 ﻿using System.Text;
-using CSharpFunctionalExtensions;
 
 namespace DirectoryService.Domain.Departments;
 
 public record Path
 {
-    private Path(string value)
+    public Path(Identifier identifier, Department? parentDepartment)
     {
-        Value = value;
-    }
-    
-    public string Value { get; private set; }
-    
-    public static Result<Path, string> Create(string identifier, Department parentDepartment)
-    {
-        StringBuilder pathBuilder = new StringBuilder();
-        pathBuilder.Insert(0, identifier);
+        StringBuilder pathBuilder = new();
+        pathBuilder.Insert(0, identifier.Value);
 
         Department? parent = parentDepartment;
         while (parent != null)
         {
-            pathBuilder.Insert(0, parent.Identifier);
+            pathBuilder.Insert(0, $"{parent.Path.Value}.");
             parent = parent.ParentDepartment;
         }
-        
-        return new Path(pathBuilder.ToString());   
+
+        Value = pathBuilder.ToString();
     }
+    
+    public string Value { get; private set; }
 }

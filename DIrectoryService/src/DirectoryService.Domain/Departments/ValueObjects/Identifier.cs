@@ -33,6 +33,6 @@ public record Identifier
             return "Department identifier must contain latin characters only";
         }
         
-        return new Identifier(value);
+        return new Identifier(value.ToLower());
     }
 }
