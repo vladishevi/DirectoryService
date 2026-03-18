@@ -18,6 +18,6 @@ public record Path
 
         Value = pathBuilder.ToString();
     }
-    
-    public string Value { get; private set; }
+
+    private string Value { get; set; }
 }

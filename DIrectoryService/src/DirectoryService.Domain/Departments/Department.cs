@@ -1,16 +1,19 @@
-﻿using CSharpFunctionalExtensions;
-
-namespace DirectoryService.Domain.Departments;
+﻿namespace DirectoryService.Domain.Departments;
 
 public class Department
 {
-    private Department(Name name, Identifier identifier, Department? parentDepartment, Path path)
+    private Department(Name name, 
+        Identifier identifier,
+        Department? parentDepartment,
+        Path path,
+        short depth)
     {
         Id = Guid.NewGuid();
         Name = name;
         Identifier = identifier;
         ParentDepartment = parentDepartment;
         Path = path;
+        Depth = depth;
     }
     
     public Guid Id { get; private set; }
@@ -23,9 +26,26 @@ public class Department
     public DateTime CreatedAt  { get; private set; }
     public DateTime UpdatedAt  { get; private set; }
 
-    public static Department Create(Name name, Identifier identifier, Department? parentDepartment)
+    public static Department Create(Name name, 
+        Identifier identifier,
+        Department? parentDepartment)
     {
         Path path = new(identifier, parentDepartment);
-        return new Department(name, identifier, parentDepartment, path);
+        short depth = CalcDepth(parentDepartment);
+        return new Department(name, identifier, parentDepartment, path, depth);
+    }
+
+    private static short CalcDepth(Department? parentDepartment)
+    {
+        short depth = 1;
+
+        Department? parent = parentDepartment;
+        while (parent != null)
+        {
+            depth++;
+            parent = parent.ParentDepartment;
+        }
+
+        return depth;
     }
 }
