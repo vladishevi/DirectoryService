@@ -9,6 +9,9 @@ public class Department
         short depth)
     {
         Id = Guid.NewGuid();
+        IsActive = true;
+        CreatedAt = DateTime.UtcNow;
+        UpdatedAt = DateTime.UtcNow;
         Name = name;
         Identifier = identifier;
         ParentDepartment = parentDepartment;
