@@ -2,12 +2,13 @@
 
 public class Department
 {
-    private Department(Name name, 
+    public Department(Name name, 
         Identifier identifier,
-        Department? parentDepartment,
-        Path path,
-        short depth)
+        Department? parentDepartment)
     {
+        Path path = new(identifier, parentDepartment);
+        short depth = CalcDepth(parentDepartment);
+        
         Id = Guid.NewGuid();
         IsActive = true;
         CreatedAt = DateTime.UtcNow;
@@ -28,15 +29,6 @@ public class Department
     public bool IsActive { get; private set; }
     public DateTime CreatedAt  { get; private set; }
     public DateTime UpdatedAt  { get; private set; }
-
-    public static Department Create(Name name, 
-        Identifier identifier,
-        Department? parentDepartment)
-    {
-        Path path = new(identifier, parentDepartment);
-        short depth = CalcDepth(parentDepartment);
-        return new Department(name, identifier, parentDepartment, path, depth);
-    }
 
     private static short CalcDepth(Department? parentDepartment)
     {
