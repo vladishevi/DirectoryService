@@ -13,11 +13,17 @@ public record Timezone
 
     public static Result<Timezone, string> Create(string code)
     {
+
         if (string.IsNullOrWhiteSpace(code))
         {
             return "Timezone cannot be empty";
         }
 
+        if (!TimeZoneInfo.TryFindSystemTimeZoneById(code, out TimeZoneInfo? _))
+        {
+            return "Timezone isn't valid";
+        }
+        
         return new Timezone(code);
     }
 }
