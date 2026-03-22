@@ -34,6 +34,11 @@ public record Address
             return "Postcode cannot be empty";
         }
         
+        if (building <= 0)
+        {
+            return "Building number must be greater than 0";
+        }
+        
         return new Address(city, street, building, postcode);
     }
 }
