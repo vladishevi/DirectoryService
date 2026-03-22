@@ -6,16 +6,9 @@ public record Name
 {
     public record Options
     {
-        public int? MinLenght;
-        public int? MaxLenght;
-        public IEnumerable<string>? CreatedNames;
-
-        public Options(int? MinLenght = null, int? MaxLenght = null, IEnumerable<string>? CreatedNames = null)
-        {
-            this.MinLenght = MinLenght;
-            this.MaxLenght = MaxLenght;
-            this.CreatedNames = CreatedNames;
-        }
+        public int? MinLength { get; init; }
+        public int? MaxLength { get; init; }
+        public IEnumerable<string>? CreatedNames { get; init; }
     }
     
     private Name(string value)
@@ -25,7 +18,7 @@ public record Name
 
     public string Value { get; }
 
-    public static Result<Name, string> Create(string value, Options? options)
+    public static Result<Name, string> Create(string value, Options? options = null)
     {
         if (string.IsNullOrWhiteSpace(value))
         {
@@ -37,14 +30,14 @@ public record Name
             return new Name(value);
         }
 
-        if (options.MinLenght != null && value.Length < options.MinLenght)
+        if (options.MinLength != null && value.Length < options.MinLength)
         {
-            return $"The name must be no shorter than {options.MinLenght} characters";
+            return $"The name must be no shorter than {options.MinLength} characters";
         }
         
-        if (options.MaxLenght != null && value.Length > options.MaxLenght)
+        if (options.MaxLength != null && value.Length > options.MaxLength)
         {
-            return $"The name must be no longer than {options.MaxLenght} characters";
+            return $"The name must be no longer than {options.MaxLength} characters";
         }
         
         if (options.CreatedNames != null && options.CreatedNames.Contains(value))
