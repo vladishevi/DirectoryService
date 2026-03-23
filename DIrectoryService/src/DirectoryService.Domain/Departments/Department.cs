@@ -11,7 +11,7 @@ public class Department
         Department? parentDepartment)
     {
         Path path = new(identifier, parentDepartment);
-        short depth = CalcDepth(parentDepartment);
+        short depth = GetDepth(parentDepartment);
         
         Id = Guid.NewGuid();
         IsActive = true;
@@ -46,17 +46,11 @@ public class Department
     public void AddPosition(Guid positionId) => 
         _positions.Add(new DepartmentPosition(Id, positionId));
     
-    private static short CalcDepth(Department? parentDepartment)
+    private static short GetDepth(Department? parentDepartment)
     {
-        short depth = 1;
+        if (parentDepartment == null)
+            return 1;
 
-        Department? parent = parentDepartment;
-        while (parent != null)
-        {
-            depth++;
-            parent = parent.ParentDepartment;
-        }
-
-        return depth;
+        return (short)(parentDepartment.Depth + 1);
     }
 }
