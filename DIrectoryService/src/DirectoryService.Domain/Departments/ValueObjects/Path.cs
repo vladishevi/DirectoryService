@@ -9,20 +9,12 @@ public record Path
         BuildDepartmentPath(identifier, parentDepartment);
     }
 
+    private string Value { get; set; }
+
     private void BuildDepartmentPath(Identifier identifier, Department? parentDepartment)
     {
-        StringBuilder pathBuilder = new();
-        pathBuilder.Insert(0, identifier.Value);
-
-        Department? parent = parentDepartment;
-        while (parent != null)
-        {
-            pathBuilder.Insert(0, $"{parent.Path.Value}.");
-            parent = parent.ParentDepartment;
-        }
-
-        Value = pathBuilder.ToString();
+        Value = parentDepartment == null ?
+            identifier.Value : 
+            $"{parentDepartment.Path.Value}.{identifier.Value}";
     }
-
-    private string Value { get; set; }
 }
