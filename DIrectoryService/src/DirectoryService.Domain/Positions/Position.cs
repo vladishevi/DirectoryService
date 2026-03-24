@@ -1,6 +1,4 @@
-﻿using DirectoryService.Domain.Common;
-
-namespace DirectoryService.Domain.Positions;
+﻿namespace DirectoryService.Domain.Positions;
 
 public class Position
 {

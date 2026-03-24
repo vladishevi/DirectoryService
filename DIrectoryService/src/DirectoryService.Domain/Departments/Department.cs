@@ -1,5 +1,4 @@
-﻿using DirectoryService.Domain.Common;
-using DirectoryService.Domain.DepartmentLocations;
+﻿using DirectoryService.Domain.DepartmentLocations;
 using DirectoryService.Domain.DepartmentPositions;
 
 namespace DirectoryService.Domain.Departments;

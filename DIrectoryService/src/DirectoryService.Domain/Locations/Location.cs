@@ -1,6 +1,4 @@
-﻿using DirectoryService.Domain.Common;
-
-namespace DirectoryService.Domain.Locations;
+﻿namespace DirectoryService.Domain.Locations;
 
 public class Location
 {
