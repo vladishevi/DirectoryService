@@ -12,10 +12,10 @@ public record Address
         Postcode = postcode;
     }
     
-    public string City { get; private set; }
-    public string Street { get; private set; }
-    public int Building { get; private set; }
-    public string Postcode { get; private set; }
+    public string City { get;}
+    public string Street { get; }
+    public int Building { get; }
+    public string Postcode { get; }
 
     public static Result<Address, string> Create(string city, string street, int building, string postcode)
     {

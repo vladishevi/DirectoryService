@@ -6,7 +6,7 @@ public record Description
 {
     private const int MAX_LENGTH = 1000;
     
-    public string Value { get; private set; }
+    public string Value { get;}
 
     private Description(string value)
     {
