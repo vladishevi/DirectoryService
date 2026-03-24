@@ -6,14 +6,14 @@ public record Path
 {
     public Path(Identifier identifier, Department? parentDepartment)
     {
-        BuildDepartmentPath(identifier, parentDepartment);
+        Value = GetDepartmentPath(identifier, parentDepartment);
     }
 
-    private string Value { get; set; }
+    public string Value { get; }
 
-    private void BuildDepartmentPath(Identifier identifier, Department? parentDepartment)
+    private string GetDepartmentPath(Identifier identifier, Department? parentDepartment)
     {
-        Value = parentDepartment == null ?
+        return parentDepartment == null ?
             identifier.Value : 
             $"{parentDepartment.Path.Value}.{identifier.Value}";
     }
