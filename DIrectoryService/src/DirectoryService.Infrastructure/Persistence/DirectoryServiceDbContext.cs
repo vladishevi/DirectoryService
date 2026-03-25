@@ -1,7 +1,7 @@
 ﻿using DirectoryService.Domain.Locations;
 using Microsoft.EntityFrameworkCore;
 
-namespace DirectoryService.Infrastructure.Infrastructure;
+namespace DirectoryService.Infrastructure.Persistence;
 
 public class DirectoryServiceDbContext : DbContext
 {

@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace DirectoryService.Infrastructure.Infrastructure;
+namespace DirectoryService.Infrastructure.Persistence;
 
 public static class DependencyInjection
 {

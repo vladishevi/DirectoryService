@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace DirectoryService.Infrastructure.Infrastructure.Configuration;
+namespace DirectoryService.Infrastructure.Persistence;
 
 public class LocationConfiguration : IEntityTypeConfiguration<Location>
 {

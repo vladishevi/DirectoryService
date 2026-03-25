@@ -1,4 +1,4 @@
-using DirectoryService.Infrastructure.Infrastructure;
+using DirectoryService.Infrastructure.Persistence;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
