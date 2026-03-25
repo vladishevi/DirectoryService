@@ -2,6 +2,9 @@
 
 public class Location
 {
+    // EF Core
+    private Location() { }
+    
     public Location(Name name, Address address, Timezone timezone)
     {
         Id = Guid.NewGuid();

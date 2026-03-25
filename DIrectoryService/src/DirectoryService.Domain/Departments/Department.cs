@@ -2,6 +2,9 @@
 
 public class Department
 {
+    // EF Core
+    private Department() { }
+    
     public Department(Name name, 
         Identifier identifier,
         Department? parentDepartment)

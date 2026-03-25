@@ -2,6 +2,9 @@
 
 public class DepartmentLocation
 {
+    // EF Core
+    private DepartmentLocation() { }
+    
     public DepartmentLocation(Guid departementId, Guid locationId)
     {
         Id = Guid.NewGuid();
