@@ -1,7 +1,7 @@
 ﻿using DirectoryService.Domain.Locations;
 using Microsoft.EntityFrameworkCore;
 
-namespace DirectoryService.Infrastructure.Postgres;
+namespace DirectoryService.Infrastructure.Infrastructure;
 
 public class DirectoryServiceDbContext : DbContext
 {
