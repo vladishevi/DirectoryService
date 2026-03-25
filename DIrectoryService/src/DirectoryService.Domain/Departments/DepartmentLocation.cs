@@ -1,4 +1,4 @@
-﻿namespace DirectoryService.Domain.DepartmentLocations;
+﻿namespace DirectoryService.Domain.Departments;
 
 public class DepartmentLocation
 {
