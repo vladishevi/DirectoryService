@@ -4,9 +4,9 @@ namespace DirectoryService.Domain.Departments;
 
 public record Name
 {
+    public const int MAX_LENGHT = 150;
     private const int MIN_LENGHT = 3;
-    private const int MAX_LENGHT = 150;
-    
+
     private Name(string value)
     {
         Value = value;
