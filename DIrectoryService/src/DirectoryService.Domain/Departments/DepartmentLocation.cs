@@ -5,14 +5,16 @@ public class DepartmentLocation
     // EF Core
     private DepartmentLocation() { }
     
-    public DepartmentLocation(Guid departementId, Guid locationId)
+    public DepartmentLocation(Department departement, Guid locationId)
     {
         Id = Guid.NewGuid();
-        DepartmentId = departementId;
+        Department = departement;
+        DepartmentId = departement.Id;
         LocationId = locationId;
     }
     
     public Guid Id { get; private set; }
+    public Department Department { get; private set; }
     public Guid DepartmentId { get; private set; }
     public Guid LocationId { get; private set; }
 }

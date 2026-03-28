@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DirectoryService.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(DirectoryServiceDbContext))]
-    [Migration("20260328111525_Initial")]
+    [Migration("20260328204011_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -29,7 +29,8 @@ namespace DirectoryService.Infrastructure.Persistence.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -55,9 +56,6 @@ namespace DirectoryService.Infrastructure.Persistence.Migrations
                         .HasColumnType("character varying(150)")
                         .HasColumnName("name");
 
-                    b.Property<Guid?>("ParentDepartmentId")
-                        .HasColumnType("uuid");
-
                     b.Property<string>("Path")
                         .IsRequired()
                         .HasColumnType("text")
@@ -67,10 +65,13 @@ namespace DirectoryService.Infrastructure.Persistence.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
+                    b.Property<Guid?>("parent_department_id")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id")
                         .HasName("pk_departments");
 
-                    b.HasIndex("ParentDepartmentId");
+                    b.HasIndex("parent_department_id");
 
                     b.ToTable("departments", (string)null);
                 });
@@ -79,19 +80,25 @@ namespace DirectoryService.Infrastructure.Persistence.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
 
                     b.Property<Guid>("DepartmentId")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("department_id");
 
                     b.Property<Guid>("LocationId")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("location_id");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_department_locations");
 
                     b.HasIndex("DepartmentId");
 
-                    b.ToTable("DepartmentLocation");
+                    b.HasIndex("LocationId");
+
+                    b.ToTable("department_locations", (string)null);
                 });
 
             modelBuilder.Entity("DirectoryService.Domain.Departments.DepartmentPosition", b =>
@@ -117,7 +124,8 @@ namespace DirectoryService.Infrastructure.Persistence.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -152,7 +160,8 @@ namespace DirectoryService.Infrastructure.Persistence.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -187,18 +196,26 @@ namespace DirectoryService.Infrastructure.Persistence.Migrations
                 {
                     b.HasOne("DirectoryService.Domain.Departments.Department", "ParentDepartment")
                         .WithMany()
-                        .HasForeignKey("ParentDepartmentId");
+                        .HasForeignKey("parent_department_id");
 
                     b.Navigation("ParentDepartment");
                 });
 
             modelBuilder.Entity("DirectoryService.Domain.Departments.DepartmentLocation", b =>
                 {
-                    b.HasOne("DirectoryService.Domain.Departments.Department", null)
+                    b.HasOne("DirectoryService.Domain.Departments.Department", "Department")
                         .WithMany("Locations")
                         .HasForeignKey("DepartmentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("DirectoryService.Domain.Locations.Location", null)
+                        .WithMany()
+                        .HasForeignKey("LocationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Department");
                 });
 
             modelBuilder.Entity("DirectoryService.Domain.Departments.DepartmentPosition", b =>

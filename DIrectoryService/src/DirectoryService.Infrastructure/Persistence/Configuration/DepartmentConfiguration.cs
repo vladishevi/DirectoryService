@@ -45,5 +45,10 @@ public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
         builder.Property(d => d.UpdatedAt)
             .HasColumnName("updated_at")
             .IsRequired();
+
+        builder.HasOne(d => d.ParentDepartment)
+            .WithMany()
+            .HasForeignKey("parent_department_id")
+            .IsRequired(false);
     }
 }

@@ -40,7 +40,7 @@ public class Department
     private readonly List<DepartmentPosition> _positions = [];
 
     public void AddLocation(Guid locationId) => 
-        _locations.Add(new DepartmentLocation(Id, locationId));
+        _locations.Add(new DepartmentLocation(this, locationId));
     
     public void AddPosition(Guid positionId) => 
         _positions.Add(new DepartmentPosition(Id, positionId));
