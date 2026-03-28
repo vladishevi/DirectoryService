@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DirectoryService.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(DirectoryServiceDbContext))]
-    [Migration("20260326152946_AddDepartmentConfiguration")]
-    partial class AddDepartmentConfiguration
+    [Migration("20260328111525_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -146,6 +146,41 @@ namespace DirectoryService.Infrastructure.Persistence.Migrations
                         .HasName("pk_locations");
 
                     b.ToTable("locations", (string)null);
+                });
+
+            modelBuilder.Entity("DirectoryService.Domain.Positions.Position", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasColumnName("description");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_active");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("name");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id")
+                        .HasName("pk_positions");
+
+                    b.ToTable("positions", (string)null);
                 });
 
             modelBuilder.Entity("DirectoryService.Domain.Departments.Department", b =>

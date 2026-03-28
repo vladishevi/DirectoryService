@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace DirectoryService.Infrastructure.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class AddDepartmentConfiguration : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -33,6 +33,39 @@ namespace DirectoryService.Infrastructure.Persistence.Migrations
                         column: x => x.ParentDepartmentId,
                         principalTable: "departments",
                         principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "locations",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    name = table.Column<string>(type: "character varying(120)", maxLength: 120, nullable: false),
+                    timezone = table.Column<string>(type: "text", nullable: false),
+                    is_active = table.Column<bool>(type: "boolean", nullable: false),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    address = table.Column<string>(type: "jsonb", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_locations", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "positions",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    description = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: true),
+                    is_active = table.Column<bool>(type: "boolean", nullable: false),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_positions", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -97,6 +130,12 @@ namespace DirectoryService.Infrastructure.Persistence.Migrations
 
             migrationBuilder.DropTable(
                 name: "DepartmentPosition");
+
+            migrationBuilder.DropTable(
+                name: "locations");
+
+            migrationBuilder.DropTable(
+                name: "positions");
 
             migrationBuilder.DropTable(
                 name: "departments");

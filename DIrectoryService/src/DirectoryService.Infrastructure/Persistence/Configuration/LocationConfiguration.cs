@@ -11,6 +11,8 @@ public class LocationConfiguration : IEntityTypeConfiguration<Location>
         builder.ToTable("locations");
         builder.HasKey(l => l.Id).HasName("pk_locations");
         
+        builder.Property(l => l.Id).HasColumnName("id");
+        
         builder.Property(l => l.Name)
             .HasColumnName("name")
             .HasConversion(l => l.Value, l => Name.Create(l).Value)

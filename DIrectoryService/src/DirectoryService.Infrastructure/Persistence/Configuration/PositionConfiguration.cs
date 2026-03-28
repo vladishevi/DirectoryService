@@ -11,11 +11,13 @@ public class PositionConfiguration : IEntityTypeConfiguration<Position>
         builder.ToTable("positions");
         builder.HasKey(p => p.Id).HasName("pk_positions");
 
+        builder.Property(p => p.Id).HasColumnName("id");
+        
         builder.Property(p => p.Name)
             .HasColumnName("name")
             .HasConversion(p => p.Value, p => Name.Create(p).Value)
             .IsRequired()
-            .HasMaxLength(100);
+            .HasMaxLength(Name.MAX_LENGHT);
 
         builder.Property(p => p.Description)
             .HasColumnName("description")
