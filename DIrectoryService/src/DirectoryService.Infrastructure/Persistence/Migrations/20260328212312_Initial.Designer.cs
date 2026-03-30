@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DirectoryService.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(DirectoryServiceDbContext))]
-    [Migration("20260328204011_Initial")]
+    [Migration("20260328212312_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -105,19 +105,25 @@ namespace DirectoryService.Infrastructure.Persistence.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
 
                     b.Property<Guid>("DepartmentId")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("department_id");
 
                     b.Property<Guid>("PositionId")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("position_id");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_department_positions");
 
                     b.HasIndex("DepartmentId");
 
-                    b.ToTable("DepartmentPosition");
+                    b.HasIndex("PositionId");
+
+                    b.ToTable("department_positions", (string)null);
                 });
 
             modelBuilder.Entity("DirectoryService.Domain.Locations.Location", b =>
@@ -223,6 +229,12 @@ namespace DirectoryService.Infrastructure.Persistence.Migrations
                     b.HasOne("DirectoryService.Domain.Departments.Department", null)
                         .WithMany("Positions")
                         .HasForeignKey("DepartmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("DirectoryService.Domain.Positions.Position", null)
+                        .WithMany()
+                        .HasForeignKey("PositionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

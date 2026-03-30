@@ -69,25 +69,6 @@ namespace DirectoryService.Infrastructure.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "DepartmentPosition",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    DepartmentId = table.Column<Guid>(type: "uuid", nullable: false),
-                    PositionId = table.Column<Guid>(type: "uuid", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_DepartmentPosition", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_DepartmentPosition_departments_DepartmentId",
-                        column: x => x.DepartmentId,
-                        principalTable: "departments",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "department_locations",
                 columns: table => new
                 {
@@ -112,6 +93,31 @@ namespace DirectoryService.Infrastructure.Persistence.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "department_positions",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    department_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    position_id = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_department_positions", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_department_positions_departments_department_id",
+                        column: x => x.department_id,
+                        principalTable: "departments",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_department_positions_positions_position_id",
+                        column: x => x.position_id,
+                        principalTable: "positions",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_department_locations_department_id",
                 table: "department_locations",
@@ -123,9 +129,14 @@ namespace DirectoryService.Infrastructure.Persistence.Migrations
                 column: "location_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_DepartmentPosition_DepartmentId",
-                table: "DepartmentPosition",
-                column: "DepartmentId");
+                name: "IX_department_positions_department_id",
+                table: "department_positions",
+                column: "department_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_department_positions_position_id",
+                table: "department_positions",
+                column: "position_id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_departments_parent_department_id",
@@ -140,16 +151,16 @@ namespace DirectoryService.Infrastructure.Persistence.Migrations
                 name: "department_locations");
 
             migrationBuilder.DropTable(
-                name: "DepartmentPosition");
-
-            migrationBuilder.DropTable(
-                name: "positions");
+                name: "department_positions");
 
             migrationBuilder.DropTable(
                 name: "locations");
 
             migrationBuilder.DropTable(
                 name: "departments");
+
+            migrationBuilder.DropTable(
+                name: "positions");
         }
     }
 }
