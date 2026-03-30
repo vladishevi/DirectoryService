@@ -1,5 +1,4 @@
-﻿using DirectoryService.Domain.Locations;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace DirectoryService.Infrastructure.Persistence;
 
@@ -12,8 +11,6 @@ public class DirectoryServiceDbContext : DbContext
         _connectionString = connectionString;
     }
     
-    public DbSet<Location> Locations => Set<Location>();
-    
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder.UseNpgsql(_connectionString);
@@ -23,20 +20,4 @@ public class DirectoryServiceDbContext : DbContext
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(DirectoryServiceDbContext).Assembly);
     }
-}
-
-public class LocationRepository
-{
-    private readonly DirectoryServiceDbContext _dbContext;
-
-    public LocationRepository(DirectoryServiceDbContext dbContext)
-    {
-        _dbContext = dbContext;
-    }
-
-    public async Task AddLocation(Location location)
-    {
-        await _dbContext.AddAsync(location);
-    }
-
 }
