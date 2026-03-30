@@ -5,7 +5,7 @@ namespace DirectoryService.Infrastructure.Postgres;
 
 public static class DependencyInjection
 {
-    public static void AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
+    public static void AddPostgresInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         AddDb(services, configuration);
     }
