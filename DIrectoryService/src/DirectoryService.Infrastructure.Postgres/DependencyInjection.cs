@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace DirectoryService.Infrastructure.Persistence;
+namespace DirectoryService.Infrastructure.Postgres;
 
 public static class DependencyInjection
 {
@@ -13,4 +13,4 @@ public static class DependencyInjection
     private static void AddDb(IServiceCollection services, IConfiguration configuration) =>
         services.AddScoped<DirectoryServiceDbContext>(_ =>
             new DirectoryServiceDbContext(configuration.GetConnectionString("DirectoryServiceDb")));
-}
+} 

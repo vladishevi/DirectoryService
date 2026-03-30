@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace DirectoryService.Infrastructure.Persistence.Migrations
+namespace DirectoryService.Infrastructure.Postgres.Persistence.Migrations
 {
     /// <inheritdoc />
     public partial class Initial : Migration

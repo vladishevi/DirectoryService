@@ -1,4 +1,4 @@
-using DirectoryService.Infrastructure.Persistence;
+using DirectoryService.Infrastructure.Postgres;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
