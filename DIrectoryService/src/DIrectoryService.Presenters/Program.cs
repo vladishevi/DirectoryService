@@ -14,7 +14,9 @@ try
 
     WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-    builder.Services.AddApiServices()
+    builder.Services
+        .AddSerilogLogging(builder.Configuration)
+        .AddApiServices()
         .AddPostgresInfrastructure(builder.Configuration);
     
     WebApplication app = builder.Build();
