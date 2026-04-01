@@ -12,5 +12,19 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
 
+  seq:
+    container_name: seq
+    image: datalust/seq:latest
+    restart: always
+    ports:
+      - "8081:80"
+      - "5341:5341"
+    environment:
+      ACCEPT_EULA: Y
+      SEQ_FIRSTRUN_NOAUTHENTICATION: "true"
+    volumes:
+      - seq-data:/data
+
 volumes:
   postgres-data:
+  seq-data:
