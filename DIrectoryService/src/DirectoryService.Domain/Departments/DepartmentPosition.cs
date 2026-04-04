@@ -1,7 +1,10 @@
-﻿namespace DirectoryService.Domain.DepartmentPositions;
+﻿namespace DirectoryService.Domain.Departments;
 
 public class DepartmentPosition
 {
+    // EF Core
+    private DepartmentPosition() { }
+    
     public DepartmentPosition(Guid departmentId, Guid positionId)
     {
         Id = Guid.NewGuid();

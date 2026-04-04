@@ -4,9 +4,9 @@ namespace DirectoryService.Domain.Positions;
 
 public record Name
 {
+    public const int MAX_LENGHT = 100;
     private const int MIN_LENGHT = 3;
-    private const int MAX_LENGHT = 100;
-    
+
     private Name(string value)
     {
         Value = value;

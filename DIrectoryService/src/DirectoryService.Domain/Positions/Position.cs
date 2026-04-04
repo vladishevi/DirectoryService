@@ -2,6 +2,9 @@
 
 public class Position
 {
+    // EF Core
+    private Position() { }
+    
     public Position(Name name, Description? description = null)
     {
         Id = Guid.NewGuid();

@@ -4,7 +4,7 @@ namespace DirectoryService.Domain.Positions;
 
 public record Description
 {
-    private const int MAX_LENGTH = 1000;
+    public const int MAX_LENGTH = 1000;
     
     public string Value { get;}
 
