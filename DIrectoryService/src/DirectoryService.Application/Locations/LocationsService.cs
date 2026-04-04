@@ -1,5 +1,6 @@
 ﻿using DirectoryService.Contracts.Locations;
 using DirectoryService.Domain.Locations;
+using Microsoft.Extensions.Logging;
 
 namespace DirectoryService.Application.Locations;
 
@@ -9,10 +10,12 @@ namespace DirectoryService.Application.Locations;
 public class LocationsService
 {
     private readonly ILocationsRepository _locationsRepository;
+    private readonly ILogger<LocationsService> _logger;
 
-    public LocationsService(ILocationsRepository locationsRepository)
+    public LocationsService(ILocationsRepository locationsRepository, ILogger<LocationsService> logger)
     {
         _locationsRepository = locationsRepository;
+        _logger = logger;
     }
 
     public async Task Create(CreateLocationDto locationDto, CancellationToken cancellationToken)
@@ -29,5 +32,6 @@ public class LocationsService
         //сохранение в бд
         await _locationsRepository.AddAsync(location, cancellationToken);
         //логирование
+        _logger.LogInformation("Location created with id: {id}", location.Id);
     }
 }
