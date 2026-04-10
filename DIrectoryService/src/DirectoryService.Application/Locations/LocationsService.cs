@@ -38,7 +38,11 @@ public class LocationsService
             return nameResult.Error;
         }
         
-        Result<Address, string> addressResult = Address.Create(locationDto.City, locationDto.Street, locationDto.Building, locationDto.Postcode);
+        Result<Address, string> addressResult = Address.Create(
+            locationDto.Address.City,
+            locationDto.Address.Street,
+            locationDto.Address.Building,
+            locationDto.Address.Postcode);
         if (addressResult.IsFailure)
         {
             return addressResult.Error;
