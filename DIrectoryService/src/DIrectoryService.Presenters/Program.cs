@@ -1,4 +1,5 @@
 using System.Globalization;
+using DirectoryService.Application;
 using DirectoryService.Infrastructure.Postgres;
 using DirectoryService.Presenters;
 using Serilog;
@@ -17,7 +18,8 @@ try
     builder.Services
         .AddSerilogLogging(builder.Configuration)
         .AddApiServices()
-        .AddPostgresInfrastructure(builder.Configuration);
+        .AddPostgresInfrastructure(builder.Configuration)
+        .AddApplicationServices();
     
     WebApplication app = builder.Build();
 

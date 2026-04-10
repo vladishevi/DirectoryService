@@ -5,7 +5,7 @@ namespace DirectoryService.Domain.Locations;
 public record Name
 {
     public const int MAX_LENGHT = 120;
-    private const int MIN_LENGHT = 3;
+    public const int MIN_LENGHT = 3;
 
     private Name(string value)
     {
