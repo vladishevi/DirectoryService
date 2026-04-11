@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using DirectoryService.Application.Locations;
+using DirectoryService.Infrastructure.Postgres.Locations;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -8,10 +10,15 @@ namespace DirectoryService.Infrastructure.Postgres;
 
 public static class DependencyInjection
 {
-    public static void AddPostgresInfrastructure(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddPostgresInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         AddDb(services, configuration);
+        AddRepositories(services);
+        return services;
     }
+
+    private static void AddRepositories(IServiceCollection services) => 
+        services.AddScoped<ILocationsRepository, EfCoreLocationsRepository>();
 
     private static void AddDb(IServiceCollection services, IConfiguration configuration)
     {
