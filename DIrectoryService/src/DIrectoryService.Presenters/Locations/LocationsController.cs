@@ -10,11 +10,12 @@ namespace DirectoryService.Presenters.Locations;
 public class LocationsController : ControllerBase
 {
     [HttpPost]
-    public async Task<IActionResult> Create([FromServices] LocationsService locationsService,
-        [FromBody] CreateLocationDto createLocationDto,
+    public async Task<IActionResult> Create(
+        [FromServices] LocationsService locationsService,
+        [FromBody] CreateLocationRequest createLocationRequest,
         CancellationToken cancellationToken)
     {
-        Result<Guid, string> result = await locationsService.Create(createLocationDto, cancellationToken);
+        Result<Guid, string> result = await locationsService.Create(createLocationRequest, cancellationToken);
         return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
     }
 }

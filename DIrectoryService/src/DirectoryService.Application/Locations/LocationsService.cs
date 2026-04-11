@@ -10,11 +10,11 @@ namespace DirectoryService.Application.Locations;
 public class LocationsService
 {
     private readonly ILocationsRepository _locationsRepository;
-    private readonly IValidator<CreateLocationDto> _createValidator;
+    private readonly IValidator<CreateLocationRequest> _createValidator;
     private readonly ILogger<LocationsService> _logger;
 
     public LocationsService(ILocationsRepository locationsRepository,
-        IValidator<CreateLocationDto> createValidator,
+        IValidator<CreateLocationRequest> createValidator,
         ILogger<LocationsService> logger)
     {
         _locationsRepository = locationsRepository;
@@ -22,33 +22,33 @@ public class LocationsService
         _logger = logger;
     }
 
-    public async Task<Result<Guid, string>> Create(CreateLocationDto locationDto, CancellationToken cancellationToken)
+    public async Task<Result<Guid, string>> Create(CreateLocationRequest locationRequest, CancellationToken cancellationToken)
     {
         //Валидация входных данных
-        ValidationResult? validationResult = await _createValidator.ValidateAsync(locationDto, cancellationToken);
+        ValidationResult? validationResult = await _createValidator.ValidateAsync(locationRequest, cancellationToken);
         if (!validationResult.IsValid)
         {
             return string.Join(", ", validationResult.Errors.Select(x => x.ErrorMessage));
         }
         
         //Валидация сущности
-        Result<Name, string> nameResult = Name.Create(locationDto.Name);
+        Result<Name, string> nameResult = Name.Create(locationRequest.Name);
         if (nameResult.IsFailure)
         {
             return nameResult.Error;
         }
         
         Result<Address, string> addressResult = Address.Create(
-            locationDto.Address.City,
-            locationDto.Address.Street,
-            locationDto.Address.Building,
-            locationDto.Address.Postcode);
+            locationRequest.Address.City,
+            locationRequest.Address.Street,
+            locationRequest.Address.Building,
+            locationRequest.Address.Postcode);
         if (addressResult.IsFailure)
         {
             return addressResult.Error;
         }
         
-        Result<Timezone, string> timezoneResult = Timezone.Create(locationDto.Timezone);
+        Result<Timezone, string> timezoneResult = Timezone.Create(locationRequest.Timezone);
         if (timezoneResult.IsFailure)
         {
             return timezoneResult.Error;

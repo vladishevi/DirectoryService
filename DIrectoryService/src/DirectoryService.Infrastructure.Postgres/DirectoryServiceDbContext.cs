@@ -10,7 +10,7 @@ public class DirectoryServiceDbContext : DbContext
         
     }
     
-    public DbSet<Location> Locations { get; private set; }
+    public DbSet<Location> Locations => Set<Location>();
     
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
