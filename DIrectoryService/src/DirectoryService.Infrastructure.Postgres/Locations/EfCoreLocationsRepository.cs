@@ -27,7 +27,7 @@ public class EfCoreLocationsRepository : ILocationsRepository
         }
         catch (Exception e)
         {
-            return GeneralErrors.Failure().ToErrors;
+            return GeneralErrors.Failure().ToErrors();
         }
     }
 }

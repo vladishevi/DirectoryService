@@ -16,12 +16,12 @@ public record Timezone
     {
         if (string.IsNullOrWhiteSpace(code))
         {
-            return GeneralErrors.ValueIsInvalid("Timezone cannot be empty", "Location.Timezone").ToErrors;
+            return GeneralErrors.ValueIsInvalid("Timezone cannot be empty", "Location.Timezone").ToErrors();
         }
 
         if (!TimeZoneInfo.TryFindSystemTimeZoneById(code, out TimeZoneInfo? _))
         {
-            return GeneralErrors.ValueIsInvalid("Timezone isn't valid", "Location.Timezone").ToErrors;
+            return GeneralErrors.ValueIsInvalid("Timezone isn't valid", "Location.Timezone").ToErrors();
         }
         
         return new Timezone(code);
