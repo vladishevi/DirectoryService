@@ -4,6 +4,7 @@ using DirectoryService.Domain.Locations;
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.Extensions.Logging;
+using Shared;
 
 namespace DirectoryService.Application.Locations;
 
@@ -22,23 +23,24 @@ public class LocationsService
         _logger = logger;
     }
 
-    public async Task<Result<Guid, string>> Create(CreateLocationRequest locationRequest, CancellationToken cancellationToken)
+    public async Task<Result<Guid, Errors>> Create(CreateLocationRequest locationRequest, CancellationToken cancellationToken)
     {
         //Валидация входных данных
         ValidationResult? validationResult = await _createValidator.ValidateAsync(locationRequest, cancellationToken);
         if (!validationResult.IsValid)
         {
-            return string.Join(", ", validationResult.Errors.Select(x => x.ErrorMessage));
+            Errors errors = validationResult.Errors.Select(e => Error.Validation(e.ErrorMessage)).ToList();
+            return errors;
         }
         
         //Валидация сущности
-        Result<Name, string> nameResult = Name.Create(locationRequest.Name);
+        Result<Name, Errors> nameResult = Name.Create(locationRequest.Name);
         if (nameResult.IsFailure)
         {
             return nameResult.Error;
         }
         
-        Result<Address, string> addressResult = Address.Create(
+        Result<Address, Errors> addressResult = Address.Create(
             locationRequest.Address.City,
             locationRequest.Address.Street,
             locationRequest.Address.Building,
@@ -48,7 +50,7 @@ public class LocationsService
             return addressResult.Error;
         }
         
-        Result<Timezone, string> timezoneResult = Timezone.Create(locationRequest.Timezone);
+        Result<Timezone, Errors> timezoneResult = Timezone.Create(locationRequest.Timezone);
         if (timezoneResult.IsFailure)
         {
             return timezoneResult.Error;
@@ -57,7 +59,7 @@ public class LocationsService
         Location location = new(nameResult.Value, addressResult.Value, timezoneResult.Value);
 
         //сохранение в бд
-        Result<Guid, string> result = await _locationsRepository.Add(location, cancellationToken);
+        Result<Guid, Errors> result = await _locationsRepository.Add(location, cancellationToken);
         if (result.IsFailure)
         {
             _logger.LogError("Error creating location: {error}", result.Error);

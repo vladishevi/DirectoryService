@@ -2,6 +2,7 @@
 using DirectoryService.Application.Locations;
 using DirectoryService.Contracts.Locations;
 using Microsoft.AspNetCore.Mvc;
+using Shared;
 
 namespace DirectoryService.Presenters.Locations;
 
@@ -15,7 +16,7 @@ public class LocationsController : ControllerBase
         [FromBody] CreateLocationRequest createLocationRequest,
         CancellationToken cancellationToken)
     {
-        Result<Guid, string> result = await locationsService.Create(createLocationRequest, cancellationToken);
+        Result<Guid, Errors> result = await locationsService.Create(createLocationRequest, cancellationToken);
         return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
     }
 }

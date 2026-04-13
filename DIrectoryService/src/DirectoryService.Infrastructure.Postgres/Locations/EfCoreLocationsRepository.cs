@@ -2,6 +2,7 @@
 using DirectoryService.Application.Locations;
 using DirectoryService.Domain.Locations;
 using Microsoft.Extensions.Logging;
+using Shared;
 
 namespace DirectoryService.Infrastructure.Postgres.Locations;
 
@@ -16,7 +17,7 @@ public class EfCoreLocationsRepository : ILocationsRepository
         _logger = logger;
     }
 
-    public async Task<Result<Guid, string>> Add(Location location, CancellationToken cancellationToken)
+    public async Task<Result<Guid, Errors>> Add(Location location, CancellationToken cancellationToken)
     {
         try
         {
@@ -26,7 +27,7 @@ public class EfCoreLocationsRepository : ILocationsRepository
         }
         catch (Exception e)
         {
-            return "DB connection error: " + e.Message;
+            return new Errors(Error.Failure("DB connection error: " + e.Message));
         }
     }
 }
