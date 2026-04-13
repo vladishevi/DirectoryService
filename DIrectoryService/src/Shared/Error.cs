@@ -29,8 +29,7 @@ public record Error
     public static Error Failure(string code, string message) =>
         new (code, message, ErrorType.FAILURE);
 
-    [JsonIgnore]
-    public Errors ToErrors => new(this);
+    public Errors ToErrors() => new(this);
 }
 
 public enum ErrorType

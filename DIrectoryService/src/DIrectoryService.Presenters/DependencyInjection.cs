@@ -1,4 +1,5 @@
-﻿using Serilog;
+﻿using Microsoft.AspNetCore.Mvc;
+using Serilog;
 using Serilog.Exceptions;
 
 namespace DirectoryService.Presenters;
@@ -8,6 +9,7 @@ public static class DependencyInjection
     public static IServiceCollection AddApiServices(this IServiceCollection services)
     {
         services.AddControllers();
+        services.Configure<ApiBehaviorOptions>(options => options.SuppressModelStateInvalidFilter = true);
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();
 
