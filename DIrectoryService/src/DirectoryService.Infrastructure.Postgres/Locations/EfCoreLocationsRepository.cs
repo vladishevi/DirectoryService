@@ -27,7 +27,7 @@ public class EfCoreLocationsRepository : ILocationsRepository
         }
         catch (Exception e)
         {
-            return Error.Failure("DB connection error: " + e.Message).ToErrors;
+            return GeneralErrors.Failure().ToErrors;
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace Shared;
+﻿using System.Text.Json.Serialization;
+
+namespace Shared;
 
 public record Error
 {
@@ -15,18 +17,19 @@ public record Error
     public ErrorType Type { get; }
     public string? InvalidField { get; }
     
-    public static Error NotFound(string message, Guid? guid, string? code = null) => 
-        new(code ?? "record.not.found", message, ErrorType.NOT_FOUND, guid?.ToString());
-    
-    public static Error Validation(string message, string? code = null, string? invalidField = null) =>
-        new(code ?? "value.is.invalid", message, ErrorType.VALIDATION, invalidField);
-    
-    public static Error Conflict(string message, Guid? guid, string? code = null) => 
-        new(code ?? "value.is.conflict", message, ErrorType.CONFLICT, guid?.ToString());
-    
-    public static Error Failure(string message, string? code = null) =>
-        new (code ?? "failure", message, ErrorType.FAILURE);
+    public static Error NotFound(string code, string message, Guid? guid) =>
+        new(code, message, ErrorType.NOT_FOUND, guid?.ToString());
 
+    public static Error Validation(string code, string message, string? invalidField = null) =>
+        new(code, message, ErrorType.VALIDATION, invalidField);
+
+    public static Error Conflict(string code, string message, Guid? guid) =>
+        new(code, message, ErrorType.CONFLICT, guid?.ToString());
+
+    public static Error Failure(string code, string message) =>
+        new (code, message, ErrorType.FAILURE);
+
+    [JsonIgnore]
     public Errors ToErrors => new(this);
 }
 

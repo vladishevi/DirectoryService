@@ -29,7 +29,7 @@ public class LocationsService
         ValidationResult? validationResult = await _createValidator.ValidateAsync(locationRequest, cancellationToken);
         if (!validationResult.IsValid)
         {
-            Errors errors = validationResult.Errors.Select(e => Error.Validation(e.ErrorMessage)).ToList();
+            Errors errors = validationResult.Errors.Select(e => GeneralErrors.ValueIsInvalid(e.PropertyName, e.ErrorMessage)).ToList();
             return errors;
         }
         
