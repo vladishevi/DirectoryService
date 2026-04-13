@@ -22,22 +22,22 @@ public record Address
     {
         if (string.IsNullOrWhiteSpace(city))
         {
-            return new Errors(Error.Validation("City cannot be empty", invalidField: "Location.Address.City"));
+            return Error.Validation("City cannot be empty", invalidField: "Location.Address.City").ToErrors;
         }
         
         if (string.IsNullOrWhiteSpace(street))
         {
-            return new Errors(Error.Validation("Street cannot be empty", invalidField: "Location.Address.Street"));
+            return Error.Validation("Street cannot be empty", invalidField: "Location.Address.Street").ToErrors;
         }
         
         if (string.IsNullOrWhiteSpace(postcode))
         {
-            return new Errors(Error.Validation("Postcode cannot be empty", invalidField: "Location.Address.Postcode"));
+            return Error.Validation("Postcode cannot be empty", invalidField: "Location.Address.Postcode").ToErrors;
         }
         
         if (building <= 0)
         {
-            return new Errors(Error.Validation("Building number must be greater than 0", invalidField: "Location.Address.Building"));
+            return Error.Validation("Building number must be greater than 0", invalidField: "Location.Address.Building").ToErrors;
         }
         
         return new Address(city, street, building, postcode);

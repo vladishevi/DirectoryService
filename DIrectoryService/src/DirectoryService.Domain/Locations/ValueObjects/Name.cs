@@ -19,14 +19,12 @@ public record Name
     {
         if (string.IsNullOrWhiteSpace(value))
         {
-            Errors errors = Error.Validation("Name cannot be empty", invalidField: "Location.Name");
-            return errors;
+            return Error.Validation("Name cannot be empty", invalidField: "Location.Name").ToErrors;
         }
 
         if (value.Length < MIN_LENGHT || value.Length > MAX_LENGHT)
         {
-            Errors errors = Error.Validation($"Name must be between {MIN_LENGHT} and {MAX_LENGHT} characters", invalidField: "Location.Name");
-            return errors;
+            return Error.Validation($"Name must be between {MIN_LENGHT} and {MAX_LENGHT} characters", invalidField: "Location.Name").ToErrors;
         }
 
         return new Name(value);
