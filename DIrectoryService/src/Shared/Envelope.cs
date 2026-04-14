@@ -14,6 +14,6 @@ public record Envelope
     public Errors Errors { get; }
     public DateTime Timestamp { get; } = DateTime.UtcNow;
     
-    public static Envelope Ok(object? result = null) => new Envelope(result, null);
-    public static Envelope Error(Errors errors) => new Envelope(null, errors);
+    public static Envelope Ok(object? result = null) => new(result, null);
+    public static Envelope Error(Errors errors) => new(null, errors);
 }

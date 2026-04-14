@@ -2,7 +2,7 @@
 
 namespace Shared;
 
-public class Errors : IEnumerable<Error>
+public record Errors : IEnumerable<Error>
 {
     private readonly IEnumerable<Error> _errors;
 
@@ -16,9 +16,6 @@ public class Errors : IEnumerable<Error>
         _errors = [error];
     }
 
-    public static implicit operator Errors(List<Error> errors) => new(errors);
-    public static implicit operator Errors(Error error) => new([error]);
-    
     public IEnumerator<Error> GetEnumerator() => _errors.GetEnumerator();
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
