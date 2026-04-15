@@ -3,7 +3,7 @@ using CSharpFunctionalExtensions;
 
 namespace DirectoryService.Domain.Departments;
 
-public record Identifier
+public sealed record Identifier
 {
     public const int MAX_LENGHT = 150;
     private const int MIN_LENGHT = 3;

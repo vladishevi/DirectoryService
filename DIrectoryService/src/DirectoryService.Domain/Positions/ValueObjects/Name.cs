@@ -2,7 +2,7 @@
 
 namespace DirectoryService.Domain.Positions;
 
-public record Name
+public sealed record Name
 {
     public const int MAX_LENGHT = 100;
     private const int MIN_LENGHT = 3;

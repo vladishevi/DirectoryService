@@ -3,7 +3,7 @@ using Shared;
 
 namespace DirectoryService.Domain.Locations;
 
-public record Address
+public sealed record Address
 {
     private Address(string city, string street, int building, string postcode)
     {
