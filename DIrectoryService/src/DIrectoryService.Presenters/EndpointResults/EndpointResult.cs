@@ -1,27 +1,22 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using CSharpFunctionalExtensions;
 using Shared;
+using IResult = Microsoft.AspNetCore.Http.IResult;
 
 namespace DirectoryService.Presenters.EndpointResults;
 
-public record EndpointResult : IActionResult
+public record EndpointResult<TValue> : IResult
 {
-    private readonly IActionResult _result;
+    private readonly IResult _result;
 
-    private EndpointResult(object result)
+    private EndpointResult(Result<TValue, Errors> result)
     {
-        _result = new SuccessResult(result);      
+        _result = result.IsFailure
+            ? new ErrorResult(result.Error)
+            : new SuccessResult<TValue>(result.Value);
     }
 
-    private EndpointResult(Errors errors)
-    {
-        _result = new ErrorResult(errors);       
-    }
+    public Task ExecuteAsync(HttpContext httpContext) => 
+        _result.ExecuteAsync(httpContext);
 
-    public async Task ExecuteResultAsync(ActionContext context)
-    {
-        await _result.ExecuteResultAsync(context);       
-    }
-
-    public static EndpointResult Success(object result) => new(result);
-    public static EndpointResult Error(Errors errors) => new(errors);
+    public static implicit operator EndpointResult<TValue>(Result<TValue, Errors> result) => new(result);
 }

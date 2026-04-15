@@ -1,23 +1,24 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Shared;
 
 namespace DirectoryService.Presenters.EndpointResults;
 
-public record SuccessResult : IActionResult
+public record SuccessResult<TValue> : IResult
 {
-    private readonly object _result;
+    private readonly TValue? _value;
 
-    public SuccessResult(object result)
+    public SuccessResult(TValue? value)
     {
-        _result = result;       
+        _value = value;
     }
 
-    public async Task ExecuteResultAsync(ActionContext context)
+    public Task ExecuteAsync(HttpContext httpContext)
     {
-        context.HttpContext.Response.ContentType = "application/json";
-        context.HttpContext.Response.StatusCode = StatusCodes.Status200OK;
+        ArgumentNullException.ThrowIfNull(httpContext);       
         
-        Envelope envelope = Envelope.Ok(_result);
+        httpContext.Response.ContentType = "application/json";
+        httpContext.Response.StatusCode = StatusCodes.Status200OK;
         
-        await context.HttpContext.Response.WriteAsJsonAsync(envelope);       
+        var envelope = Envelope<TValue>.Ok(_value);
+        return httpContext.Response.WriteAsJsonAsync(envelope);       
     }
 }

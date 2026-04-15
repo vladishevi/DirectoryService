@@ -1,9 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Shared;
+﻿using Shared;
 
 namespace DirectoryService.Presenters.EndpointResults;
 
-public record ErrorResult : IActionResult
+public record ErrorResult : IResult
 {
     private readonly Errors _errors;
 
@@ -12,13 +11,15 @@ public record ErrorResult : IActionResult
         _errors = errors;
     }
 
-    public async Task ExecuteResultAsync(ActionContext context)
+    public Task ExecuteAsync(HttpContext httpContext)
     {
-        context.HttpContext.Response.ContentType = "application/json";
-        context.HttpContext.Response.StatusCode = GetStatusCode();        
+        ArgumentNullException.ThrowIfNull(httpContext);      
+        
+        httpContext.Response.ContentType = "application/json";
+        httpContext.Response.StatusCode = GetStatusCode();        
 
         Envelope envelope = Envelope.Error(_errors);
-        await context.HttpContext.Response.WriteAsJsonAsync(envelope);
+        return httpContext.Response.WriteAsJsonAsync(envelope);
     }
 
     private int GetStatusCode()
@@ -30,16 +31,12 @@ public record ErrorResult : IActionResult
 
     private int GetStatusCodeByErrorType(Error error)
     {
-        switch (error.Type)
+        return error.Type switch
         {
-            case ErrorType.VALIDATION:
-                return StatusCodes.Status400BadRequest;
-            case ErrorType.NOT_FOUND:
-                return StatusCodes.Status404NotFound;
-            case ErrorType.CONFLICT:
-                return StatusCodes.Status409Conflict;
-            default:
-                return StatusCodes.Status500InternalServerError;
-        }
+            ErrorType.VALIDATION => StatusCodes.Status400BadRequest,
+            ErrorType.NOT_FOUND => StatusCodes.Status404NotFound,
+            ErrorType.CONFLICT => StatusCodes.Status409Conflict,
+            _ => StatusCodes.Status500InternalServerError
+        };
     }
 }

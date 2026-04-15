@@ -18,18 +18,18 @@ public record Error
     public string? InvalidField { get; }
     
     public static Error NotFound(string code, string message, Guid? guid) =>
-        new(code, message, ErrorType.NOT_FOUND, guid?.ToString());
+        new(code, $"{message}. Record id: {guid}", ErrorType.NOT_FOUND, guid?.ToString());
 
     public static Error Validation(string code, string message, string? invalidField = null) =>
         new(code, message, ErrorType.VALIDATION, invalidField);
 
     public static Error Conflict(string code, string message, Guid? guid = null) =>
-        new(code, message, ErrorType.CONFLICT, guid?.ToString());
+        new(code, $"{message}. Record id: {guid}", ErrorType.CONFLICT);
 
     public static Error Failure(string code, string message) =>
         new (code, message, ErrorType.FAILURE);
 
-    public Errors ToErrors() => new Errors(this);
+    public Errors ToErrors() => new(this);
 }
 
 public enum ErrorType
