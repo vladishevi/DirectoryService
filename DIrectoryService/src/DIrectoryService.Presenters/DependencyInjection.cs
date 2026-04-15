@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using DirectoryService.Presenters.Middlewares;
+using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using Serilog.Exceptions;
 
@@ -12,6 +13,7 @@ public static class DependencyInjection
         services.Configure<ApiBehaviorOptions>(options => options.SuppressModelStateInvalidFilter = true);
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();
+        services.AddHttpLogging();
 
         return services;
     }
@@ -31,7 +33,9 @@ public static class DependencyInjection
 
     public static WebApplication Configure(this WebApplication app)
     {
+        app.UseExceptionMiddleware();
         app.UseSerilogRequestLogging();
+        app.UseHttpLogging();
         
         if (app.Environment.IsDevelopment())
         {
