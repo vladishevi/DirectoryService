@@ -1,6 +1,6 @@
 ﻿namespace DirectoryService.Domain.Locations;
 
-public class Location
+public sealed class Location
 {
     // EF Core
     private Location() { }

@@ -3,7 +3,7 @@ using Shared;
 
 namespace DirectoryService.Domain.Locations;
 
-public record Name
+public sealed record Name
 {
     public const int MAX_LENGHT = 120;
     public const int MIN_LENGHT = 3;
