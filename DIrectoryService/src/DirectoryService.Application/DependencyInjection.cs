@@ -1,9 +1,6 @@
-﻿using CSharpFunctionalExtensions;
-using DirectoryService.Application.Abstractions;
-using DirectoryService.Application.Locations;
+﻿using DirectoryService.Application.Abstractions;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
-using Shared;
 
 namespace DirectoryService.Application;
 
@@ -12,8 +9,16 @@ public static class DependencyInjection
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
         services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly);
-        services.AddScoped<ICommandHandler<Guid, CreateLocationCommand>, CreateLocationHandler>();
+        AddHandlersFromAssembly(services);
         
         return services;
     }
+
+    private static void AddHandlersFromAssembly(IServiceCollection services) =>
+        services.Scan(scan => scan
+            .FromAssembliesOf(typeof(DependencyInjection))
+            .AddClasses(classes => classes
+                .AssignableToAny(typeof(ICommandHandler<,>), typeof(ICommandHandler<>)))
+            .AsSelfWithInterfaces()
+            .WithScopedLifetime());
 }
