@@ -30,7 +30,7 @@ public class EfCoreLocationsRepository : ILocationsRepository
         catch (DbUpdateException exception) when (exception.InnerException is PostgresException pgException)
         {
             if (pgException.SqlState == PostgresErrorCodes.UniqueViolation
-                && pgException.ConstraintName.Contains("name", StringComparison.InvariantCultureIgnoreCase))
+                && pgException.ConstraintName.Contains(Indexes.NAME, StringComparison.InvariantCultureIgnoreCase))
             {
                 return LocationsErrors.NameConflict(location.Name.Value).ToErrors();
             }
