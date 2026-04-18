@@ -1,13 +1,17 @@
-﻿namespace DirectoryService.Domain.Departments;
+﻿using CSharpFunctionalExtensions;
+using Shared;
 
-public class Department
+namespace DirectoryService.Domain.Departments;
+
+public sealed class Department
 {
     // EF Core
     private Department() { }
     
-    public Department(Name name, 
+    private Department(Name name, 
         Identifier identifier,
-        Department? parentDepartment)
+        Department? parentDepartment,
+        IEnumerable<DepartmentLocation> locations)
     {
         Path path = new(identifier, parentDepartment);
         short depth = GetDepth(parentDepartment);
@@ -21,6 +25,7 @@ public class Department
         ParentDepartment = parentDepartment;
         Path = path;
         Depth = depth;
+        _locations = [.. locations]; 
     }
     
     public Guid Id { get; private set; }
@@ -39,11 +44,18 @@ public class Department
     private readonly List<DepartmentLocation> _locations = [];
     private readonly List<DepartmentPosition> _positions = [];
 
-    public void AddLocation(Guid locationId) => 
-        _locations.Add(new DepartmentLocation(this, locationId));
-    
-    public void AddPosition(Guid positionId) => 
-        _positions.Add(new DepartmentPosition(Id, positionId));
+    public static Result<Department, Errors> Create(Name name, 
+        Identifier identifier,
+        Department? parentDepartment,
+        IEnumerable<DepartmentLocation> locations)
+    {
+        if (!locations.Any())
+        {
+            return GeneralErrors.ValueIsInvalid("Department.Locations", "Department must have at least one location").ToErrors();
+        }
+        
+        return new Department(name, identifier, parentDepartment, locations);
+    }
     
     private static short GetDepth(Department? parentDepartment)
     {

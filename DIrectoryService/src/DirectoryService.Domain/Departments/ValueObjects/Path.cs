@@ -2,7 +2,7 @@
 
 namespace DirectoryService.Domain.Departments;
 
-public record Path
+public sealed record Path
 {
     public Path(string value)
     {

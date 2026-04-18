@@ -1,6 +1,6 @@
 ﻿namespace DirectoryService.Domain.Departments;
 
-public class DepartmentPosition
+public sealed class DepartmentPosition
 {
     // EF Core
     private DepartmentPosition() { }
