@@ -11,4 +11,14 @@ public static class GeneralErrors
     {
         return Error.Validation("value.invalid", message ?? $"{valueName} is invalid", valueName);
     }
+    
+    public static Error DatabaseError(string? code = null, string? message = null)
+    {
+        return Error.Failure(code ?? "database.error", message ?? "Something went wrong with the database");
+    }
+    
+    public static Error OperationCancelled(string? code = null, string? message = null)
+    {
+        return Error.Failure(code ?? "operation.cancelled", message ?? "Operation cancelled");
+    }
 }

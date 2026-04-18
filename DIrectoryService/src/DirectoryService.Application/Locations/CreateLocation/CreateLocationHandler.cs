@@ -1,5 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Application.Abstractions;
+using DirectoryService.Application.Validation;
 using DirectoryService.Contracts.Locations;
 using DirectoryService.Domain.Locations;
 using FluentValidation;
@@ -35,14 +36,14 @@ public class CreateLocationHandler : ICommandHandler<Guid, CreateLocationCommand
     /// </returns>
     public async Task<Result<Guid, Errors>> Handle(CreateLocationCommand command, CancellationToken cancellationToken)
     {
-        ValidationResult? validationResult = await _validator.ValidateAsync(command.CreateLocationRequest, cancellationToken);
+        //Input validation
+        ValidationResult validationResult = await _validator.ValidateAsync(command.CreateLocationRequest, cancellationToken);
         if (!validationResult.IsValid)
         {
-            Errors errors = new([.. validationResult.Errors.Select(e => GeneralErrors.ValueIsInvalid(e.PropertyName, e.ErrorMessage))]);
-            return errors;
+            return validationResult.ToErrors();
         }
         
-        //Валидация сущности
+        //Domain validation
         Result<Name, Errors> nameResult = Name.Create(command.CreateLocationRequest.Name);
         if (nameResult.IsFailure)
         {
@@ -67,7 +68,7 @@ public class CreateLocationHandler : ICommandHandler<Guid, CreateLocationCommand
         
         Location location = new(nameResult.Value, addressResult.Value, timezoneResult.Value);
 
-        //сохранение в бд
+        //db saving
         Result<Guid, Errors> result = await _locationsRepository.Add(location, cancellationToken);
         if (result.IsFailure)
         {
@@ -75,7 +76,7 @@ public class CreateLocationHandler : ICommandHandler<Guid, CreateLocationCommand
             return result.Error;
         }
                 
-        //логирование
+        //logging
         _logger.LogInformation("Location created with id: {id}", location.Id);
         return location.Id;
     }

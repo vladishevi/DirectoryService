@@ -37,7 +37,7 @@ public record Address
         
         if (building <= 0)
         {
-            return GeneralErrors.ValueIsInvalid("Building number must be greater than 0", "Location.Address.Building").ToErrors();
+            return GeneralErrors.ValueIsInvalid("Location.Address.Building", "Building must be greater than zero").ToErrors();
         }
         
         return new Address(city, street, building, postcode);

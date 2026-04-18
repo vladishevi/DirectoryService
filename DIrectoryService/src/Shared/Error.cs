@@ -4,6 +4,7 @@ namespace Shared;
 
 public record Error
 {
+    [JsonConstructor]
     private Error(string code, string message, ErrorType type, string? invalidField = null)
     {
         Code = code;
@@ -32,6 +33,7 @@ public record Error
     public Errors ToErrors() => new(this);
 }
 
+[JsonConverter(typeof(JsonStringEnumConverter))]
 public enum ErrorType
 {
     VALIDATION,
