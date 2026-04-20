@@ -42,29 +42,14 @@ public class CreateLocationHandler : ICommandHandler<Guid, CreateLocationCommand
             return validationResult.ToErrors();
         }
         
-        //Domain validation
         Result<Name, Errors> nameResult = Name.Create(command.CreateLocationRequest.Name);
-        if (nameResult.IsFailure)
-        {
-            return nameResult.Error;
-        }
-        
         Result<Address, Errors> addressResult = Address.Create(
             command.CreateLocationRequest.Address.City,
             command.CreateLocationRequest.Address.Street,
             command.CreateLocationRequest.Address.Building,
             command.CreateLocationRequest.Address.Postcode);
-        if (addressResult.IsFailure)
-        {
-            return addressResult.Error;
-        }
         
         Result<Timezone, Errors> timezoneResult = Timezone.Create(command.CreateLocationRequest.Timezone);
-        if (timezoneResult.IsFailure)
-        {
-            return timezoneResult.Error;
-        }
-        
         Location location = new(nameResult.Value, addressResult.Value, timezoneResult.Value);
 
         //db saving
