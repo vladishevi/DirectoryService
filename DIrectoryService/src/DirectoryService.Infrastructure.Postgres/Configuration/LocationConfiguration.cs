@@ -6,6 +6,7 @@ namespace DirectoryService.Infrastructure.Postgres;
 
 public static class Indexes
 {
+    public const string ADDRESS = "ix_locations_address";
     public const string NAME = "ix_locations_name";
 }
 
@@ -17,25 +18,36 @@ public class LocationConfiguration : IEntityTypeConfiguration<Location>
         builder.HasKey(l => l.Id).HasName("pk_locations");
         
         builder.Property(l => l.Id).HasColumnName("id");
-        
+
         builder.Property(l => l.Name)
             .HasColumnName("name")
+            .HasColumnType("citext")
             .HasConversion(l => l.Value, l => Name.Create(l).Value)
             .IsRequired()
             .HasMaxLength(Name.MAX_LENGHT);
 
-        builder.OwnsOne(l => l.Address, ab =>
+        builder.OwnsOne(l => l.Address, a =>
         {
-            ab.ToJson("address");
-            
-            ab.Property(a => a.City)
+            a.Property(a => a.City)
+                .HasColumnName("city")
+                .HasColumnType("citext")
                 .IsRequired();
-            ab.Property(a => a.Street)
+            a.Property(a => a.Street)
+                .HasColumnName("street")
+                .HasColumnType("citext")
                 .IsRequired();
-            ab.Property(a => a.Building)
+            a.Property(a => a.Building)
+                .HasColumnName("building")
+                .HasColumnType("citext")
                 .IsRequired();
-            ab.Property(a => a.Postcode)
+            a.Property(a => a.Postcode)
+                .HasColumnName("postcode")
+                .HasColumnType("citext")
                 .IsRequired();
+
+            a.HasIndex(a => new { a.City, a.Street, a.Building, a.Postcode })
+                .IsUnique()
+                .HasDatabaseName(Indexes.ADDRESS);
         });
 
         builder.Property(l => l.Timezone)

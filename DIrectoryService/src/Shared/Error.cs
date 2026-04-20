@@ -24,8 +24,8 @@ public record Error
     public static Error Validation(string code, string message, string? invalidField = null) =>
         new(code, message, ErrorType.VALIDATION, invalidField);
 
-    public static Error Conflict(string code, string message) =>
-        new(code, message, ErrorType.CONFLICT);
+    public static Error Conflict(string? code = null, string? message = null) =>
+        new(code ?? "conflict.error", message ?? "conflict error occured", ErrorType.CONFLICT);
 
     public static Error Failure(string code, string message) =>
         new (code, message, ErrorType.FAILURE);

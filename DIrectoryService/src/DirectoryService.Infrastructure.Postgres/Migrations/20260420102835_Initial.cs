@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace DirectoryService.Infrastructure.Postgres.Persistence.Migrations
+namespace DirectoryService.Infrastructure.Postgres.Migrations
 {
     /// <inheritdoc />
     public partial class Initial : Migration
@@ -11,6 +11,9 @@ namespace DirectoryService.Infrastructure.Postgres.Persistence.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.AlterDatabase()
+                .Annotation("Npgsql:PostgresExtension:citext", ",,");
+
             migrationBuilder.CreateTable(
                 name: "departments",
                 columns: table => new
@@ -40,12 +43,15 @@ namespace DirectoryService.Infrastructure.Postgres.Persistence.Migrations
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
-                    name = table.Column<string>(type: "character varying(120)", maxLength: 120, nullable: false),
+                    name = table.Column<string>(type: "citext", maxLength: 120, nullable: false),
+                    city = table.Column<string>(type: "citext", nullable: false),
+                    street = table.Column<string>(type: "citext", nullable: false),
+                    building = table.Column<string>(type: "citext", nullable: false),
+                    postcode = table.Column<string>(type: "citext", nullable: false),
                     timezone = table.Column<string>(type: "text", nullable: false),
                     is_active = table.Column<bool>(type: "boolean", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    address = table.Column<string>(type: "jsonb", nullable: false)
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -142,6 +148,18 @@ namespace DirectoryService.Infrastructure.Postgres.Persistence.Migrations
                 name: "IX_departments_parent_department_id",
                 table: "departments",
                 column: "parent_department_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_locations_address",
+                table: "locations",
+                columns: new[] { "city", "street", "building", "postcode" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "ix_locations_name",
+                table: "locations",
+                column: "name",
+                unique: true);
         }
 
         /// <inheritdoc />
