@@ -61,4 +61,30 @@ public class EfCoreLocationsRepository : ILocationsRepository
             return LocationsErrors.DatabaseError().ToErrors();
         }
     }
+
+    public async Task<Result<Location, Errors>> GetById(Guid id, CancellationToken cancellationToken)
+    {
+        try
+        {
+            Location? location = await _dbContext.Locations.FirstOrDefaultAsync(l => l.Id == id, cancellationToken);
+            if (location != null)
+            {
+                return location;
+            }
+
+            _logger.LogWarning("Location not found with id {id}", id);
+            return GeneralErrors.NotFound("Location not found", id).ToErrors();
+
+        }
+        catch (OperationCanceledException)
+        {
+            _logger.LogWarning("Operation cancelled while getting location with id {id}", id);
+            return GeneralErrors.OperationCancelled().ToErrors();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Database error while getting location with id {id}", id);
+            return LocationsErrors.DatabaseError().ToErrors();
+        }
+    }
 }

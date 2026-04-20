@@ -11,6 +11,11 @@ public static class GeneralErrors
     {
         return Error.Validation("value.invalid", message ?? $"{valueName} is invalid", valueName);
     }
+
+    public static Error NotFound(string? message = null, Guid? guid = null)
+    {
+        return Error.NotFound("not.found", message ?? "Not found", guid);
+    }
     
     public static Error DatabaseError(string? code = null, string? message = null)
     {
