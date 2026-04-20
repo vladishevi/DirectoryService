@@ -29,24 +29,26 @@ public class EfCoreLocationsRepository : ILocationsRepository
         }
         catch (DbUpdateException exception) when (exception.InnerException is PostgresException pgException)
         {
-            if (pgException.SqlState == PostgresErrorCodes.UniqueViolation)
+            if (pgException.SqlState != PostgresErrorCodes.UniqueViolation)
             {
-                if (pgException.ConstraintName.Contains(Indexes.ADDRESS, StringComparison.InvariantCultureIgnoreCase))
-                {
-                    return LocationsErrors.AddressConflict(location.Address.ToString()).ToErrors();
-                }
-
-                if (pgException.ConstraintName.Contains(nameof(Location.Name),
-                        StringComparison.InvariantCultureIgnoreCase))
-                {
-                    return LocationsErrors.NameConflict(location.Name.Value).ToErrors();
-                }
-
-                return Error.Conflict().ToErrors();
+                _logger.LogError("Database update error while creating new location with name {name}",
+                    location.Name.Value);
+                
+                return LocationsErrors.DatabaseError().ToErrors();
             }
 
-            _logger.LogError("Database update error while creating new location with name {name}", location.Name.Value);
-            return LocationsErrors.DatabaseError().ToErrors();
+            if (pgException.ConstraintName.Contains(nameof(Location.Name),
+                    StringComparison.InvariantCultureIgnoreCase))
+            {
+                return LocationsErrors.NameConflict(location.Name.Value).ToErrors();
+            }
+                
+            if (pgException.ConstraintName.Contains(Indexes.ADDRESS, StringComparison.InvariantCultureIgnoreCase))
+            {
+                return LocationsErrors.AddressConflict(location.Address.ToString()).ToErrors();
+            }
+
+            return Error.Conflict().ToErrors();
         }
         catch (OperationCanceledException)
         {

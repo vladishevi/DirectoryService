@@ -1,7 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Application.Abstractions;
 using DirectoryService.Application.Validation;
-using DirectoryService.Contracts.Locations;
 using DirectoryService.Domain.Locations;
 using FluentValidation;
 using FluentValidation.Results;
@@ -13,11 +12,11 @@ namespace DirectoryService.Application.Locations;
 public class CreateLocationHandler : ICommandHandler<Guid, CreateLocationCommand>
 {
     private readonly ILocationsRepository _locationsRepository;
-    private readonly IValidator<CreateLocationRequest> _validator;
+    private readonly IValidator<CreateLocationCommand> _validator;
     private readonly ILogger<CreateLocationHandler> _logger;
 
     public CreateLocationHandler(ILocationsRepository locationsRepository,
-        IValidator<CreateLocationRequest> validator,
+        IValidator<CreateLocationCommand> validator,
         ILogger<CreateLocationHandler> logger)
     {
         _locationsRepository = locationsRepository;
@@ -37,7 +36,7 @@ public class CreateLocationHandler : ICommandHandler<Guid, CreateLocationCommand
     public async Task<Result<Guid, Errors>> Handle(CreateLocationCommand command, CancellationToken cancellationToken)
     {
         //Input validation
-        ValidationResult validationResult = await _validator.ValidateAsync(command.CreateLocationRequest, cancellationToken);
+        ValidationResult validationResult = await _validator.ValidateAsync(command, cancellationToken);
         if (!validationResult.IsValid)
         {
             return validationResult.ToErrors();
@@ -80,6 +79,4 @@ public class CreateLocationHandler : ICommandHandler<Guid, CreateLocationCommand
         _logger.LogInformation("Location created with id: {id}", location.Id);
         return location.Id;
     }
-
-    public Task<Result<Guid, Errors>> Handle(CreateLocationCommand command) => throw new NotImplementedException();
 }
