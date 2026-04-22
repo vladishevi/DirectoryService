@@ -16,6 +16,7 @@ public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
 
         builder.Property(d => d.Name)
             .HasColumnName("name")
+            .HasColumnType("citext")
             .HasConversion(d => d.Value, d => Name.Create(d).Value)
             .IsRequired()
             .HasMaxLength(Name.MAX_LENGHT);
@@ -50,5 +51,9 @@ public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
             .WithMany()
             .HasForeignKey("parent_department_id")
             .IsRequired(false);
+        
+        builder.HasIndex(d => d.Name)
+            .IsUnique()
+            .HasDatabaseName(Indexes.DEPARTMENT_NAME);
     }
 }

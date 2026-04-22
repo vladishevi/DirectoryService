@@ -4,12 +4,6 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace DirectoryService.Infrastructure.Postgres;
 
-public static class Indexes
-{
-    public const string ADDRESS = "ix_locations_address";
-    public const string NAME = "ix_locations_name";
-}
-
 public class LocationConfiguration : IEntityTypeConfiguration<Location>
 {
     public void Configure(EntityTypeBuilder<Location> builder)
@@ -47,7 +41,7 @@ public class LocationConfiguration : IEntityTypeConfiguration<Location>
 
             a.HasIndex(a => new { a.City, a.Street, a.Building, a.Postcode })
                 .IsUnique()
-                .HasDatabaseName(Indexes.ADDRESS);
+                .HasDatabaseName(Indexes.LOCATION_ADDRESS);
         });
 
         builder.Property(l => l.Timezone)
@@ -70,6 +64,6 @@ public class LocationConfiguration : IEntityTypeConfiguration<Location>
 
         builder.HasIndex(l => l.Name)
             .IsUnique()
-            .HasDatabaseName(Indexes.NAME);
+            .HasDatabaseName(Indexes.LOCATION_NAME);
     }
 }

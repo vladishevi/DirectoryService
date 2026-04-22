@@ -10,8 +10,7 @@ public sealed class Department
     
     private Department(Name name, 
         Identifier identifier,
-        Department? parentDepartment,
-        IEnumerable<DepartmentLocation> locations)
+        Department? parentDepartment)
     {
         Path path = new(identifier, parentDepartment);
         short depth = GetDepth(parentDepartment);
@@ -25,7 +24,6 @@ public sealed class Department
         ParentDepartment = parentDepartment;
         Path = path;
         Depth = depth;
-        _locations = [.. locations]; 
     }
     
     public Guid Id { get; private set; }
@@ -46,15 +44,19 @@ public sealed class Department
 
     public static Result<Department, Errors> Create(Name name, 
         Identifier identifier,
-        Department? parentDepartment,
-        IEnumerable<DepartmentLocation> locations)
+        Department? parentDepartment)
     {
-        if (!locations.Any())
+        return new Department(name, identifier, parentDepartment);
+    }
+
+    public Result<Errors> AddLocation(DepartmentLocation location)
+    {
+        if (_locations.Any(dl => dl.LocationId == location.LocationId))
         {
-            return GeneralErrors.ValueIsInvalid("Department.Locations", "Department must have at least one location").ToErrors();
+            return GeneralErrors.Failure($"Department {Name} already assigned to the location").ToErrors();
         }
-        
-        return new Department(name, identifier, parentDepartment, locations);
+        _locations.Add(location);
+        return Result.Success<Errors>(null);
     }
     
     private static short GetDepth(Department? parentDepartment)
