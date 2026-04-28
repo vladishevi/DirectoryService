@@ -10,13 +10,15 @@ public class CreateDepartmentValidator : AbstractValidator<CreateDepartmentComma
     public CreateDepartmentValidator()
     {
         RuleFor(d => d.Request.Name)
+            .NotNull().WithError(GeneralErrors.ValueIsInvalid("Name is required"))
             .MustBeValueObject(Name.Create);
         
         RuleFor(d => d.Request.Identifier)
+            .NotEmpty().WithError(GeneralErrors.ValueIsInvalid("Identifier is required"))
             .MustBeValueObject(Identifier.Create);
 
         RuleFor(d => d.Request.LocationIds)
-            .NotEmpty()
+            .NotEmpty().WithError(GeneralErrors.ValueIsInvalid("Locations are required"))
             .WithError(GeneralErrors.ValueIsInvalid("At least one location must be provided"));
 
         RuleFor(d => d.Request.LocationIds)

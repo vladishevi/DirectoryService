@@ -43,7 +43,7 @@ public class EfCoreLocationsRepository : ILocationsRepository
                 return LocationsErrors.NameConflict(location.Name.Value).ToErrors();
             }
                 
-            if (pgException.ConstraintName.Contains(Indexes.LOCATION_ADDRESS, StringComparison.InvariantCultureIgnoreCase))
+            if (pgException.ConstraintName.Contains(Constants.Indexes.LOCATION_ADDRESS, StringComparison.InvariantCultureIgnoreCase))
             {
                 return LocationsErrors.AddressConflict(location.Address.ToString()).ToErrors();
             }

@@ -23,6 +23,7 @@ public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
         
         builder.Property(d => d.Identifier)
             .HasColumnName("identifier")
+            .HasColumnType("citext")
             .HasConversion(d => d.Value, d => Identifier.Create(d).Value)
             .IsRequired()
             .HasMaxLength(Identifier.MAX_LENGHT);
@@ -54,6 +55,10 @@ public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
         
         builder.HasIndex(d => d.Name)
             .IsUnique()
-            .HasDatabaseName(Indexes.DEPARTMENT_NAME);
+            .HasDatabaseName(Constants.Indexes.DEPARTMENT_NAME);
+
+        builder.HasIndex(d => d.Identifier)
+            .IsUnique()
+            .HasDatabaseName(Constants.Indexes.DEPARTMENT_IDENTIFIER);
     }
 }

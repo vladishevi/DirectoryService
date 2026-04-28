@@ -49,14 +49,14 @@ public sealed class Department
         return new Department(name, identifier, parentDepartment);
     }
 
-    public Result<Errors> AddLocation(DepartmentLocation location)
+    public UnitResult<Errors> AddLocations(IEnumerable<DepartmentLocation> locations)
     {
-        if (_locations.Any(dl => dl.LocationId == location.LocationId))
+        if (locations.Any(location => _locations.Contains(location)))
         {
             return GeneralErrors.Failure($"Department {Name} already assigned to the location").ToErrors();
         }
-        _locations.Add(location);
-        return Result.Success<Errors>(null);
+        _locations.AddRange(locations);
+        return UnitResult.Success<Errors>();
     }
     
     private static short GetDepth(Department? parentDepartment)

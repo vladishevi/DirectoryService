@@ -41,7 +41,7 @@ public class LocationConfiguration : IEntityTypeConfiguration<Location>
 
             a.HasIndex(a => new { a.City, a.Street, a.Building, a.Postcode })
                 .IsUnique()
-                .HasDatabaseName(Indexes.LOCATION_ADDRESS);
+                .HasDatabaseName(Constants.Indexes.LOCATION_ADDRESS);
         });
 
         builder.Property(l => l.Timezone)
@@ -64,6 +64,6 @@ public class LocationConfiguration : IEntityTypeConfiguration<Location>
 
         builder.HasIndex(l => l.Name)
             .IsUnique()
-            .HasDatabaseName(Indexes.LOCATION_NAME);
+            .HasDatabaseName(Constants.Indexes.LOCATION_NAME);
     }
 }

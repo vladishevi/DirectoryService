@@ -2,6 +2,7 @@
 using DirectoryService.Application.Abstractions;
 using DirectoryService.Application.Locations;
 using DirectoryService.Application.Validation;
+using DirectoryService.Contracts.Departments;
 using DirectoryService.Domain.Departments;
 using DirectoryService.Domain.Locations;
 using FluentValidation;
@@ -40,11 +41,25 @@ public class CreateDepartmentHandler : ICommandHandler<Guid,CreateDepartmentComm
         {
             return result.ToErrors();
         }
+
+        Department? parentDepartment = null;
+        //get the parent department from db
+        if (command.Request.ParentId != null)
+        {
+            Result<Department, Errors> getParentDepartmentResult = await _departmentsRepository.GetById(command.Request.ParentId.Value, cancellationToken);
+            if (getParentDepartmentResult.IsFailure)
+            {
+                _logger.LogError("Error getting parent department with id {id} while creating department with name {name}", command.Request.ParentId, command.Request.Name);
+                return getParentDepartmentResult.Error;
+            }
+            
+            parentDepartment = getParentDepartmentResult.Value;
+        }
         
         //create department
         Result<Name, Errors> nameResult = Name.Create(command.Request.Name);
         Result<Identifier, Errors> identifierResult = Identifier.Create(command.Request.Identifier);
-        Department department  = Department.Create(nameResult.Value, identifierResult.Value, null).Value;
+        Department department  = Department.Create(nameResult.Value, identifierResult.Value, parentDepartment).Value;
         
         //get locations from db
         List<Location> locations = []; 
@@ -65,13 +80,12 @@ public class CreateDepartmentHandler : ICommandHandler<Guid,CreateDepartmentComm
         departmentLocations.AddRange(
             locations.Select(location => new DepartmentLocation(department, location.Id)));
 
-        foreach (DepartmentLocation departmentLocation in departmentLocations)
+        //add locations to department
+        UnitResult<Errors> addLocationsResult = department.AddLocations(departmentLocations);
+        if (addLocationsResult.IsFailure)
         {
-            Result<Errors> addResult = department.AddLocation(departmentLocation);
-            if (addResult.IsFailure)
-            {
-                return GeneralErrors.Failure("Failed to add location to department").ToErrors();
-            }
+            _logger.LogError("Failed to add locations to department with name {departmentName}", department.Name);
+            return addLocationsResult.Error;
         }
 
         //db save
@@ -79,10 +93,11 @@ public class CreateDepartmentHandler : ICommandHandler<Guid,CreateDepartmentComm
         if (addDepartmentResult.IsFailure)
         {
             _logger.LogError("Failed to create new department by name {departmentName}", department.Name);
+            return addDepartmentResult.Error;
         }
 
         //logging
-        _logger.LogInformation("New department has been created. Name: {name}, Guid: {guid}", department.Name, department.Id);
+        _logger.LogInformation("New department has been created. Name: {name}, Guid: {guid}", department.Name.Value, department.Id);
         return department.Id;
     }
 }
