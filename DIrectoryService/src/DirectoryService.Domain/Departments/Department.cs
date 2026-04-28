@@ -62,7 +62,7 @@ public sealed class Department
     private static short GetDepth(Department? parentDepartment)
     {
         if (parentDepartment == null)
-            return 1;
+            return 0;
 
         return (short)(parentDepartment.Depth + 1);
     }
