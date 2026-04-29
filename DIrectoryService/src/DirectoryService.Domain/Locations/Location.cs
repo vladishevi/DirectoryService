@@ -1,4 +1,6 @@
-﻿namespace DirectoryService.Domain.Locations;
+﻿using DirectoryService.Domain.Departments;
+
+namespace DirectoryService.Domain.Locations;
 
 public sealed class Location
 {
@@ -16,6 +18,8 @@ public sealed class Location
         UpdatedAt = DateTime.UtcNow;
     }
     
+    public IReadOnlyCollection<DepartmentLocation> Departments => _departments;
+    
     public Guid Id { get; private set; }
     public Name Name { get; private set; }
     public Address Address { get; private set; }
@@ -23,4 +27,6 @@ public sealed class Location
     public bool IsActive { get; private set; }
     public DateTime CreatedAt  { get; private set; }
     public DateTime UpdatedAt  { get; private set; }
+    
+    private readonly List<DepartmentLocation> _departments = [];
 }

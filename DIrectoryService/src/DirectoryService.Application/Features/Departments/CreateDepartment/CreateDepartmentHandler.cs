@@ -61,8 +61,7 @@ public class CreateDepartmentHandler : ICommandHandler<Guid,CreateDepartmentComm
         Result<Identifier, Errors> identifierResult = Identifier.Create(command.Request.Identifier);
         Department department  = Department.Create(nameResult.Value, identifierResult.Value, parentDepartment).Value;
         
-        //get locations from db
-        List<Location> locations = []; 
+        //check if locations exist
         foreach (Guid locationId in command.Request.LocationIds)
         {
             Result<bool, Errors> locationExistsResult = await _locationsRepository.Exists(locationId, cancellationToken);
@@ -81,13 +80,8 @@ public class CreateDepartmentHandler : ICommandHandler<Guid,CreateDepartmentComm
             }
         }
 
-        //create DepartmentLocations
-        List<DepartmentLocation> departmentLocations = [];
-        departmentLocations.AddRange(
-            locations.Select(location => new DepartmentLocation(department, location.Id)));
-
         //add locations to department
-        UnitResult<Errors> addLocationsResult = department.AddLocations(departmentLocations);
+        UnitResult<Errors> addLocationsResult = department.AddLocations(command.Request.LocationIds);
         if (addLocationsResult.IsFailure)
         {
             _logger.LogError("Failed to add locations to department with name {departmentName}", department.Name);

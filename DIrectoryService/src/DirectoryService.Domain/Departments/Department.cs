@@ -49,13 +49,13 @@ public sealed class Department
         return new Department(name, identifier, parentDepartment);
     }
 
-    public UnitResult<Errors> AddLocations(IEnumerable<DepartmentLocation> locations)
+    public UnitResult<Errors> AddLocations(IEnumerable<Guid> locationsIds)
     {
-        if (locations.Any(location => _locations.Contains(location)))
+        if (_locations.Any(location => locationsIds.Contains(location.Id)))
         {
             return GeneralErrors.Failure($"Department {Name} already assigned to the location").ToErrors();
         }
-        _locations.AddRange(locations);
+        _locations.AddRange(locationsIds.Select(locationId => new DepartmentLocation(this, locationId)));
         return UnitResult.Success<Errors>();
     }
     
