@@ -87,4 +87,22 @@ public class EfCoreLocationsRepository : ILocationsRepository
             return LocationsErrors.DatabaseError().ToErrors();
         }
     }
+
+    public async Task<Result<bool, Errors>> Exists(Guid id, CancellationToken cancellationToken)
+    {
+        try
+        {
+            return await _dbContext.Locations.AnyAsync(l => l.Id == id, cancellationToken);
+        }
+        catch (OperationCanceledException)
+        {
+            _logger.LogWarning("Operation cancelled while checking if location with id {id} exists", id);
+            return GeneralErrors.OperationCancelled().ToErrors();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Database error while checking if location with id {id} exists", id);
+            return LocationsErrors.DatabaseError().ToErrors();
+        }
+    }
 }

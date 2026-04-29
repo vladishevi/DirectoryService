@@ -65,14 +65,20 @@ public class CreateDepartmentHandler : ICommandHandler<Guid,CreateDepartmentComm
         List<Location> locations = []; 
         foreach (Guid locationId in command.Request.LocationIds)
         {
-            Result<Location, Errors> locationResult = await _locationsRepository.GetById(locationId, cancellationToken);
-            if (locationResult.IsFailure)
+            Result<bool, Errors> locationExistsResult = await _locationsRepository.Exists(locationId, cancellationToken);
+            if (locationExistsResult.IsFailure)
             {
                 _logger.LogError("Error getting location with id {id} while creating department with name {name}",
                     locationId, command.Request.Name);
-                return locationResult.Error;
+                return locationExistsResult.Error;
             }
-            locations.Add(locationResult.Value);
+
+            if (!locationExistsResult.Value)
+            {
+                _logger.LogError("Location with id {id} does not exist while creating department with name {name}",
+                    locationId, command.Request.Name);
+                return GeneralErrors.NotFound("Location not found", locationId).ToErrors();
+            }
         }
 
         //create DepartmentLocations
