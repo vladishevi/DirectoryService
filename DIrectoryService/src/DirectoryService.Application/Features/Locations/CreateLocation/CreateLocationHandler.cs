@@ -7,7 +7,7 @@ using FluentValidation.Results;
 using Microsoft.Extensions.Logging;
 using Shared;
 
-namespace DirectoryService.Application.Locations;
+namespace DirectoryService.Application.Features.Locations;
 
 public class CreateLocationHandler : ICommandHandler<Guid, CreateLocationCommand>
 {

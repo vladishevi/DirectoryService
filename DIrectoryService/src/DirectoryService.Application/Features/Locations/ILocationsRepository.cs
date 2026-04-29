@@ -2,7 +2,7 @@
 using DirectoryService.Domain.Locations;
 using Shared;
 
-namespace DirectoryService.Application.Locations;
+namespace DirectoryService.Application.Features.Locations;
 
 public interface ILocationsRepository
 {

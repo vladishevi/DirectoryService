@@ -58,16 +58,6 @@ public sealed class Department
         _locations.AddRange(locationsIds.Select(locationId => new DepartmentLocation(this, locationId)));
         return UnitResult.Success<Errors>();
     }
-
-    public UnitResult<Errors> AddPositions(IEnumerable<Guid> positionsIds)
-    {
-        if (_positions.Any(position => positionsIds.Contains(position.Id)))
-        {
-            return GeneralErrors.Failure($"Department {Name} already assigned to the position").ToErrors();
-        }
-        _positions.AddRange(positionsIds.Select(positionId => new DepartmentPosition(Id, positionId)));
-        return UnitResult.Success<Errors>();
-    }
     
     private static short GetDepth(Department? parentDepartment)
     {

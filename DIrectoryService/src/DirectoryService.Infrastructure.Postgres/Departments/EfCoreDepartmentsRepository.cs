@@ -69,7 +69,7 @@ public class EfCoreDepartmentsRepository : IDepartmentsRepository
     {
         try
         {
-            Department? department = await _dbContext.Departments.SingleAsync(d => d.Id == id, cancellationToken);
+            Department? department = await _dbContext.Departments.FirstOrDefaultAsync(d => d.Id == id, cancellationToken);
             if (department != null)
             {
                 return department;
@@ -90,20 +90,21 @@ public class EfCoreDepartmentsRepository : IDepartmentsRepository
         }
     }
 
-    public async Task<Result<IEnumerable<Department>, Errors>> GetById(IEnumerable<Guid> ids,
-        CancellationToken cancellationToken)
+    public async Task<Result<bool, Errors>> Exists(Guid id, CancellationToken cancellationToken)
     {
-        List<Department> departments = [];
-        foreach (Guid id in ids)
+        try
         {
-            Result<Department, Errors> getDepartmentResult = await GetById(id, cancellationToken);
-            if (getDepartmentResult.IsFailure)
-            {
-                return getDepartmentResult.Error;
-            }
-            departments.Add(getDepartmentResult.Value);
+            return await _dbContext.Departments.AnyAsync(d => d.Id == id, cancellationToken);
         }
-
-        return departments;
+        catch (OperationCanceledException)
+        {
+            _logger.LogWarning("Operation cancelled while checking if department with id {id} exists", id);
+            return GeneralErrors.OperationCancelled().ToErrors();
+        }
+        catch (Exception exception)
+        {
+            _logger.LogError(exception, "Database error while checking if department with id {id} exists", id);
+            return DepartmentsErrors.DatabaseError().ToErrors();
+        }
     }
 }

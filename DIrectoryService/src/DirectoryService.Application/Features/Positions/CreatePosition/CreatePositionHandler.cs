@@ -45,26 +45,31 @@ public class CreatePositionHandler : ICommandHandler<Guid, CreatePositionCommand
         Description description = Description.Create(command.Request.Description).Value;
         Position position = new(name, description);
 
-        //get departments from db
-        Result<IEnumerable<Department>, Errors> getDepartmentsResult =
-            await _departmentsRepository.GetById(command.Request.DepartmentIds, cancellationToken);
-        if (getDepartmentsResult.IsFailure)
+        //check if departments exist
+        foreach (Guid departmentId in command.Request.DepartmentIds)
         {
-            _logger.LogError("Error getting departments with ids {ids} while creating position with name {name}",
-                command.Request.DepartmentIds, command.Request.Name);
-            return getDepartmentsResult.Error;
+            Result<bool, Errors> departmentExistsResult = await _departmentsRepository.Exists(departmentId, cancellationToken);
+            if (departmentExistsResult.IsFailure)
+            {
+                _logger.LogError("Error getting department with id {id} while creating position with name {name}",
+                    departmentId, command.Request.Name);
+                return departmentExistsResult.Error;
+            }
+            
+            if (!departmentExistsResult.Value)
+            {
+                _logger.LogError("Department with id {id} does not exist while creating position with name {name}",
+                    departmentId, command.Request.Name);
+                return GeneralErrors.NotFound("Department not found", departmentId).ToErrors();
+            }           
         }
 
-        //add position to departments
-        IEnumerable<Department> departments = getDepartmentsResult.Value;
-        foreach (Department department in departments)
+        //add departments to position
+        UnitResult<Errors> addDepartmentsResult = position.AddDepartments(command.Request.DepartmentIds);
+        if (addDepartmentsResult.IsFailure)
         {
-            UnitResult<Errors> addPositionsResult = department.AddPositions(command.Request.DepartmentIds);
-            if (addPositionsResult.IsFailure)
-            {
-                _logger.LogError("Failed to add position to department with name {departmentName}", department.Name);
-                return addPositionsResult.Error;
-            }
+            _logger.LogError("Failed to add departments to position with name {positionName}", position.Name);
+            return addDepartmentsResult.Error;
         }
 
         //save to db

@@ -1,10 +1,10 @@
 ﻿using DirectoryService.Application.Abstractions;
-using DirectoryService.Application.Locations;
+using DirectoryService.Application.Features.Locations;
 using DirectoryService.Contracts.Locations;
 using DirectoryService.Presenters.EndpointResults;
 using Microsoft.AspNetCore.Mvc;
 
-namespace DirectoryService.Presenters.Locations;
+namespace DirectoryService.Presenters.Features.Locations;
 
 [ApiController]
 [Route("/api/locations")]

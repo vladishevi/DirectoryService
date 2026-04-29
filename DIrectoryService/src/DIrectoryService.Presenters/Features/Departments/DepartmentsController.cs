@@ -3,7 +3,7 @@ using DirectoryService.Contracts.Departments;
 using DirectoryService.Presenters.EndpointResults;
 using Microsoft.AspNetCore.Mvc;
 
-namespace DirectoryService.Presenters.Departments;
+namespace DirectoryService.Presenters.Features.Departments;
 
 [ApiController]
 [Route("/api/departments")]
