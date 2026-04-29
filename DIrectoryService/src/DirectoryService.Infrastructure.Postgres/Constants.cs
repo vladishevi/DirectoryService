@@ -11,5 +11,7 @@ public static class Constants
 
         public const string DEPARTMENT_NAME = "ix_departments_name";
         public const string DEPARTMENT_IDENTIFIER = "ix_departments_identifier";
+        
+        public const string POSITION_NAME = "ix_positions_name";
     }
 }

@@ -15,6 +15,7 @@ public class PositionConfiguration : IEntityTypeConfiguration<Position>
         
         builder.Property(p => p.Name)
             .HasColumnName("name")
+            .HasColumnType("citext")
             .HasConversion(p => p.Value, p => Name.Create(p).Value)
             .IsRequired()
             .HasMaxLength(Name.MAX_LENGHT);

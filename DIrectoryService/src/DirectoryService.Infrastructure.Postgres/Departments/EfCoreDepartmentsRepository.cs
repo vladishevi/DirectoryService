@@ -69,7 +69,7 @@ public class EfCoreDepartmentsRepository : IDepartmentsRepository
     {
         try
         {
-            Department? department = await _dbContext.Departments.FirstOrDefaultAsync(d => d.Id == id, cancellationToken);
+            Department? department = await _dbContext.Departments.SingleAsync(d => d.Id == id, cancellationToken);
             if (department != null)
             {
                 return department;
@@ -88,5 +88,22 @@ public class EfCoreDepartmentsRepository : IDepartmentsRepository
             _logger.LogError(exception, "Database error while getting department with id {id}", id);
             return DepartmentsErrors.DatabaseError().ToErrors();
         }
+    }
+
+    public async Task<Result<IEnumerable<Department>, Errors>> GetById(IEnumerable<Guid> ids,
+        CancellationToken cancellationToken)
+    {
+        List<Department> departments = [];
+        foreach (Guid id in ids)
+        {
+            Result<Department, Errors> getDepartmentResult = await GetById(id, cancellationToken);
+            if (getDepartmentResult.IsFailure)
+            {
+                return getDepartmentResult.Error;
+            }
+            departments.Add(getDepartmentResult.Value);
+        }
+
+        return departments;
     }
 }
