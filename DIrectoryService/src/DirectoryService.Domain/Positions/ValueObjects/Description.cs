@@ -14,7 +14,7 @@ public sealed record Description
         Value = value;
     }
 
-    public static Result<Description, Errors> Create(string? value)
+    public static Result<Description, Errors> Create(string value)
     {
         if (string.IsNullOrWhiteSpace(value))
         {
