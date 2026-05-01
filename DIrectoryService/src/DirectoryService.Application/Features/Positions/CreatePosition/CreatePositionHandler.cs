@@ -42,7 +42,7 @@ public class CreatePositionHandler : ICommandHandler<Guid, CreatePositionCommand
         
         //create position
         Name name = Name.Create(command.Request.Name).Value;
-        Description description = Description.Create(command.Request.Description).Value;
+        Description description = command.Request.Description == null ? null : Description.Create(command.Request.Description).Value;
         Position position = new(name, description);
 
         //check if departments exist

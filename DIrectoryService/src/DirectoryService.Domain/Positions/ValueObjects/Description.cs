@@ -14,11 +14,16 @@ public sealed record Description
         Value = value;
     }
 
-    public static Result<Description, Errors> Create(string value)
+    public static Result<Description, Errors> Create(string? value)
     {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return GeneralErrors.ValueIsInvalid("position.description", "Description cannot be null").ToErrors();
+        }
+        
         if (value.Length > MAX_LENGTH)
         {
-            GeneralErrors.ValueIsInvalid("position.description", "Description name must be no longer than {MAX_LENGTH}")
+            return GeneralErrors.ValueIsInvalid("position.description", "Description name must be no longer than {MAX_LENGTH}")
                 .ToErrors();
         }
 

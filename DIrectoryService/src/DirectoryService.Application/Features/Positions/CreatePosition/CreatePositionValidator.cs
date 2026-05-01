@@ -13,7 +13,8 @@ public class CreatePositionValidator : AbstractValidator<CreatePositionCommand>
             .MustBeValueObject(Name.Create);
 
         RuleFor(p => p.Request.Description)
-            .MustBeValueObject(Description.Create);
+            .MustBeValueObject(Description.Create)
+            .When(p => p.Request.Description != null);       
         
         RuleFor(p => p.Request.DepartmentIds)
             .NotEmpty().WithError(GeneralErrors.ValueIsInvalid("At least one location must be provided"));
