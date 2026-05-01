@@ -65,12 +65,7 @@ public class CreatePositionHandler : ICommandHandler<Guid, CreatePositionCommand
         }
 
         //add departments to position
-        UnitResult<Errors> addDepartmentsResult = position.AddDepartments(command.Request.DepartmentIds);
-        if (addDepartmentsResult.IsFailure)
-        {
-            _logger.LogError("Failed to add departments to position with name {positionName}", position.Name);
-            return addDepartmentsResult.Error;
-        }
+        position.UpdateDepartments(command.Request.DepartmentIds);
 
         //save to db
         Result<Guid, Errors> addPositionResult = await _positionsRepository.Add(position, cancellationToken);

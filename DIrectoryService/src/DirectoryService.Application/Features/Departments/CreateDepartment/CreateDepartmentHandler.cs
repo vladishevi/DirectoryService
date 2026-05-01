@@ -81,12 +81,7 @@ public class CreateDepartmentHandler : ICommandHandler<Guid,CreateDepartmentComm
         }
 
         //add locations to department
-        UnitResult<Errors> addLocationsResult = department.AddLocations(command.Request.LocationIds);
-        if (addLocationsResult.IsFailure)
-        {
-            _logger.LogError("Failed to add locations to department with name {departmentName}", department.Name);
-            return addLocationsResult.Error;
-        }
+        department.UpdateLocations(command.Request.LocationIds);
 
         //db save
         Result<Guid, Errors> addDepartmentResult = await _departmentsRepository.Add(department, cancellationToken);

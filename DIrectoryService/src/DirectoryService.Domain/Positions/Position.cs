@@ -30,14 +30,9 @@ public sealed class Position
     
     private readonly List<DepartmentPosition> _departments = [];
 
-    public UnitResult<Errors> AddDepartments(IEnumerable<Guid> departmentsIds)
+    public void UpdateDepartments(IEnumerable<Guid> departmentsIds)
     {
-        if (_departments.Any(department => departmentsIds.Contains(department.Id)))
-        {
-            return GeneralErrors.Failure($"Position {Name} already assign to the department").ToErrors();
-        }
-        
+        _departments.Clear();        
         _departments.AddRange(departmentsIds.Select(departmentId => new DepartmentPosition(departmentId, Id)));
-        return UnitResult.Success<Errors>();
     }
 }
