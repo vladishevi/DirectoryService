@@ -1,4 +1,5 @@
-﻿using DirectoryService.Application.Features.Departments;
+﻿using DirectoryService.Application.Abstractions;
+using DirectoryService.Application.Features.Departments;
 using DirectoryService.Application.Features.Locations;
 using DirectoryService.Application.Features.Positions;
 using DirectoryService.Infrastructure.Postgres.Departments;
@@ -22,11 +23,13 @@ public static class DependencyInjection
     }
 
     private static void AddRepositories(IServiceCollection services) =>
-        services
-            .AddScoped<ILocationsRepository, EfCoreLocationsRepository>()
-            .AddScoped<IDepartmentsRepository, EfCoreDepartmentsRepository>()
-            .AddScoped<IPositionsRepository, EfCorePositionsRepository>();
-
+        services.Scan(scan => scan
+            .FromAssembliesOf(typeof(DependencyInjection))
+            .AddClasses(classes => classes
+                .AssignableToAny(typeof(IRepository)))
+            .AsSelfWithInterfaces()
+            .WithScopedLifetime());
+    
     private static void AddDb(IServiceCollection services, IConfiguration configuration)
     {
         services.AddDbContext<DirectoryServiceDbContext>((sp, options) =>

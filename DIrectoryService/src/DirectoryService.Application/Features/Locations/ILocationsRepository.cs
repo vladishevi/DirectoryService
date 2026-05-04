@@ -1,10 +1,11 @@
 ﻿using CSharpFunctionalExtensions;
+using DirectoryService.Application.Abstractions;
 using DirectoryService.Domain.Locations;
 using Shared;
 
 namespace DirectoryService.Application.Features.Locations;
 
-public interface ILocationsRepository
+public interface ILocationsRepository : IRepository
 {
     Task<Result<Guid, Errors>> Add(Location location, CancellationToken cancellationToken);
     Task<Result<Location, Errors>> GetById(Guid id, CancellationToken cancellationToken);

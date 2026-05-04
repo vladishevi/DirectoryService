@@ -1,10 +1,11 @@
 ﻿using CSharpFunctionalExtensions;
+using DirectoryService.Application.Abstractions;
 using DirectoryService.Domain.Departments;
 using Shared;
 
 namespace DirectoryService.Application.Features.Departments;
 
-public interface IDepartmentsRepository
+public interface IDepartmentsRepository : IRepository
 {
     Task<Result<Guid, Errors>> Add(Department department, CancellationToken cancellationToken);
     Task<Result<Department, Errors>> GetById(Guid id, CancellationToken cancellationToken);
