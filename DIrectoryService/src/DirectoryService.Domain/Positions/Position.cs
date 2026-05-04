@@ -1,4 +1,8 @@
-﻿namespace DirectoryService.Domain.Positions;
+﻿using CSharpFunctionalExtensions;
+using DirectoryService.Domain.Departments;
+using Shared;
+
+namespace DirectoryService.Domain.Positions;
 
 public sealed class Position
 {
@@ -21,4 +25,19 @@ public sealed class Position
     public bool IsActive { get; private set; }
     public DateTime CreatedAt  { get; private set; }
     public DateTime UpdatedAt  { get; private set; }
+    
+    public IReadOnlyCollection<DepartmentPosition> Departments => _departments;
+    
+    private readonly List<DepartmentPosition> _departments = [];
+
+    public UnitResult<Errors> AddDepartments(IEnumerable<Guid> departmentsIds)
+    {
+        if (_departments.Any(department => departmentsIds.Contains(department.Id)))
+        {
+            return GeneralErrors.Failure($"Position {Name} already assign to the department").ToErrors();
+        }
+        
+        _departments.AddRange(departmentsIds.Select(departmentId => new DepartmentPosition(departmentId, Id)));
+        return UnitResult.Success<Errors>();
+    }
 }

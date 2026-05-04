@@ -3,6 +3,7 @@ using System;
 using DirectoryService.Infrastructure.Postgres;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DirectoryService.Infrastructure.Postgres.Migrations
 {
     [DbContext(typeof(DirectoryServiceDbContext))]
-    partial class DirectoryServiceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260422134122_AddDepartmentIndexes")]
+    partial class AddDepartmentIndexes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -196,7 +199,7 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("citext")
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("name");
 
                     b.Property<DateTime>("UpdatedAt")
@@ -227,7 +230,7 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
                         .IsRequired();
 
                     b.HasOne("DirectoryService.Domain.Locations.Location", null)
-                        .WithMany("Departments")
+                        .WithMany()
                         .HasForeignKey("LocationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -244,7 +247,7 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
                         .IsRequired();
 
                     b.HasOne("DirectoryService.Domain.Positions.Position", null)
-                        .WithMany("Departments")
+                        .WithMany()
                         .HasForeignKey("PositionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -298,16 +301,6 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
                     b.Navigation("Locations");
 
                     b.Navigation("Positions");
-                });
-
-            modelBuilder.Entity("DirectoryService.Domain.Locations.Location", b =>
-                {
-                    b.Navigation("Departments");
-                });
-
-            modelBuilder.Entity("DirectoryService.Domain.Positions.Position", b =>
-                {
-                    b.Navigation("Departments");
                 });
 #pragma warning restore 612, 618
         }

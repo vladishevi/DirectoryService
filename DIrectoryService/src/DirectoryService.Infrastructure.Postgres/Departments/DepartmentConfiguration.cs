@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Path = DirectoryService.Domain.Departments.Path;
 
-namespace DirectoryService.Infrastructure.Postgres;
+namespace DirectoryService.Infrastructure.Postgres.Departments;
 
 public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
 {
@@ -16,12 +16,14 @@ public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
 
         builder.Property(d => d.Name)
             .HasColumnName("name")
+            .HasColumnType("citext")
             .HasConversion(d => d.Value, d => Name.Create(d).Value)
             .IsRequired()
             .HasMaxLength(Name.MAX_LENGHT);
         
         builder.Property(d => d.Identifier)
             .HasColumnName("identifier")
+            .HasColumnType("citext")
             .HasConversion(d => d.Value, d => Identifier.Create(d).Value)
             .IsRequired()
             .HasMaxLength(Identifier.MAX_LENGHT);
@@ -50,5 +52,13 @@ public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
             .WithMany()
             .HasForeignKey("parent_department_id")
             .IsRequired(false);
+        
+        builder.HasIndex(d => d.Name)
+            .IsUnique()
+            .HasDatabaseName(Constants.Indexes.DEPARTMENT_NAME);
+
+        builder.HasIndex(d => d.Identifier)
+            .IsUnique()
+            .HasDatabaseName(Constants.Indexes.DEPARTMENT_IDENTIFIER);
     }
 }

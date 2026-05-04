@@ -1,6 +1,6 @@
 ﻿using Shared;
 
-namespace DirectoryService.Application.Locations;
+namespace DirectoryService.Application.Features.Locations;
 
 public static class LocationsErrors
 {

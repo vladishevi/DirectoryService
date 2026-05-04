@@ -1,0 +1,87 @@
+﻿using CSharpFunctionalExtensions;
+using DirectoryService.Application.Abstractions;
+using DirectoryService.Application.Features.Departments;
+using DirectoryService.Application.Validation;
+using DirectoryService.Domain.Departments;
+using DirectoryService.Domain.Positions;
+using FluentValidation;
+using FluentValidation.Results;
+using Microsoft.Extensions.Logging;
+using Shared;
+using Name = DirectoryService.Domain.Positions.Name;
+
+namespace DirectoryService.Application.Features.Positions;
+
+public class CreatePositionHandler : ICommandHandler<Guid, CreatePositionCommand>
+{
+    private readonly IPositionsRepository _positionsRepository;
+    private readonly IDepartmentsRepository _departmentsRepository;
+    private readonly IValidator<CreatePositionCommand> _validator;
+    private readonly ILogger<CreatePositionHandler> _logger;
+
+    public CreatePositionHandler(
+        IPositionsRepository positionsRepository,
+        IDepartmentsRepository departmentsRepository,
+        IValidator<CreatePositionCommand> validator,
+        ILogger<CreatePositionHandler> logger)
+    {
+        _positionsRepository = positionsRepository;
+        _departmentsRepository = departmentsRepository;
+        _validator = validator;
+        _logger = logger;
+    }
+    
+    public async Task<Result<Guid, Errors>> Handle(CreatePositionCommand command, CancellationToken cancellationToken)
+    {
+        //input validation
+        ValidationResult result = await _validator.ValidateAsync(command, cancellationToken);
+        if (!result.IsValid)
+        {
+            return result.ToErrors();
+        }
+        
+        //create position
+        Name name = Name.Create(command.Request.Name).Value;
+        Description description = command.Request.Description == null ? null : Description.Create(command.Request.Description).Value;
+        Position position = new(name, description);
+
+        //check if departments exist
+        foreach (Guid departmentId in command.Request.DepartmentIds)
+        {
+            Result<bool, Errors> departmentExistsResult = await _departmentsRepository.Exists(departmentId, cancellationToken);
+            if (departmentExistsResult.IsFailure)
+            {
+                _logger.LogError("Error getting department with id {id} while creating position with name {name}",
+                    departmentId, command.Request.Name);
+                return departmentExistsResult.Error;
+            }
+            
+            if (!departmentExistsResult.Value)
+            {
+                _logger.LogError("Department with id {id} does not exist while creating position with name {name}",
+                    departmentId, command.Request.Name);
+                return GeneralErrors.NotFound("Department not found", departmentId).ToErrors();
+            }           
+        }
+
+        //add departments to position
+        UnitResult<Errors> addDepartmentsResult = position.AddDepartments(command.Request.DepartmentIds);
+        if (addDepartmentsResult.IsFailure)
+        {
+            _logger.LogError("Failed to add departments to position with name {positionName}", position.Name);
+            return addDepartmentsResult.Error;
+        }
+
+        //save to db
+        Result<Guid, Errors> addPositionResult = await _positionsRepository.Add(position, cancellationToken);
+        if (addPositionResult.IsFailure)
+        {
+            _logger.LogError("Failed to create new position with name {positionName}", position.Name);
+            return addPositionResult.Error;
+        }
+
+        //logging
+        _logger.LogInformation("New position has been created. Name: {name}, Guid: {guid}", position.Name.Value, position.Id);
+        return position.Id;       
+    }
+}

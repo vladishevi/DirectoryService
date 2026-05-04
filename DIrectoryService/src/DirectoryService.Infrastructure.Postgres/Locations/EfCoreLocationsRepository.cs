@@ -1,5 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
-using DirectoryService.Application.Locations;
+using DirectoryService.Application.Features.Locations;
 using DirectoryService.Domain.Locations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -43,7 +43,7 @@ public class EfCoreLocationsRepository : ILocationsRepository
                 return LocationsErrors.NameConflict(location.Name.Value).ToErrors();
             }
                 
-            if (pgException.ConstraintName.Contains(Indexes.ADDRESS, StringComparison.InvariantCultureIgnoreCase))
+            if (pgException.ConstraintName.Contains(Constants.Indexes.LOCATION_ADDRESS, StringComparison.InvariantCultureIgnoreCase))
             {
                 return LocationsErrors.AddressConflict(location.Address.ToString()).ToErrors();
             }
@@ -60,5 +60,75 @@ public class EfCoreLocationsRepository : ILocationsRepository
             _logger.LogError(e, "Database error while creating new location with name {name}", location.Name.Value);
             return LocationsErrors.DatabaseError().ToErrors();
         }
+    }
+
+    public async Task<Result<Location, Errors>> GetById(Guid id, CancellationToken cancellationToken)
+    {
+        try
+        {
+            Location? location = await _dbContext.Locations.FirstOrDefaultAsync(l => l.Id == id, cancellationToken);
+            if (location != null)
+            {
+                return location;
+            }
+
+            _logger.LogWarning("Location not found with id {id}", id);
+            return GeneralErrors.NotFound("Location not found", id).ToErrors();
+
+        }
+        catch (OperationCanceledException)
+        {
+            _logger.LogWarning("Operation cancelled while getting location with id {id}", id);
+            return GeneralErrors.OperationCancelled().ToErrors();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Database error while getting location with id {id}", id);
+            return LocationsErrors.DatabaseError().ToErrors();
+        }
+    }
+
+    public async Task<Result<bool, Errors>> Exists(Guid id, CancellationToken cancellationToken)
+    {
+        try
+        {
+            return await _dbContext.Locations.AnyAsync(l => l.Id == id, cancellationToken);
+        }
+        catch (OperationCanceledException)
+        {
+            _logger.LogWarning("Operation cancelled while checking if location with id {id} exists", id);
+            return GeneralErrors.OperationCancelled().ToErrors();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Database error while checking if location with id {id} exists", id);
+            return LocationsErrors.DatabaseError().ToErrors();
+        }
+    }
+
+    public async Task<Result<bool, Errors>> AllExist(IEnumerable<Guid> ids, CancellationToken cancellationToken)
+    {
+        try
+        {
+            if (ids.Distinct().Count() != ids.Count())
+            {
+                return GeneralErrors.Dublicate(message: "Ids must be unique").ToErrors();
+            }
+            
+            int existingCount = await _dbContext.Locations
+                .CountAsync(l => ids.Contains(l.Id), cancellationToken: cancellationToken);
+
+            return existingCount == ids.Count();
+        }
+        catch (OperationCanceledException)
+        {
+            _logger.LogWarning("Operation cancelled while checking if locations exist");
+            return GeneralErrors.OperationCancelled().ToErrors();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Database error while checking if locations exist");
+            return LocationsErrors.DatabaseError().ToErrors();
+        }       
     }
 }

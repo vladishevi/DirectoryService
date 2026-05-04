@@ -11,6 +11,11 @@ public static class GeneralErrors
     {
         return Error.Validation("value.invalid", message ?? $"{valueName} is invalid", valueName);
     }
+
+    public static Error NotFound(string? message = null, Guid? guid = null)
+    {
+        return Error.NotFound("not.found", message ?? "Not found", guid);
+    }
     
     public static Error DatabaseError(string? code = null, string? message = null)
     {
@@ -20,5 +25,10 @@ public static class GeneralErrors
     public static Error OperationCancelled(string? code = null, string? message = null)
     {
         return Error.Failure(code ?? "operation.cancelled", message ?? "Operation cancelled");
+    }
+    
+    public static Error Dublicate(string? code = null, string? message = null)
+    {
+        return Error.Failure(code ?? "dublicate.error", message ?? "Dublicate error occured");
     }
 }

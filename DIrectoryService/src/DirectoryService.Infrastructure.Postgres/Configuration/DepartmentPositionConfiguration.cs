@@ -22,7 +22,7 @@ public class DepartmentPositionConfiguration : IEntityTypeConfiguration<Departme
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasOne<Position>()
-            .WithMany()
+            .WithMany(p => p.Departments)
             .HasForeignKey(dp => dp.PositionId)
             .IsRequired()
             .OnDelete(DeleteBehavior.Cascade);

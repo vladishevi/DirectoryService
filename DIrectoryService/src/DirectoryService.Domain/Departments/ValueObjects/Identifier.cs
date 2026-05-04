@@ -1,5 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 using CSharpFunctionalExtensions;
+using Shared;
 
 namespace DirectoryService.Domain.Departments;
 
@@ -15,22 +16,22 @@ public sealed record Identifier
         Value = value;
     }
     
-    public static Result<Identifier, string> Create(string value)
+    public static Result<Identifier, Errors> Create(string value)
     {
         if (string.IsNullOrWhiteSpace(value))
         {
-            return  "Department identifier cannot be empty";
+            return GeneralErrors.ValueIsInvalid("Department.Identifier", "Department identifier cannot be empty").ToErrors();
         }
         
         if (value.Length is < MIN_LENGHT or > MAX_LENGHT)
         {
-            return $"Department identifier must be between {MIN_LENGHT} and {MAX_LENGHT} characters";
+            return GeneralErrors.ValueIsInvalid("Department.Identifier", $"Department identifier must be between {MIN_LENGHT} and {MAX_LENGHT} characters").ToErrors();
         }
 
         bool isLatin = Regex.IsMatch(value, "^[A-Za-z]+$");
         if (!isLatin)
         {
-            return "Department identifier must contain latin characters only";
+            return GeneralErrors.ValueIsInvalid("Department.Identifier", "Department identifier must contain latin characters only").ToErrors();
         }
         
         return new Identifier(value.ToLower());
