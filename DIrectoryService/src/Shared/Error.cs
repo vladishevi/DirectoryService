@@ -19,7 +19,7 @@ public record Error
     public string? InvalidField { get; }
     
     public static Error NotFound(string code, string message, Guid? guid) =>
-        new(code, $"{message}. Record id: {guid}", ErrorType.NOT_FOUND, guid?.ToString());
+        new(code, guid != null ? $"{message}. Record id: {guid}" : message, ErrorType.NOT_FOUND, guid?.ToString());
 
     public static Error Validation(string code, string message, string? invalidField = null) =>
         new(code, message, ErrorType.VALIDATION, invalidField);

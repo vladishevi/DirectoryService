@@ -105,4 +105,30 @@ public class EfCoreLocationsRepository : ILocationsRepository
             return LocationsErrors.DatabaseError().ToErrors();
         }
     }
+
+    public async Task<Result<bool, Errors>> AllExist(IEnumerable<Guid> ids, CancellationToken cancellationToken)
+    {
+        try
+        {
+            if (ids.Distinct().Count() != ids.Count())
+            {
+                return GeneralErrors.Dublicate(message: "Ids must be unique").ToErrors();
+            }
+            
+            int existingCount = await _dbContext.Locations
+                .CountAsync(l => ids.Contains(l.Id), cancellationToken: cancellationToken);
+
+            return existingCount == ids.Count();
+        }
+        catch (OperationCanceledException)
+        {
+            _logger.LogWarning("Operation cancelled while checking if locations exist");
+            return GeneralErrors.OperationCancelled().ToErrors();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Database error while checking if locations exist");
+            return LocationsErrors.DatabaseError().ToErrors();
+        }       
+    }
 }

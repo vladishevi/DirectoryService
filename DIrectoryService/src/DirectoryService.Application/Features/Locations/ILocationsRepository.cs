@@ -9,4 +9,5 @@ public interface ILocationsRepository
     Task<Result<Guid, Errors>> Add(Location location, CancellationToken cancellationToken);
     Task<Result<Location, Errors>> GetById(Guid id, CancellationToken cancellationToken);
     Task<Result<bool, Errors>> Exists(Guid id, CancellationToken cancellationToken);
+    Task<Result<bool, Errors>> AllExist(IEnumerable<Guid> ids, CancellationToken cancellationToken);   
 }

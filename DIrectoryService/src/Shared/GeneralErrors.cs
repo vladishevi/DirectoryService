@@ -26,4 +26,9 @@ public static class GeneralErrors
     {
         return Error.Failure(code ?? "operation.cancelled", message ?? "Operation cancelled");
     }
+    
+    public static Error Dublicate(string? code = null, string? message = null)
+    {
+        return Error.Failure(code ?? "dublicate.error", message ?? "Dublicate error occured");
+    }
 }
