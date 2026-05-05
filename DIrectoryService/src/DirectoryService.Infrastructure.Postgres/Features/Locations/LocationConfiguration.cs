@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace DirectoryService.Infrastructure.Postgres.Locations;
+namespace DirectoryService.Infrastructure.Postgres.Features.Locations;
 
 public class LocationConfiguration : IEntityTypeConfiguration<Location>
 {

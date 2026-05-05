@@ -68,7 +68,7 @@ public class CreatePositionHandler : ICommandHandler<Guid, CreatePositionCommand
         position.UpdateDepartments(command.Request.DepartmentIds);
 
         //save to db
-        Result<Guid, Errors> addPositionResult = await _positionsRepository.Add(position, cancellationToken);
+        Result<Guid, Errors> addPositionResult = await _positionsRepository.AddAndSave(position, cancellationToken);
         if (addPositionResult.IsFailure)
         {
             _logger.LogError("Failed to create new position with name {positionName}", position.Name);

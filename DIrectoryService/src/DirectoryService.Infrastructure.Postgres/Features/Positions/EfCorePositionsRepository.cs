@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 using Npgsql;
 using Shared;
 
-namespace DirectoryService.Infrastructure.Postgres.Positions;
+namespace DirectoryService.Infrastructure.Postgres.Features.Positions;
 
 public class EfCorePositionsRepository : IPositionsRepository
 {
@@ -21,7 +21,7 @@ public class EfCorePositionsRepository : IPositionsRepository
         _logger = logger;
     }
 
-    public async Task<Result<Guid, Errors>> Add(Position position, CancellationToken cancellationToken)
+    public async Task<Result<Guid, Errors>> AddAndSave(Position position, CancellationToken cancellationToken)
     {
         try
         {

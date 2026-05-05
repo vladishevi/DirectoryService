@@ -1,5 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Application.Abstractions;
+using DirectoryService.Application.Database;
 using DirectoryService.Domain.Departments;
 using Shared;
 
@@ -11,5 +12,4 @@ public interface IDepartmentsRepository : IRepository
     Task<Result<Department, Errors>> GetById(Guid id, CancellationToken cancellationToken);
     Task<Result<Department, Errors>> GetByIdWithLocations(Guid id, CancellationToken cancellationToken);
     Task<Result<bool, Errors>> Exists(Guid id, CancellationToken cancellationToken);
-    Task<Result<int, Errors>> SaveChanges(CancellationToken cancellationToken);
 }

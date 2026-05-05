@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 using Npgsql;
 using Shared;
 
-namespace DirectoryService.Infrastructure.Postgres.Locations;
+namespace DirectoryService.Infrastructure.Postgres.Features.Locations;
 
 public class EfCoreLocationsRepository : ILocationsRepository
 {
@@ -19,7 +19,7 @@ public class EfCoreLocationsRepository : ILocationsRepository
         _logger = logger;
     }
 
-    public async Task<Result<Guid, Errors>> Add(Location location, CancellationToken cancellationToken)
+    public async Task<Result<Guid, Errors>> AddAndSave(Location location, CancellationToken cancellationToken)
     {
         try
         {

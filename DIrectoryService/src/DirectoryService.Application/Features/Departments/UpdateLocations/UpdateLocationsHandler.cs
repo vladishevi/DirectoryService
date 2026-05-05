@@ -1,5 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Application.Abstractions;
+using DirectoryService.Application.Database;
 using DirectoryService.Application.Features.Locations;
 using DirectoryService.Application.Validation;
 using DirectoryService.Domain.Departments;
@@ -15,17 +16,20 @@ public class UpdateLocationsHandler : ICommandHandler<Guid, UpdateLocationsComma
     private readonly IDepartmentsRepository _departmentsRepository;
     private readonly ILocationsRepository _locationsRepository;
     private readonly IValidator<UpdateLocationsCommand> _validator;
+    private readonly ITransactionManager _transactionManager;
     private readonly ILogger<UpdateLocationsHandler> _logger;
 
     public UpdateLocationsHandler(
         IDepartmentsRepository departmentsRepository,
         ILocationsRepository locationsRepository,
         IValidator<UpdateLocationsCommand> validator,
+        ITransactionManager transactionManager,
         ILogger<UpdateLocationsHandler> logger)
     {
         _departmentsRepository = departmentsRepository;
         _locationsRepository = locationsRepository;
         _validator = validator;
+        _transactionManager = transactionManager;
         _logger = logger;
     }
     
@@ -71,7 +75,7 @@ public class UpdateLocationsHandler : ICommandHandler<Guid, UpdateLocationsComma
         department.UpdateLocations(command.Request.LocationIds);
         
         //db save
-        Result<int, Errors> saveChangesResult = await _departmentsRepository.SaveChanges(cancellationToken);
+        UnitResult<Errors> saveChangesResult = await _transactionManager.SaveChangesAsync(cancellationToken);
         if (saveChangesResult.IsFailure)
         {
             _logger.LogError("Error saving changes to department with id {id}", command.DepartmentId);

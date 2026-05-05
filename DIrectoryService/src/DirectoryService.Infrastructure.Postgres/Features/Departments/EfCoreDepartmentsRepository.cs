@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 using Npgsql;
 using Shared;
 
-namespace DirectoryService.Infrastructure.Postgres.Departments;
+namespace DirectoryService.Infrastructure.Postgres.Features.Departments;
 
 public class EfCoreDepartmentsRepository : IDepartmentsRepository
 {
@@ -118,7 +118,6 @@ public class EfCoreDepartmentsRepository : IDepartmentsRepository
         }
     }
 
-
     public async Task<Result<bool, Errors>> Exists(Guid id, CancellationToken cancellationToken)
     {
         try
@@ -134,24 +133,6 @@ public class EfCoreDepartmentsRepository : IDepartmentsRepository
         {
             _logger.LogError(exception, "Database error while checking if department with id {id} exists", id);
             return DepartmentsErrors.DatabaseError().ToErrors();
-        }
-    }
-
-    public async Task<Result<int, Errors>> SaveChanges(CancellationToken cancellationToken)
-    {
-        try
-        {
-            return await _dbContext.SaveChangesAsync(cancellationToken);
-        }
-        catch (OperationCanceledException)
-        {
-            _logger.LogWarning("Operation cancelled while saving changes");
-            return GeneralErrors.OperationCancelled().ToErrors();
-        }
-        catch (Exception exception)
-        {
-            _logger.LogError(exception, "Database error while saving changes");
-            return DepartmentsErrors.DatabaseError().ToErrors();       
         }
     }
 }

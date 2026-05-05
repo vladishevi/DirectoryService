@@ -53,7 +53,7 @@ public class CreateLocationHandler : ICommandHandler<Guid, CreateLocationCommand
         Location location = new(nameResult.Value, addressResult.Value, timezoneResult.Value);
 
         //db saving
-        Result<Guid, Errors> result = await _locationsRepository.Add(location, cancellationToken);
+        Result<Guid, Errors> result = await _locationsRepository.AddAndSave(location, cancellationToken);
         if (result.IsFailure)
         {
             _logger.LogError("Error creating location: {error}", result.Error);
