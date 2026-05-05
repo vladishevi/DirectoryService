@@ -47,6 +47,13 @@ public class UpdateLocationsHandler : ICommandHandler<Guid, UpdateLocationsComma
             return getDepartmentResult.Error;
         }
         
+        Department department = getDepartmentResult.Value;
+        if (!department.IsActive)
+        {
+            _logger.LogError("Department with {name} is inactive while updating locations}", department.Name);
+            return GeneralErrors.Inactive("Department is inactive", department.Id).ToErrors();      
+        }
+        
         //check if locations exist
         Result<bool, Errors> locationsExistResult = await _locationsRepository.AllExist(command.Request.LocationIds, active: true, cancellationToken);
         if (locationsExistResult.IsFailure)
@@ -61,7 +68,6 @@ public class UpdateLocationsHandler : ICommandHandler<Guid, UpdateLocationsComma
         }
 
         //update locations
-        Department department = getDepartmentResult.Value;
         department.UpdateLocations(command.Request.LocationIds);
         
         //db save

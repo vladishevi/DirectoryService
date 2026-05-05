@@ -141,7 +141,6 @@ public class EfCoreDepartmentsRepository : IDepartmentsRepository
     {
         try
         {
-            var entries = _dbContext.ChangeTracker.Entries();
             return await _dbContext.SaveChangesAsync(cancellationToken);
         }
         catch (OperationCanceledException)
