@@ -63,7 +63,7 @@ public class CreateDepartmentHandler : ICommandHandler<Guid,CreateDepartmentComm
         
         //check if locations exist
         Result<bool, Errors> locationsExistResult =
-            await _locationsRepository.AllExist(command.Request.LocationIds, cancellationToken);
+            await _locationsRepository.AllExist(command.Request.LocationIds, active: true, cancellationToken);
         if (locationsExistResult.IsFailure)
         {
             _logger.LogError("Error checking if locations exist while creating department with name {name}",
@@ -72,8 +72,8 @@ public class CreateDepartmentHandler : ICommandHandler<Guid,CreateDepartmentComm
         }
         if (!locationsExistResult.Value)
         {
-            _logger.LogError("Location does not exist while creating department with name {name}", command.Request.Name);
-            return GeneralErrors.NotFound("Location not found").ToErrors();
+            _logger.LogError("Location does not exist or inactive while creating department with name {name}", command.Request.Name);
+            return GeneralErrors.NotFound("Location not found or inactive").ToErrors();
         }
 
         //add locations to department

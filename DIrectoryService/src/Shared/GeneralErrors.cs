@@ -17,6 +17,11 @@ public static class GeneralErrors
         return Error.NotFound("not.found", message ?? "Not found", guid);
     }
     
+    public static Error NotFoundOrInactive(string? message = null, Guid? guid = null)
+    {
+        return Error.NotFound("not.found.or.inactive", message ?? "Not found or inactive", guid);
+    }
+    
     public static Error DatabaseError(string? code = null, string? message = null)
     {
         return Error.Failure(code ?? "database.error", message ?? "Something went wrong with the database");

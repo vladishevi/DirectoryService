@@ -48,7 +48,7 @@ public class UpdateLocationsHandler : ICommandHandler<Guid, UpdateLocationsComma
         }
         
         //check if locations exist
-        Result<bool, Errors> locationsExistResult = await _locationsRepository.AllExist(command.Request.LocationIds, cancellationToken);
+        Result<bool, Errors> locationsExistResult = await _locationsRepository.AllExist(command.Request.LocationIds, active: true, cancellationToken);
         if (locationsExistResult.IsFailure)
         {
             _logger.LogError("Error checking if locations exist while updating locations of department with id {id}", command.DepartmentId);
@@ -57,7 +57,7 @@ public class UpdateLocationsHandler : ICommandHandler<Guid, UpdateLocationsComma
         if (!locationsExistResult.Value)
         {
             _logger.LogError("Location does not exist while updating locations of department with id {id}", command.DepartmentId);
-            return GeneralErrors.NotFound("Location not found").ToErrors();       
+            return GeneralErrors.NotFoundOrInactive("Location not found or inactive").ToErrors();       
         }
 
         //update locations

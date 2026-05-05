@@ -106,7 +106,7 @@ public class EfCoreLocationsRepository : ILocationsRepository
         }
     }
 
-    public async Task<Result<bool, Errors>> AllExist(IEnumerable<Guid> ids, CancellationToken cancellationToken)
+    public async Task<Result<bool, Errors>> AllExist(IEnumerable<Guid> ids, bool active, CancellationToken cancellationToken)
     {
         try
         {
@@ -114,8 +114,12 @@ public class EfCoreLocationsRepository : ILocationsRepository
             {
                 return GeneralErrors.Dublicate(message: "Ids must be unique").ToErrors();
             }
+
+            IQueryable<Location> query = _dbContext.Locations.Where(l => ids.Contains(l.Id));
+            if (active)
+                query = query.Where(l => l.IsActive);
             
-            int existingCount = await _dbContext.Locations
+            int existingCount = await query
                 .CountAsync(l => ids.Contains(l.Id), cancellationToken: cancellationToken);
 
             return existingCount == ids.Count();
