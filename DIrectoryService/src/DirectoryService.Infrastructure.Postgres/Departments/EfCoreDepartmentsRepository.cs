@@ -21,12 +21,12 @@ public class EfCoreDepartmentsRepository : IDepartmentsRepository
         _logger = logger;
     }
 
-    public async Task<Result<Guid, Errors>> Add(Department department, CancellationToken cancellationToken)
+    public async Task<Result<Guid, Errors>> AddAndSave(Department department, CancellationToken cancellationToken)
     {
         try
         {
             await _dbContext.Departments.AddAsync(department, cancellationToken);
-            await _dbContext.SaveChangesAsync(cancellationToken);
+            _dbContext.SaveChangesAsync(cancellationToken);
             return department.Id;
         }
         catch (DbUpdateException exception) when (exception.InnerException is PostgresException pgException)
@@ -89,6 +89,35 @@ public class EfCoreDepartmentsRepository : IDepartmentsRepository
             return DepartmentsErrors.DatabaseError().ToErrors();
         }
     }
+    
+    public async Task<Result<Department, Errors>> GetByIdWithLocations(Guid id, CancellationToken cancellationToken)
+    {
+        try
+        {
+            Department? department = await _dbContext.Departments
+                .Include(d => d.Locations)
+                .FirstOrDefaultAsync(d => d.Id == id, cancellationToken);
+            
+            if (department != null)
+            {
+                return department;
+            }
+
+            _logger.LogWarning("Department not found with id {id}", id);
+            return GeneralErrors.NotFound("Department not found", id).ToErrors();
+        }
+        catch (OperationCanceledException)
+        {
+            _logger.LogWarning("Operation cancelled while getting department with id {id}", id);
+            return GeneralErrors.OperationCancelled().ToErrors();
+        }
+        catch (Exception exception)
+        {
+            _logger.LogError(exception, "Database error while getting department with id {id}", id);
+            return DepartmentsErrors.DatabaseError().ToErrors();
+        }
+    }
+
 
     public async Task<Result<bool, Errors>> Exists(Guid id, CancellationToken cancellationToken)
     {
@@ -105,6 +134,25 @@ public class EfCoreDepartmentsRepository : IDepartmentsRepository
         {
             _logger.LogError(exception, "Database error while checking if department with id {id} exists", id);
             return DepartmentsErrors.DatabaseError().ToErrors();
+        }
+    }
+
+    public async Task<Result<int, Errors>> SaveChanges(CancellationToken cancellationToken)
+    {
+        try
+        {
+            var entries = _dbContext.ChangeTracker.Entries();
+            return await _dbContext.SaveChangesAsync(cancellationToken);
+        }
+        catch (OperationCanceledException)
+        {
+            _logger.LogWarning("Operation cancelled while saving changes");
+            return GeneralErrors.OperationCancelled().ToErrors();
+        }
+        catch (Exception exception)
+        {
+            _logger.LogError(exception, "Database error while saving changes");
+            return DepartmentsErrors.DatabaseError().ToErrors();       
         }
     }
 }

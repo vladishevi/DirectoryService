@@ -12,7 +12,8 @@ public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
         builder.ToTable("departments");
         builder.HasKey(d => d.Id).HasName("pk_departments");
 
-        builder.Property(d => d.Id).HasColumnName("id");
+        builder.Property(d => d.Id).
+            HasColumnName("id");
 
         builder.Property(d => d.Name)
             .HasColumnName("name")

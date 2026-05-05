@@ -79,8 +79,8 @@ public class CreateDepartmentHandler : ICommandHandler<Guid,CreateDepartmentComm
         //add locations to department
         department.UpdateLocations(command.Request.LocationIds);
 
-        //db save
-        Result<Guid, Errors> addDepartmentResult = await _departmentsRepository.Add(department, cancellationToken);
+        //add department to db
+        Result<Guid, Errors> addDepartmentResult = await _departmentsRepository.AddAndSave(department, cancellationToken);
         if (addDepartmentResult.IsFailure)
         {
             _logger.LogError("Failed to create new department by name {departmentName}", department.Name);

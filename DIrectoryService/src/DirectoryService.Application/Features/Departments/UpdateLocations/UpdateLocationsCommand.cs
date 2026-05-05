@@ -2,4 +2,4 @@
 
 namespace DirectoryService.Application.Features.Departments;
 
-public record UpdateLocationsCommand(UpdateLocationsRequest Request) : ICommand;
+public record UpdateLocationsCommand(Guid DepartmentId, UpdateLocationsRequest Request) : ICommand;
