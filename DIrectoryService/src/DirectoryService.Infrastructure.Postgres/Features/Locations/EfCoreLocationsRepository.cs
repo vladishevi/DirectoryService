@@ -120,7 +120,7 @@ public class EfCoreLocationsRepository : ILocationsRepository
                 query = query.Where(l => l.IsActive);
             
             int existingCount = await query
-                .CountAsync(l => ids.Contains(l.Id), cancellationToken: cancellationToken);
+                .CountAsync(cancellationToken: cancellationToken);
 
             return existingCount == ids.Count();
         }
