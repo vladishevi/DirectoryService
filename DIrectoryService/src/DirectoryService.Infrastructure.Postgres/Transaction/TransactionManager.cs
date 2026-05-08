@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 using Shared;
 
-namespace DirectoryService.Infrastructure.Postgres;
+namespace DirectoryService.Infrastructure.Postgres.Transaction;
 
 public class TransactionManager : ITransactionManager
 {
@@ -41,24 +41,18 @@ public class TransactionManager : ITransactionManager
             return GeneralErrors.DatabaseError().ToErrors();
         }       
     }
-    
-    public async Task<UnitResult<Errors>> SaveChangesAsync(CancellationToken cancellationToken)
+
+    public async Task<Result<T, Errors>> SaveChangesAsync<T>(TransactionExceptionHandler<T> exceptionHandler, CancellationToken cancellationToken)
     {
         try
         {
             await _dbContext.SaveChangesAsync(cancellationToken);
             _logger.LogInformation("Changes saved");
-            return UnitResult.Success<Errors>();
+            return new Result<T, Errors>();
         }
-        catch (OperationCanceledException)
+        catch (Exception exp)
         {
-            _logger.LogWarning("Operation cancelled while saving changes");
-            return GeneralErrors.OperationCancelled().ToErrors();
-        }
-        catch (Exception)
-        {
-            _logger.LogError("Database error while saving changes");
-            return GeneralErrors.DatabaseError().ToErrors();       
+            return exceptionHandler.Handle(exp);
         }
     }
 }

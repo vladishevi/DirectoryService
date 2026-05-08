@@ -19,7 +19,7 @@ public class EfCoreLocationsRepository : ILocationsRepository
         _logger = logger;
     }
 
-    public async Task<Result<Guid, Errors>> AddAndSave(Location location, CancellationToken cancellationToken)
+    public async Task<Result<Guid, Errors>> Add(Location location, CancellationToken cancellationToken)
     {
         try
         {

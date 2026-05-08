@@ -3,6 +3,7 @@ using DirectoryService.Application.Database;
 using DirectoryService.Application.Features.Departments;
 using DirectoryService.Application.Features.Locations;
 using DirectoryService.Application.Features.Positions;
+using DirectoryService.Infrastructure.Postgres.Transaction;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
