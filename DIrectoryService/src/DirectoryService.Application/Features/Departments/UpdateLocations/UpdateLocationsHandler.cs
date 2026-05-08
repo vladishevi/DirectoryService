@@ -4,7 +4,6 @@ using DirectoryService.Application.Database;
 using DirectoryService.Application.Features.Locations;
 using DirectoryService.Application.Validation;
 using DirectoryService.Domain.Departments;
-using DirectoryService.Infrastructure.Postgres.Transaction;
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.Extensions.Logging;
@@ -18,7 +17,6 @@ public class UpdateLocationsHandler : ICommandHandler<Guid, UpdateLocationsComma
     private readonly ILocationsRepository _locationsRepository;
     private readonly IValidator<UpdateLocationsCommand> _validator;
     private readonly ITransactionManager _transactionManager;
-    private readonly TransactionExceptionHandler _transactionExceptionHandler;
     private readonly ILogger<UpdateLocationsHandler> _logger;
 
     public UpdateLocationsHandler(
@@ -26,14 +24,12 @@ public class UpdateLocationsHandler : ICommandHandler<Guid, UpdateLocationsComma
         ILocationsRepository locationsRepository,
         IValidator<UpdateLocationsCommand> validator,
         ITransactionManager transactionManager,
-        TransactionExceptionHandler transactionExceptionHandler,
         ILogger<UpdateLocationsHandler> logger)
     {
         _departmentsRepository = departmentsRepository;
         _locationsRepository = locationsRepository;
         _validator = validator;
         _transactionManager = transactionManager;
-        _transactionExceptionHandler = transactionExceptionHandler;
         _logger = logger;
     }
     
@@ -79,7 +75,7 @@ public class UpdateLocationsHandler : ICommandHandler<Guid, UpdateLocationsComma
         department.UpdateLocations(command.Request.LocationIds);
         
         //db save
-        UnitResult<Errors> saveChangesResult = await _transactionManager.SaveChangesAsync(_transactionExceptionHandler, cancellationToken);
+        UnitResult<Errors> saveChangesResult = await _transactionManager.SaveChangesAsync(cancellationToken);
         if (saveChangesResult.IsFailure)
         {
             _logger.LogError("Error saving changes to department with id {id}", command.DepartmentId);

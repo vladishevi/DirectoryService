@@ -21,12 +21,11 @@ public class EfCorePositionsRepository : IPositionsRepository
         _logger = logger;
     }
 
-    public async Task<Result<Guid, Errors>> AddAndSave(Position position, CancellationToken cancellationToken)
+    public async Task<Result<Guid, Errors>> Add(Position position, CancellationToken cancellationToken)
     {
         try
         {
             await _dbContext.Positions.AddAsync(position, cancellationToken);
-            await _dbContext.SaveChangesAsync(cancellationToken);
             return position.Id;
         }
         catch (DbUpdateException exception) when (exception.InnerException is PostgresException pgException)
@@ -38,11 +37,6 @@ public class EfCorePositionsRepository : IPositionsRepository
                 return PositionsErrors.DatabaseError().ToErrors();
             }
 
-            if (pgException.ConstraintName.Contains(Constants.Indexes.POSITION_NAME,
-                    StringComparison.InvariantCultureIgnoreCase))
-            {
-                return PositionsErrors.NameConflict(position.Name.Value).ToErrors();
-            }
             
             return Error.Conflict().ToErrors();
         }

@@ -4,12 +4,17 @@ namespace DirectoryService.Application.Features.Departments;
 
 public static class DepartmentsErrors
 {
-    public static Error NameConflict(string name) =>
-        Error.Conflict("department.name.already.exists", $"Department with name '{name}' already exists");
+    public static Error NameConflict(string? name = null) =>
+        Error.Conflict("department.name.already.exists",
+            name != null 
+                ? $"Department with name '{name}' already exists" 
+                : "Department with name already exists");
 
-    public static Error IdentifierConflict(string identifier) =>
+    public static Error IdentifierConflict(string? identifier = null) =>
         Error.Conflict("department.identifier.already.exists",
-            $"Department with identifier '{identifier}' already exists");
+            identifier != null
+                ? $"Department with identifier '{identifier}' already exists"
+                : "Department with identifier already exists");
 
     public static Error DatabaseError()
     {

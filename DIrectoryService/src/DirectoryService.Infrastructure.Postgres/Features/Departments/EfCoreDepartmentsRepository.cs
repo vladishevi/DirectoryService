@@ -3,7 +3,6 @@ using DirectoryService.Application.Features.Departments;
 using DirectoryService.Domain.Departments;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Npgsql;
 using Shared;
 
 namespace DirectoryService.Infrastructure.Postgres.Features.Departments;
@@ -21,35 +20,12 @@ public class EfCoreDepartmentsRepository : IDepartmentsRepository
         _logger = logger;
     }
 
-    public async Task<Result<Guid, Errors>> AddAndSave(Department department, CancellationToken cancellationToken)
+    public async Task<Result<Guid, Errors>> Add(Department department, CancellationToken cancellationToken)
     {
         try
         {
             await _dbContext.Departments.AddAsync(department, cancellationToken);
-            _dbContext.SaveChangesAsync(cancellationToken);
             return department.Id;
-        }
-        catch (DbUpdateException exception) when (exception.InnerException is PostgresException pgException)
-        {
-            if (pgException.SqlState != PostgresErrorCodes.UniqueViolation)
-            {
-                _logger.LogError("Database update error while creating new department with name {name}",
-                    department.Name.Value);
-                return DepartmentsErrors.DatabaseError().ToErrors();
-            }
-
-            if (pgException.ConstraintName.Contains(Constants.Indexes.DEPARTMENT_NAME, StringComparison.InvariantCultureIgnoreCase))
-            {
-                return DepartmentsErrors.NameConflict(department.Name.Value).ToErrors();
-            }
-
-            if (pgException.ConstraintName.Contains(Constants.Indexes.DEPARTMENT_IDENTIFIER,
-                    StringComparison.InvariantCultureIgnoreCase))
-            {
-                return DepartmentsErrors.IdentifierConflict(department.Identifier.Value).ToErrors();
-            }
-
-            return Error.Conflict().ToErrors();
         }
         catch (OperationCanceledException)
         {

@@ -18,6 +18,7 @@ public static class DependencyInjection
     {
         AddDb(services, configuration);
         AddRepositories(services);
+        AddTransactionExceptionHandlers(services);
         services.AddScoped<ITransactionManager, TransactionManager>();
         return services;
     }
@@ -44,5 +45,15 @@ public static class DependencyInjection
             }
             options.UseLoggerFactory(loggerFactory);
         });
+    }
+
+    private static void AddTransactionExceptionHandlers(IServiceCollection services)
+    {
+        services.Scan(scan => scan
+            .FromAssembliesOf(typeof(DependencyInjection))
+            .AddClasses(classes => classes
+                .AssignableToAny(typeof(ITransactionExceptionHandler)))
+            .AsSelfWithInterfaces()
+            .WithScopedLifetime());
     }
 }

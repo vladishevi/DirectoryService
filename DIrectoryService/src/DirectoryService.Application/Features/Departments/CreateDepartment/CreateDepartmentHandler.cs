@@ -1,5 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Application.Abstractions;
+using DirectoryService.Application.Database;
 using DirectoryService.Application.Features.Locations;
 using DirectoryService.Application.Validation;
 using DirectoryService.Contracts.Departments;
@@ -17,6 +18,7 @@ public class CreateDepartmentHandler : ICommandHandler<Guid,CreateDepartmentComm
 {
     private readonly IDepartmentsRepository _departmentsRepository;
     private readonly ILocationsRepository _locationsRepository;
+    private readonly ITransactionManager _transactionManager;
     private readonly IValidator<CreateDepartmentCommand> _validator;
 
     private readonly ILogger<CreateDepartmentHandler> _logger;
@@ -24,11 +26,13 @@ public class CreateDepartmentHandler : ICommandHandler<Guid,CreateDepartmentComm
     public CreateDepartmentHandler(
         IDepartmentsRepository departmentsRepository,
         ILocationsRepository locationsRepository,
+        ITransactionManager transactionManager,
         IValidator<CreateDepartmentCommand> validator,
         ILogger<CreateDepartmentHandler> logger)
     {
         _departmentsRepository = departmentsRepository;
         _locationsRepository = locationsRepository;
+        _transactionManager = transactionManager;
         _validator = validator;
         _logger = logger;
     }
@@ -79,12 +83,20 @@ public class CreateDepartmentHandler : ICommandHandler<Guid,CreateDepartmentComm
         //add locations to department
         department.UpdateLocations(command.Request.LocationIds);
 
-        //add department to db
-        Result<Guid, Errors> addDepartmentResult = await _departmentsRepository.AddAndSave(department, cancellationToken);
+        //add department
+        Result<Guid, Errors> addDepartmentResult = await _departmentsRepository.Add(department, cancellationToken);
         if (addDepartmentResult.IsFailure)
         {
             _logger.LogError("Failed to create new department by name {departmentName}", department.Name);
             return addDepartmentResult.Error;
+        }
+
+        //save to db
+        UnitResult<Errors> saveResult = await _transactionManager.SaveChangesAsync(cancellationToken);
+        if (saveResult.IsFailure)
+        {
+            _logger.LogError("Error saving department to database: {error}", saveResult.Error);
+            return saveResult.Error;
         }
 
         //logging
