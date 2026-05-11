@@ -13,7 +13,9 @@ public class DepartmentPositionConfiguration : IEntityTypeConfiguration<Departme
 
         builder.HasKey(d => d.Id).HasName("pk_department_positions");
 
-        builder.Property(d => d.Id).HasColumnName("id");
+        builder.Property(d => d.Id)
+            .HasColumnName("id")
+            .ValueGeneratedOnAdd();
 
         builder.HasOne<Department>()
             .WithMany(d => d.Positions)

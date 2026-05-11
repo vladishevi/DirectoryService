@@ -1,9 +1,9 @@
-﻿using DirectoryService.Application.Features.Departments;
+﻿using DirectoryService.Application.Abstractions;
+using DirectoryService.Application.Database;
+using DirectoryService.Application.Features.Departments;
 using DirectoryService.Application.Features.Locations;
 using DirectoryService.Application.Features.Positions;
-using DirectoryService.Infrastructure.Postgres.Departments;
-using DirectoryService.Infrastructure.Postgres.Locations;
-using DirectoryService.Infrastructure.Postgres.Positions;
+using DirectoryService.Infrastructure.Postgres.Transaction;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,15 +18,19 @@ public static class DependencyInjection
     {
         AddDb(services, configuration);
         AddRepositories(services);
+        AddTransactionExceptionHandlers(services);
+        services.AddScoped<ITransactionManager, TransactionManager>();
         return services;
     }
 
     private static void AddRepositories(IServiceCollection services) =>
-        services
-            .AddScoped<ILocationsRepository, EfCoreLocationsRepository>()
-            .AddScoped<IDepartmentsRepository, EfCoreDepartmentsRepository>()
-            .AddScoped<IPositionsRepository, EfCorePositionsRepository>();
-
+        services.Scan(scan => scan
+            .FromAssembliesOf(typeof(DependencyInjection))
+            .AddClasses(classes => classes
+                .AssignableToAny(typeof(IRepository)))
+            .AsSelfWithInterfaces()
+            .WithScopedLifetime());
+    
     private static void AddDb(IServiceCollection services, IConfiguration configuration)
     {
         services.AddDbContext<DirectoryServiceDbContext>((sp, options) =>
@@ -41,5 +45,15 @@ public static class DependencyInjection
             }
             options.UseLoggerFactory(loggerFactory);
         });
+    }
+
+    private static void AddTransactionExceptionHandlers(IServiceCollection services)
+    {
+        services.Scan(scan => scan
+            .FromAssembliesOf(typeof(DependencyInjection))
+            .AddClasses(classes => classes
+                .AssignableToAny(typeof(ITransactionExceptionHandler)))
+            .AsSelfWithInterfaces()
+            .WithScopedLifetime());
     }
 }

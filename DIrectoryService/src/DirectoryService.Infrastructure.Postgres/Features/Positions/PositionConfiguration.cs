@@ -2,7 +2,7 @@ using DirectoryService.Domain.Positions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace DirectoryService.Infrastructure.Postgres.Positions;
+namespace DirectoryService.Infrastructure.Postgres.Features.Positions;
 
 public class PositionConfiguration : IEntityTypeConfiguration<Position>
 {

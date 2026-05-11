@@ -1,5 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Application.Abstractions;
+using DirectoryService.Application.Database;
 using DirectoryService.Application.Features.Locations;
 using DirectoryService.Application.Validation;
 using DirectoryService.Contracts.Departments;
@@ -17,6 +18,7 @@ public class CreateDepartmentHandler : ICommandHandler<Guid,CreateDepartmentComm
 {
     private readonly IDepartmentsRepository _departmentsRepository;
     private readonly ILocationsRepository _locationsRepository;
+    private readonly ITransactionManager _transactionManager;
     private readonly IValidator<CreateDepartmentCommand> _validator;
 
     private readonly ILogger<CreateDepartmentHandler> _logger;
@@ -24,11 +26,13 @@ public class CreateDepartmentHandler : ICommandHandler<Guid,CreateDepartmentComm
     public CreateDepartmentHandler(
         IDepartmentsRepository departmentsRepository,
         ILocationsRepository locationsRepository,
+        ITransactionManager transactionManager,
         IValidator<CreateDepartmentCommand> validator,
         ILogger<CreateDepartmentHandler> logger)
     {
         _departmentsRepository = departmentsRepository;
         _locationsRepository = locationsRepository;
+        _transactionManager = transactionManager;
         _validator = validator;
         _logger = logger;
     }
@@ -63,7 +67,7 @@ public class CreateDepartmentHandler : ICommandHandler<Guid,CreateDepartmentComm
         
         //check if locations exist
         Result<bool, Errors> locationsExistResult =
-            await _locationsRepository.AllExist(command.Request.LocationIds, cancellationToken);
+            await _locationsRepository.AllExist(command.Request.LocationIds, active: true, cancellationToken);
         if (locationsExistResult.IsFailure)
         {
             _logger.LogError("Error checking if locations exist while creating department with name {name}",
@@ -72,24 +76,27 @@ public class CreateDepartmentHandler : ICommandHandler<Guid,CreateDepartmentComm
         }
         if (!locationsExistResult.Value)
         {
-            _logger.LogError("Location does not exist while creating department with name {name}", command.Request.Name);
-            return GeneralErrors.NotFound("Location not found").ToErrors();
+            _logger.LogError("Location does not exist or inactive while creating department with name {name}", command.Request.Name);
+            return GeneralErrors.NotFound("Location not found or inactive").ToErrors();
         }
 
         //add locations to department
-        UnitResult<Errors> addLocationsResult = department.AddLocations(command.Request.LocationIds);
-        if (addLocationsResult.IsFailure)
-        {
-            _logger.LogError("Failed to add locations to department with name {departmentName}", department.Name);
-            return addLocationsResult.Error;
-        }
+        department.UpdateLocations(command.Request.LocationIds);
 
-        //db save
+        //add department
         Result<Guid, Errors> addDepartmentResult = await _departmentsRepository.Add(department, cancellationToken);
         if (addDepartmentResult.IsFailure)
         {
             _logger.LogError("Failed to create new department by name {departmentName}", department.Name);
             return addDepartmentResult.Error;
+        }
+
+        //save to db
+        UnitResult<Errors> saveResult = await _transactionManager.SaveChangesAsync(cancellationToken);
+        if (saveResult.IsFailure)
+        {
+            _logger.LogError("Error saving department to database: {error}", saveResult.Error);
+            return saveResult.Error;
         }
 
         //logging

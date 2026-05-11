@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Path = DirectoryService.Domain.Departments.Path;
 
-namespace DirectoryService.Infrastructure.Postgres.Departments;
+namespace DirectoryService.Infrastructure.Postgres.Features.Departments;
 
 public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
 {
@@ -12,7 +12,8 @@ public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
         builder.ToTable("departments");
         builder.HasKey(d => d.Id).HasName("pk_departments");
 
-        builder.Property(d => d.Id).HasColumnName("id");
+        builder.Property(d => d.Id).
+            HasColumnName("id");
 
         builder.Property(d => d.Name)
             .HasColumnName("name")

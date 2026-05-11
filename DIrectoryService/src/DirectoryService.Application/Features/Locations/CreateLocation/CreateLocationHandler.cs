@@ -1,5 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Application.Abstractions;
+using DirectoryService.Application.Database;
 using DirectoryService.Application.Validation;
 using DirectoryService.Domain.Locations;
 using FluentValidation;
@@ -13,14 +14,17 @@ public class CreateLocationHandler : ICommandHandler<Guid, CreateLocationCommand
 {
     private readonly ILocationsRepository _locationsRepository;
     private readonly IValidator<CreateLocationCommand> _validator;
+    private readonly ITransactionManager _transactionManager;
     private readonly ILogger<CreateLocationHandler> _logger;
 
     public CreateLocationHandler(ILocationsRepository locationsRepository,
         IValidator<CreateLocationCommand> validator,
+        ITransactionManager transactionManager,
         ILogger<CreateLocationHandler> logger)
     {
         _locationsRepository = locationsRepository;
         _validator = validator;
+        _transactionManager = transactionManager;
         _logger = logger;
     }
     
@@ -52,12 +56,20 @@ public class CreateLocationHandler : ICommandHandler<Guid, CreateLocationCommand
         Result<Timezone, Errors> timezoneResult = Timezone.Create(command.CreateLocationRequest.Timezone);
         Location location = new(nameResult.Value, addressResult.Value, timezoneResult.Value);
 
-        //db saving
+        //add location
         Result<Guid, Errors> result = await _locationsRepository.Add(location, cancellationToken);
         if (result.IsFailure)
         {
             _logger.LogError("Error creating location: {error}", result.Error);
             return result.Error;
+        }
+        
+        //db save
+        UnitResult<Errors> saveResult = await _transactionManager.SaveChangesAsync(cancellationToken);
+        if (saveResult.IsFailure)
+        {
+            _logger.LogError("Error saving location to database: {error}", saveResult.Error);
+            return saveResult.Error;
         }
                 
         //logging

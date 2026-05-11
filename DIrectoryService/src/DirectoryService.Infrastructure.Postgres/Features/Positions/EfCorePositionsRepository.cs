@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 using Npgsql;
 using Shared;
 
-namespace DirectoryService.Infrastructure.Postgres.Positions;
+namespace DirectoryService.Infrastructure.Postgres.Features.Positions;
 
 public class EfCorePositionsRepository : IPositionsRepository
 {
@@ -26,7 +26,6 @@ public class EfCorePositionsRepository : IPositionsRepository
         try
         {
             await _dbContext.Positions.AddAsync(position, cancellationToken);
-            await _dbContext.SaveChangesAsync(cancellationToken);
             return position.Id;
         }
         catch (DbUpdateException exception) when (exception.InnerException is PostgresException pgException)
@@ -38,11 +37,6 @@ public class EfCorePositionsRepository : IPositionsRepository
                 return PositionsErrors.DatabaseError().ToErrors();
             }
 
-            if (pgException.ConstraintName.Contains(Constants.Indexes.POSITION_NAME,
-                    StringComparison.InvariantCultureIgnoreCase))
-            {
-                return PositionsErrors.NameConflict(position.Name.Value).ToErrors();
-            }
             
             return Error.Conflict().ToErrors();
         }
