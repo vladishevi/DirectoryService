@@ -37,7 +37,7 @@ public class DepartmentsController
         [FromBody] UpdateParentRequest request, 
         CancellationToken cancellationToken)
     {
-        UpdateParentCommand command = new(request);
+        UpdateParentCommand command = new(departmentId, request);
         return await updateParentHandler.Handle(command, cancellationToken);
     }
 }

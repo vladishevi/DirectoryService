@@ -3,4 +3,4 @@ using DirectoryService.Contracts.Departments;
 
 namespace DirectoryService.Application.Features.Departments;
 
-public record UpdateParentCommand(UpdateParentRequest Request) : ICommand;
+public record UpdateParentCommand(Guid DepartmentId, UpdateParentRequest Request) : ICommand;

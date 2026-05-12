@@ -94,11 +94,15 @@ public class EfCoreDepartmentsRepository : IDepartmentsRepository
         }
     }
 
-    public async Task<Result<bool, Errors>> Exists(Guid id, CancellationToken cancellationToken)
+    public async Task<Result<bool, Errors>> Exists(Guid id, bool active, CancellationToken cancellationToken)
     {
         try
         {
-            return await _dbContext.Departments.AnyAsync(d => d.Id == id, cancellationToken);
+            IQueryable<Department> query = _dbContext.Departments.Where(d => d.Id == id);
+            if (active)
+                query = query.Where(d => d.IsActive);
+
+            return await query.AnyAsync(cancellationToken);
         }
         catch (OperationCanceledException)
         {
