@@ -31,6 +31,7 @@ public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
         
         builder.Property(d => d.Path)
             .HasColumnName("path")
+            .HasColumnType("ltree")
             .HasConversion(p => p.Value, p => new Path(p));
         
         builder.Property(d => d.Depth)
