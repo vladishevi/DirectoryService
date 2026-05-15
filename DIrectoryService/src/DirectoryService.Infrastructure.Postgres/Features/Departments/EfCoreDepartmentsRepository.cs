@@ -1,6 +1,7 @@
 using CSharpFunctionalExtensions;
 using DirectoryService.Application.Features.Departments;
 using DirectoryService.Domain.Departments;
+using DirectoryService.Infrastructure.Postgres.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Shared;
@@ -14,6 +15,7 @@ public class EfCoreDepartmentsRepository : IDepartmentsRepository
 
     public EfCoreDepartmentsRepository(
         DirectoryServiceDbContext dbContext,
+        DbConnectionFactory dbConnectionFactory,
         ILogger<EfCoreDepartmentsRepository> logger)
     {
         _dbContext = dbContext;
@@ -114,5 +116,20 @@ public class EfCoreDepartmentsRepository : IDepartmentsRepository
             _logger.LogError(exception, "Database error while checking if department with id {id} exists", id);
             return DepartmentsErrors.DatabaseError().ToErrors();
         }
+    }
+
+    public Task<Result<bool, Errors>> IsDescendantOf(Guid id, Guid parentId, CancellationToken cancellationToken)
+    {
+        try
+        {
+            
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+
+        throw new InvalidOperationException();
     }
 }
