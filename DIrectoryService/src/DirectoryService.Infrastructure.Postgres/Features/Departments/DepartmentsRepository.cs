@@ -126,21 +126,16 @@ public class DepartmentsRepository : IDepartmentsRepository
     {
         try
         {
-            Department descendant = await _dbContext.Departments.FirstOrDefaultAsync(d => d.Id == descendantId, ct);
-            Department ancestor = await _dbContext.Departments.FirstOrDefaultAsync(d => d.Id == ancestorId, ct);
-
-            if (descendant == null || ancestor == null)
-            {
-                return GeneralErrors.NotFound("Department or ancestor not found").ToErrors();
-            }
-            
-            using IDbConnection connection = await _dbConnectionFactory.CreateConnection();
             const string sql = """
-                               Select @descendantPath::ltree <@ @ancestorPath::ltree
+                               SELECT EXISTS
+                               (SELECT 1 FROM departments d
+                               JOIN departments a ON a.id = @ancestorId
+                               WHERE d.id = @descendantId
+                               AND d.path::ltree <@ a.path::ltree)
                                """;
             
-            var value =  await connection.QuerySingleAsync<bool>(sql, new { descendantPath = descendant.Path.Value, ancestorPath = ancestor.Path.Value });
-            return value;
+            using IDbConnection connection = await _dbConnectionFactory.CreateConnection();
+            return await connection.QuerySingleAsync<bool>(sql, new {descendantId, ancestorId});
         }
         catch (OperationCanceledException)
         {
