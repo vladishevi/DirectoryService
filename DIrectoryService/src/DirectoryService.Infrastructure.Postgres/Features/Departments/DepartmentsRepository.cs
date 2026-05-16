@@ -1,4 +1,6 @@
+using System.Data;
 using CSharpFunctionalExtensions;
+using Dapper;
 using DirectoryService.Application.Features.Departments;
 using DirectoryService.Domain.Departments;
 using DirectoryService.Infrastructure.Postgres.Database;
@@ -8,17 +10,19 @@ using Shared;
 
 namespace DirectoryService.Infrastructure.Postgres.Features.Departments;
 
-public class EfCoreDepartmentsRepository : IDepartmentsRepository
+public class DepartmentsRepository : IDepartmentsRepository
 {
     private readonly DirectoryServiceDbContext _dbContext;
-    private readonly ILogger<EfCoreDepartmentsRepository> _logger;
+    private readonly DbConnectionFactory _dbConnectionFactory;
+    private readonly ILogger<DepartmentsRepository> _logger;
 
-    public EfCoreDepartmentsRepository(
+    public DepartmentsRepository(
         DirectoryServiceDbContext dbContext,
         DbConnectionFactory dbConnectionFactory,
-        ILogger<EfCoreDepartmentsRepository> logger)
+        ILogger<DepartmentsRepository> logger)
     {
         _dbContext = dbContext;
+        _dbConnectionFactory = dbConnectionFactory;
         _logger = logger;
     }
 
@@ -118,16 +122,35 @@ public class EfCoreDepartmentsRepository : IDepartmentsRepository
         }
     }
 
-    public Task<Result<bool, Errors>> IsDescendantOf(Guid id, Guid parentId, CancellationToken cancellationToken)
+    public async Task<Result<bool, Errors>> IsDescendantOf(Guid descendantId, Guid ancestorId, CancellationToken ct)
     {
         try
         {
+            Department descendant = await _dbContext.Departments.FirstOrDefaultAsync(d => d.Id == descendantId, ct);
+            Department ancestor = await _dbContext.Departments.FirstOrDefaultAsync(d => d.Id == ancestorId, ct);
+
+            if (descendant == null || ancestor == null)
+            {
+                return GeneralErrors.NotFound("Department or ancestor not found").ToErrors();
+            }
             
+            using IDbConnection connection = await _dbConnectionFactory.CreateConnection();
+            const string sql = """
+                               Select @descendantPath::ltree <@ @ancestorPath::ltree
+                               """;
+            
+            var value =  await connection.QuerySingleAsync<bool>(sql, new { descendantPath = descendant.Path.Value, ancestorPath = ancestor.Path.Value });
+            return value;
         }
-        catch (Exception e)
+        catch (OperationCanceledException)
         {
-            Console.WriteLine(e);
-            throw;
+            _logger.LogWarning("Operation cancelled while checking the department hierarchy");
+            return GeneralErrors.OperationCancelled().ToErrors();
+        }
+        catch (Exception exception)
+        {
+            _logger.LogError(exception, "Database error while checking the department hierarchy");
+            return DepartmentsErrors.DatabaseError().ToErrors();
         }
 
         throw new InvalidOperationException();

@@ -51,20 +51,40 @@ public class UpdateParentHandler : ICommandHandler<Guid, UpdateParentCommand>
         }
 
         //check if parent exists and active
-        Result<bool, Errors> parentExistsResult =  await _departmentsRepository.Exists(command.Request.ParentId, active: true, ct);
-        if (parentExistsResult.IsFailure)
+        if (command.Request.ParentId != null)
         {
-            _logger.LogError("Error getting parent department with id {id} while updating parent", command.Request.ParentId);
-            return parentExistsResult.Error;
+            Result<bool, Errors> parentExistsResult =  await _departmentsRepository.Exists((Guid)command.Request.ParentId, active: true, ct);
+            if (parentExistsResult.IsFailure)
+            {
+                _logger.LogError("Error getting parent department with id {id} while updating parent", command.Request.ParentId);
+                return parentExistsResult.Error;
+            }
+            if (!parentExistsResult.Value)
+            {
+                _logger.LogError("Parent department with name {name} does not exist while updating parent", command.Request.ParentId);
+                return GeneralErrors.NotFound("Parent department not found", command.Request.ParentId).ToErrors();
+            }
         }
-
-        if (!parentExistsResult.Value)
-        {
-            _logger.LogError("Parent department with name {name} does not exist while updating parent", command.Request.ParentId);
-            return GeneralErrors.NotFound("Parent department not found", command.Request.ParentId).ToErrors();
-        }
-
+        
         //check if a parent isn't a department child
-        throw new NotImplementedException();
+        if (command.Request.ParentId != null)
+        {
+            Result<bool, Errors> isParentDescendantResult =
+                await _departmentsRepository.IsDescendantOf((Guid)command.Request.ParentId, command.DepartmentId, ct);
+            if (isParentDescendantResult.IsFailure)
+            {
+                _logger.LogError("Error checking if parent department with id {id} is a descendant of department with id {departmentId}",
+                    command.Request.ParentId, command.DepartmentId);
+                return isParentDescendantResult.Error;
+            }
+            if (isParentDescendantResult.Value)
+            {
+                _logger.LogError("Parent department with id {id} is a descendant of department with id {departmentId}",
+                    command.Request.ParentId, command.DepartmentId);
+            }
+        }
+
+
+        throw new InvalidOperationException();
     }
 }
