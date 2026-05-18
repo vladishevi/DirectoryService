@@ -126,16 +126,23 @@ public class DepartmentsRepository : IDepartmentsRepository
     {
         try
         {
+            Department? descendant = await _dbContext.Departments.FirstOrDefaultAsync(d => d.Id == descendantId, cancellationToken: ct);
+            Department? ancestor = await _dbContext.Departments.FirstOrDefaultAsync(d => d.Id == ancestorId, cancellationToken: ct);
+            
+            if (descendant == null || ancestor == null)
+            {
+                return GeneralErrors.NotFound("Department not found").ToErrors();
+            }
+            
             const string sql = """
-                               SELECT EXISTS
-                               (SELECT 1 FROM departments d
-                               JOIN departments a ON a.id = @ancestorId
-                               WHERE d.id = @descendantId
-                               AND d.path::ltree <@ a.path::ltree)
+                               SELECT @descendantPath::ltree <@ @ancestorPath::ltree
                                """;
             
             using IDbConnection connection = await _dbConnectionFactory.CreateConnection();
-            return await connection.QuerySingleAsync<bool>(sql, new {descendantId, ancestorId});
+            return await connection.QuerySingleAsync<bool>(new CommandDefinition(
+                sql,
+                new { descendantPath = descendant.Path.Value, ancestorPath = ancestor.Path.Value },
+                cancellationToken: ct));
         }
         catch (OperationCanceledException)
         {
@@ -147,7 +154,79 @@ public class DepartmentsRepository : IDepartmentsRepository
             _logger.LogError(exception, "Database error while checking the department hierarchy");
             return DepartmentsErrors.DatabaseError().ToErrors();
         }
+    }
 
-        throw new InvalidOperationException();
+    public async Task<Result<Department, Errors>> GetByIdWithLock(Guid id, CancellationToken ct)
+    {
+        try
+        {
+            Department? department = await _dbContext.Departments.FirstOrDefaultAsync(d => d.Id == id, cancellationToken: ct);
+            if (department != null)
+            {
+                return department;
+            }
+            
+            _logger.LogWarning("Department not found with id {id}", id);
+            return GeneralErrors.NotFound("Department not found", id).ToErrors();           
+        }
+        catch (OperationCanceledException)
+        {
+            _logger.LogWarning("Operation cancelled while locking department with id {id}", id);
+            return GeneralErrors.OperationCancelled().ToErrors();
+        }
+        catch (Exception exception)
+        {
+            _logger.LogError(exception, "Database error while locking department with id {id}", id);
+            return DepartmentsErrors.DatabaseError().ToErrors();
+        }
+    }
+
+    public async Task<UnitResult<Errors>> LockSubtree(string rootPath, CancellationToken ct)
+    {
+        try
+        {
+            await _dbContext.Database.ExecuteSqlInterpolatedAsync($"""
+                                                           SELECT id
+                                                           FROM departments
+                                                           WHERE path <@ {rootPath}::ltree
+                                                           FOR UPDATE
+                                                           """, cancellationToken: ct);
+            return UnitResult.Success<Errors>();           
+        }
+        catch (OperationCanceledException)
+        {
+            _logger.LogWarning("Operation cancelled while locking subtree with root path {rootPath}", rootPath);
+            return GeneralErrors.OperationCancelled().ToErrors();
+        }
+        catch (Exception exception)
+        {
+            _logger.LogError(exception, "Database error while locking subtree with root path {rootPath}", rootPath);
+            return DepartmentsErrors.DatabaseError().ToErrors();
+        }       
+    }
+
+    public async Task<UnitResult<Errors>> MoveSubtree(string oldRootPath, string newRootPath, CancellationToken ct)
+    {
+        try
+        {
+            await _dbContext.Database.ExecuteSqlInterpolatedAsync($"""
+                                                                   UPDATE departments
+                                                                   SET path = 
+                                                                   {newRootPath}::ltree || subpath(path, nlevel({oldRootPath}::ltree) - 1)
+                                                                   WHERE path <@ {oldRootPath}::ltree
+                                                                   """, ct);
+            
+            return UnitResult.Success<Errors>();
+        }
+        catch (OperationCanceledException)
+        {
+            _logger.LogWarning("Operation cancelled while moving subtree with root path {rootPath}", oldRootPath);
+            return GeneralErrors.OperationCancelled().ToErrors();
+        }
+        catch (Exception exception)
+        {
+            _logger.LogError(exception, "Database error while moving subtree with root path {rootPath}", oldRootPath);
+            return DepartmentsErrors.DatabaseError().ToErrors();
+        }       
     }
 }

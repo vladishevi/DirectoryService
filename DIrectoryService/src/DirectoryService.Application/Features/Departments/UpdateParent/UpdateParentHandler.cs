@@ -2,6 +2,7 @@
 using DirectoryService.Application.Abstractions;
 using DirectoryService.Application.Database;
 using DirectoryService.Application.Validation;
+using DirectoryService.Domain.Departments;
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.Extensions.Logging;
@@ -37,33 +38,59 @@ public class UpdateParentHandler : ICommandHandler<Guid, UpdateParentCommand>
             return validationResult.ToErrors();
         }
 
-        //check if department exists and active
-        Result<bool, Errors> departmentExistsResult =  await _departmentsRepository.Exists(command.DepartmentId, active: true, ct);
-        if (departmentExistsResult.IsFailure)
+        //open transaction
+        Result<ITransactionScope, Errors> beginTransactionResult = await _transactionManager.BeginAsync(ct);
+        if (beginTransactionResult.IsFailure)
+        {
+            _logger.LogError("Error starting transaction while updating parent");
+            return beginTransactionResult.Error;
+        }
+        
+        ITransactionScope transaction = beginTransactionResult.Value;
+        
+        //get department with lock and check for active
+        Result<Department, Errors> getDepartmentWithLockResult = await _departmentsRepository.GetByIdWithLock(command.DepartmentId, ct);
+        if (getDepartmentWithLockResult.IsFailure)
         {
             _logger.LogError("Error getting department with id {id} while updating parent", command.DepartmentId);
-            return departmentExistsResult.Error;
+            transaction.Rollback(ct);
+            return getDepartmentWithLockResult.Error;
         }
-        if (!departmentExistsResult.Value)
+        Department department = getDepartmentWithLockResult.Value;
+        if (!department.IsActive)
         {
-            _logger.LogError("Department with name {name} does not exist while updating parent", command.DepartmentId);
-            return GeneralErrors.NotFound("Department not found", command.DepartmentId).ToErrors();
+            _logger.LogError("Department with name {name} is inactive while updating parent", department.Name);
+            transaction.Rollback(ct);
+            return GeneralErrors.Inactive("Department is inactive", department.Id).ToErrors();
         }
-
-        //check if parent exists and active
+        
+        //get parent with lock and check for active
+        Department? parentDepartment = null;
         if (command.Request.ParentId != null)
         {
-            Result<bool, Errors> parentExistsResult =  await _departmentsRepository.Exists((Guid)command.Request.ParentId, active: true, ct);
-            if (parentExistsResult.IsFailure)
+            Result<Department, Errors> getParentWithLockResult = await _departmentsRepository.GetByIdWithLock((Guid)command.Request.ParentId, ct);
+            if (getParentWithLockResult.IsFailure)
             {
                 _logger.LogError("Error getting parent department with id {id} while updating parent", command.Request.ParentId);
-                return parentExistsResult.Error;
+                transaction.Rollback(ct);
+                return getParentWithLockResult.Error;
             }
-            if (!parentExistsResult.Value)
+            parentDepartment = getParentWithLockResult.Value;
+            if (!parentDepartment.IsActive)
             {
-                _logger.LogError("Parent department with name {name} does not exist while updating parent", command.Request.ParentId);
-                return GeneralErrors.NotFound("Parent department not found", command.Request.ParentId).ToErrors();
+                _logger.LogError("Parent department with name {name} is inactive while updating parent", parentDepartment.Name);
+                transaction.Rollback(ct);
+                return GeneralErrors.Inactive("Parent department is inactive", parentDepartment.Id).ToErrors();
             }
+        }
+
+        //lock subtree
+        UnitResult<Errors> lockSubtreeResult = await _departmentsRepository.LockSubtree(department.Path.Value, ct);
+        if (lockSubtreeResult.IsFailure)
+        {
+            _logger.LogError("Error locking subtree of department with id {id} while updating parent", department.Id);
+            transaction.Rollback(ct);
+            return lockSubtreeResult.Error;
         }
         
         //check if a parent isn't a department child
@@ -81,10 +108,32 @@ public class UpdateParentHandler : ICommandHandler<Guid, UpdateParentCommand>
             {
                 _logger.LogError("Parent department with id {id} is a descendant of department with id {departmentId}",
                     command.Request.ParentId, command.DepartmentId);
+                return DepartmentsErrors.HierarchyError().ToErrors();
             }
         }
 
-
-        throw new InvalidOperationException();
+        //move subtree
+        UnitResult<Errors> moveSubtreeResult = await _departmentsRepository.MoveSubtree(
+            department.Path.Value,
+            parentDepartment == null ? "" : parentDepartment.Path.Value, 
+            ct);
+        if (moveSubtreeResult.IsFailure)
+        {
+            _logger.LogError("Error moving subtree of department with id {id} while updating parent", department.Id);
+            transaction.Rollback(ct);
+            return moveSubtreeResult.Error;
+        }
+        
+        //commit transaction
+        UnitResult<Errors> commitTransactionResult = await transaction.Commit(ct);
+        if (commitTransactionResult.IsFailure)
+        {
+            _logger.LogError("Error committing transaction while updating parent");
+            transaction.Rollback(ct);
+            return commitTransactionResult.Error;
+        }
+        
+        _logger.LogInformation("Parent updated for department with id {id}", department.Id);
+        return department.Id;
     }
 }
