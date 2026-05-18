@@ -46,7 +46,7 @@ public class UpdateParentHandler : ICommandHandler<Guid, UpdateParentCommand>
             return beginTransactionResult.Error;
         }
         
-        ITransactionScope transaction = beginTransactionResult.Value;
+        using ITransactionScope transaction = beginTransactionResult.Value;
         
         //get department with lock and check for active
         Result<Department, Errors> getDepartmentWithLockResult = await _departmentsRepository.GetByIdWithLock(command.DepartmentId, ct);
