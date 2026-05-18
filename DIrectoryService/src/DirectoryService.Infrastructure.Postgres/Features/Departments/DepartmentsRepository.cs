@@ -160,7 +160,12 @@ public class DepartmentsRepository : IDepartmentsRepository
     {
         try
         {
-            Department? department = await _dbContext.Departments.FirstOrDefaultAsync(d => d.Id == id, cancellationToken: ct);
+            Department? department = await _dbContext.Departments.FromSqlInterpolated($"""
+                                                                                           SELECT *
+                                                                                           FROM departments d
+                                                                                           WHERE d.id = {id}
+                                                                                           FOR UPDATE
+                                                                                           """).SingleOrDefaultAsync(ct);
             if (department != null)
             {
                 return department;

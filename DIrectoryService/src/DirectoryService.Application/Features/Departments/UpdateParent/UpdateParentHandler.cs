@@ -84,13 +84,13 @@ public class UpdateParentHandler : ICommandHandler<Guid, UpdateParentCommand>
             }
         }
 
-        //lock subtree
-        UnitResult<Errors> lockSubtreeResult = await _departmentsRepository.LockDescendants(department.Id, ct);
-        if (lockSubtreeResult.IsFailure)
+        //lock descendants
+        UnitResult<Errors> lockDescendants = await _departmentsRepository.LockDescendants(department.Id, ct);
+        if (lockDescendants.IsFailure)
         {
             _logger.LogError("Error locking subtree of department with id {id} while updating parent", department.Id);
             transaction.Rollback(ct);
-            return lockSubtreeResult.Error;
+            return lockDescendants.Error;
         }
         
         //check if a parent isn't a department child
