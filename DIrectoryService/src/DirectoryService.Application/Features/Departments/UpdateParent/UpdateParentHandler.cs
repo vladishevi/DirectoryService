@@ -85,7 +85,7 @@ public class UpdateParentHandler : ICommandHandler<Guid, UpdateParentCommand>
         }
 
         //lock subtree
-        UnitResult<Errors> lockSubtreeResult = await _departmentsRepository.LockSubtree(department.Path.Value, ct);
+        UnitResult<Errors> lockSubtreeResult = await _departmentsRepository.LockDescendants(department.Id, ct);
         if (lockSubtreeResult.IsFailure)
         {
             _logger.LogError("Error locking subtree of department with id {id} while updating parent", department.Id);
@@ -113,10 +113,7 @@ public class UpdateParentHandler : ICommandHandler<Guid, UpdateParentCommand>
         }
 
         //move subtree
-        UnitResult<Errors> moveSubtreeResult = await _departmentsRepository.MoveSubtree(
-            department.Path.Value,
-            parentDepartment == null ? "" : parentDepartment.Path.Value, 
-            ct);
+        UnitResult<Errors> moveSubtreeResult = await _departmentsRepository.ChangeParentTo(department.Id, parentDepartment?.Id, ct);
         if (moveSubtreeResult.IsFailure)
         {
             _logger.LogError("Error moving subtree of department with id {id} while updating parent", department.Id);

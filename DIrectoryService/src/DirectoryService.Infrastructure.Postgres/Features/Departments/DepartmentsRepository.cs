@@ -181,51 +181,96 @@ public class DepartmentsRepository : IDepartmentsRepository
         }
     }
 
-    public async Task<UnitResult<Errors>> LockSubtree(string rootPath, CancellationToken ct)
+    public async Task<UnitResult<Errors>> LockDescendants(Guid departmentId, CancellationToken ct)
     {
         try
         {
+            Department? department = await _dbContext.Departments.FirstOrDefaultAsync(d => d.Id == departmentId, cancellationToken: ct);
+            if (department == null)
+            {
+                return GeneralErrors.NotFound("Department not found", departmentId).ToErrors();
+            }
+            
             await _dbContext.Database.ExecuteSqlInterpolatedAsync($"""
                                                            SELECT id
                                                            FROM departments
-                                                           WHERE path <@ {rootPath}::ltree
+                                                           WHERE 
+                                                               path <@ {department.Path.Value}::ltree
+                                                               AND id <> {departmentId}
                                                            FOR UPDATE
                                                            """, cancellationToken: ct);
             return UnitResult.Success<Errors>();           
         }
         catch (OperationCanceledException)
         {
-            _logger.LogWarning("Operation cancelled while locking subtree with root path {rootPath}", rootPath);
+            _logger.LogWarning("Operation cancelled while locking descendants of department with id {id}", departmentId);
             return GeneralErrors.OperationCancelled().ToErrors();
         }
         catch (Exception exception)
         {
-            _logger.LogError(exception, "Database error while locking subtree with root path {rootPath}", rootPath);
+            _logger.LogError(exception, "Database error while locking descendants of department with id {id}", departmentId);           
             return DepartmentsErrors.DatabaseError().ToErrors();
         }       
     }
 
-    public async Task<UnitResult<Errors>> MoveSubtree(string oldRootPath, string newRootPath, CancellationToken ct)
+    public async Task<UnitResult<Errors>> ChangeParentTo(Guid departmentId, Guid? newParentId, CancellationToken ct)
     {
         try
         {
+            Department? department = await _dbContext.Departments.FirstOrDefaultAsync(d => d.Id == departmentId, cancellationToken: ct);
+            if (department == null)
+            {
+                return GeneralErrors.NotFound("Department not found").ToErrors();
+            }
+
+            Department? newParent = null;
+            if (newParentId != null)
+            {
+                newParent = await _dbContext.Departments.FirstOrDefaultAsync(d => d.Id == newParentId, cancellationToken: ct);
+            }
+
+            //change parent id
             await _dbContext.Database.ExecuteSqlInterpolatedAsync($"""
-                                                                   UPDATE departments
-                                                                   SET path = 
-                                                                   {newRootPath}::ltree || subpath(path, nlevel({oldRootPath}::ltree) - 1)
-                                                                   WHERE path <@ {oldRootPath}::ltree
+                                                                   UPDATE departments d
+                                                                   SET parent_department_id = {newParentId}
+                                                                   WHERE d.id = {departmentId}
                                                                    """, ct);
+            
+            //change path and depth
+            if (newParent == null)
+            {
+                await _dbContext.Database.ExecuteSqlInterpolatedAsync($"""
+                                                                       UPDATE departments
+                                                                       SET 
+                                                                           path = subpath(path, nlevel({department.Path.Value}::ltree) - 1),
+                                                                           depth = nlevel(path) - nlevel({department.Path.Value}::ltree)
+                                                                       WHERE path <@ {department.Path.Value}::ltree
+                                                                       """, ct);
+            }
+            else
+            {
+                await _dbContext.Database.ExecuteSqlInterpolatedAsync($"""
+                                                                       UPDATE departments
+                                                                       SET 
+                                                                           path = {newParent.Path.Value}::ltree 
+                                                                           || subpath(path, nlevel({department.Path.Value}::ltree) - 1),
+                                                                           depth = nlevel({newParent.Path.Value}::ltree) 
+                                                                           + nlevel(path) - nlevel({department.Path.Value}::ltree)
+                                                                       WHERE path <@ {department.Path.Value}::ltree
+                                                                       """, ct);
+                
+            }
             
             return UnitResult.Success<Errors>();
         }
         catch (OperationCanceledException)
         {
-            _logger.LogWarning("Operation cancelled while moving subtree with root path {rootPath}", oldRootPath);
+            _logger.LogWarning("Operation cancelled while changing parent of a department with id {id}", departmentId);
             return GeneralErrors.OperationCancelled().ToErrors();
         }
         catch (Exception exception)
         {
-            _logger.LogError(exception, "Database error while moving subtree with root path {rootPath}", oldRootPath);
+            _logger.LogError(exception, "Database error while changing parent of a department with id {id}", departmentId);          
             return DepartmentsErrors.DatabaseError().ToErrors();
         }       
     }
