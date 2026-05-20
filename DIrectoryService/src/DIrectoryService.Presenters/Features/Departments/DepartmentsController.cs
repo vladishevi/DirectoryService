@@ -2,7 +2,6 @@
 using DirectoryService.Contracts.Departments;
 using DirectoryService.Presenters.EndpointResults;
 using Microsoft.AspNetCore.Mvc;
-using Shared;
 
 namespace DirectoryService.Presenters.Features.Departments;
 
@@ -29,5 +28,16 @@ public class DepartmentsController
     {
         UpdateLocationsCommand command = new(departmentId, request);
         return await updateLocationsHandler.Handle(command, cancellationToken);
+    }
+
+    [HttpPut("{departmentId}/parent")]
+    public async Task<EndpointResult<Guid>> UpdateParent(
+        [FromServices] UpdateParentHandler updateParentHandler,
+        [FromRoute] Guid departmentId,
+        [FromBody] UpdateParentRequest request, 
+        CancellationToken cancellationToken)
+    {
+        UpdateParentCommand command = new(departmentId, request);
+        return await updateParentHandler.Handle(command, cancellationToken);
     }
 }

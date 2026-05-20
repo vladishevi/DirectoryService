@@ -31,6 +31,7 @@ public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
         
         builder.Property(d => d.Path)
             .HasColumnName("path")
+            .HasColumnType("ltree")
             .HasConversion(p => p.Value, p => new Path(p));
         
         builder.Property(d => d.Depth)
@@ -61,5 +62,9 @@ public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
         builder.HasIndex(d => d.Identifier)
             .IsUnique()
             .HasDatabaseName(Constants.Indexes.DEPARTMENT_IDENTIFIER);
+        
+        builder.HasIndex(d => d.Path)
+            .HasMethod("gist")
+            .HasDatabaseName(Constants.Indexes.DEPARTMENT_PATH);
     }
 }

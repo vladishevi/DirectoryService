@@ -1,14 +1,13 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Application.Features.Locations;
 using DirectoryService.Domain.Locations;
-using DirectoryService.Infrastructure.Postgres;
 using DirectoryService.Infrastructure.Postgres.Transaction;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Npgsql;
 using Shared;
 
-namespace DirectoryService.Application.Features.Departments;
+namespace DirectoryService.Infrastructure.Postgres.Features.Locations;
 
 public class LocationsTransactionExceptionHandler : ITransactionExceptionHandler
 {
