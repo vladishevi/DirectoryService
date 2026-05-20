@@ -25,6 +25,7 @@ public sealed class Position
     public bool IsActive { get; private set; }
     public DateTime CreatedAt  { get; private set; }
     public DateTime UpdatedAt  { get; private set; }
+    public uint xmin { get; private set; }
     
     public IReadOnlyCollection<DepartmentPosition> Departments => _departments;
     
@@ -35,4 +36,6 @@ public sealed class Position
         _departments.Clear();        
         _departments.AddRange(departmentsIds.Select(departmentId => new DepartmentPosition(departmentId, Id)));
     }
+
+    public void UpdateName(Name name) => Name = name;
 }

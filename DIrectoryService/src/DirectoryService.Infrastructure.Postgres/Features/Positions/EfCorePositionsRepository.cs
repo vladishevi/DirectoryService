@@ -53,4 +53,28 @@ public class EfCorePositionsRepository : IPositionsRepository
             return GeneralErrors.DatabaseError().ToErrors();
         }
     }
+
+    public async Task<Result<Position, Errors>> GetById(Guid id, CancellationToken ct)
+    {
+        try
+        {
+            Position? position = await _dbContext.Positions.FirstOrDefaultAsync(p => p.Id == id, ct);
+            if (position == null)
+            {
+                return GeneralErrors.NotFound("Position not found", id).ToErrors();
+            }
+
+            return position;
+        }
+        catch (OperationCanceledException)
+        {
+            _logger.LogWarning("Operation cancelled while getting position with id {id}", id);
+            return GeneralErrors.OperationCancelled().ToErrors();
+        }
+        catch (Exception exception)
+        {
+            _logger.LogError(exception, "Database error while getting position with id {id}", id);
+            return GeneralErrors.DatabaseError().ToErrors();       
+        }
+    }
 }
