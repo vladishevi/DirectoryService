@@ -93,7 +93,7 @@ public class EfCoreLocationsRepository : ILocationsRepository
             IQueryable<Location> query = _dbContext.Locations.Where(l => ids.Contains(l.Id));
             if (active)
                 query = query.Where(l => l.IsActive);
-            
+
             int existingCount = await query
                 .CountAsync(cancellationToken: cancellationToken);
 
@@ -108,6 +108,20 @@ public class EfCoreLocationsRepository : ILocationsRepository
         {
             _logger.LogError(e, "Database error while checking if locations exist");
             return LocationsErrors.DatabaseError().ToErrors();
-        }       
+        }
+    }
+
+    public async Task<Result<Guid, Errors>> Delete(Location location)
+    {
+        try
+        {
+            _dbContext.Remove(location);
+            return location.Id;
+        }
+        catch (Exception exception)
+        {
+            _logger.LogError(exception, "Database error while deleting location with id {id}", location.Id);
+            return GeneralErrors.DatabaseError().ToErrors();
+        }
     }
 }
