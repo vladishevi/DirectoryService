@@ -77,4 +77,18 @@ public class EfCorePositionsRepository : IPositionsRepository
             return GeneralErrors.DatabaseError().ToErrors();       
         }
     }
+
+    public async Task<Result<Guid, Errors>> Delete(Position position)
+    {
+        try
+        {
+            _dbContext.Remove(position);
+            return position.Id;
+        }
+        catch (Exception exception)
+        {
+            _logger.LogError(exception, "Database error while deleting position with id {id}", position.Id);
+            return GeneralErrors.DatabaseError().ToErrors();
+        }
+    }
 }

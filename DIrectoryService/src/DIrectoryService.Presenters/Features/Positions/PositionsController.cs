@@ -30,4 +30,14 @@ public class PositionsController : ControllerBase
         UpdateNameCommand command = new(positionId, request);
         return await handler.Handle(command, cancellationToken);       
     }
+
+    [HttpDelete("{positionId}")]
+    public async Task<EndpointResult<Guid>> Delete(
+        [FromServices] ICommandHandler<Guid, DeletePositionCommand> handler,
+        [FromRoute] Guid positionId,
+        CancellationToken cancellationToken)
+    {
+        DeletePositionCommand command = new(positionId);
+        return await handler.Handle(command, cancellationToken);      
+    }
 }

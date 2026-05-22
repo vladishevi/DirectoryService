@@ -2,7 +2,7 @@
 using DirectoryService.Domain.Departments;
 using FluentValidation;
 
-namespace DirectoryService.Presenters.Features.Positions;
+namespace DirectoryService.Application.Features.Positions;
 
 public class UpdateNameValidator : AbstractValidator<UpdateNameCommand>
 {

@@ -1,3 +1,3 @@
-﻿namespace DirectoryService.Presenters.Features.Positions;
+﻿namespace DirectoryService.Contracts.Positions;
 
 public record UpdateNameRequest(string Name);

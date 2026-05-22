@@ -1,7 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Application.Abstractions;
 using DirectoryService.Application.Database;
-using DirectoryService.Application.Features.Positions;
 using DirectoryService.Application.Validation;
 using DirectoryService.Domain.Positions;
 using FluentValidation;
@@ -9,7 +8,7 @@ using FluentValidation.Results;
 using Microsoft.Extensions.Logging;
 using Shared;
 
-namespace DirectoryService.Presenters.Features.Positions;
+namespace DirectoryService.Application.Features.Positions;
 
 public class UpdateNameHandler(
     IPositionsRepository positionsRepository,
