@@ -1,5 +1,6 @@
 ﻿using DirectoryService.Application.Features.Departments;
 using DirectoryService.Contracts.Departments;
+using DirectoryService.Application.Abstractions;
 using DirectoryService.Presenters.EndpointResults;
 using Microsoft.AspNetCore.Mvc;
 
@@ -39,5 +40,15 @@ public class DepartmentsController
     {
         UpdateParentCommand command = new(departmentId, request);
         return await updateParentHandler.Handle(command, cancellationToken);
+    }
+
+    [HttpDelete("{departmentId}")]
+    public async Task<EndpointResult<Guid>> Delete(
+        [FromServices] ICommandHandler<Guid, DeleteDepartmentCommand> handler,
+        [FromRoute] Guid departmentId,
+        CancellationToken cancellationToken)
+    {
+        DeleteDepartmentCommand command = new(departmentId);
+        return await handler.Handle(command, cancellationToken);
     }
 }

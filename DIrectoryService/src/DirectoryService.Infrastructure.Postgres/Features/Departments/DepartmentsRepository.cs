@@ -186,6 +186,20 @@ public class DepartmentsRepository : IDepartmentsRepository
         }
     }
 
+    public Result<Guid, Errors> Delete(Department department)
+    {
+        try
+        {
+            _dbContext.Remove(department);
+            return department.Id;
+        }
+        catch (Exception exception)
+        {
+            _logger.LogError(exception, "Database error while deleting department with id {id}", department.Id);
+            return DepartmentsErrors.DatabaseError().ToErrors();
+        }
+    }
+
     public async Task<UnitResult<Errors>> LockDescendants(Guid departmentId, CancellationToken ct)
     {
         try
