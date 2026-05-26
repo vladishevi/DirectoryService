@@ -1,4 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
+using DirectoryService.Domain.Locations;
 using Shared;
 
 namespace DirectoryService.Domain.Departments;
@@ -54,7 +55,22 @@ public sealed class Department
         _locations.Clear();
         _locations.AddRange(locationsIds.Select(locationId => new DepartmentLocation(this, locationId)));
     }
-    
+
+    public void RemoveLocation(Guid locationId)
+    {
+        DepartmentLocation? location = _locations.FirstOrDefault(l => l.LocationId == locationId);
+        if (location != null)
+        {
+            _locations.Remove(location);
+        }
+    }
+
+    public void UpdatePositions(IEnumerable<Guid> positionsIds)
+    {
+        _positions.Clear();
+        _positions.AddRange(positionsIds.Select(positionId => new DepartmentPosition(Id, positionId)));
+    }
+
     private static short GetDepth(Department? parentDepartment)
     {
         if (parentDepartment == null)

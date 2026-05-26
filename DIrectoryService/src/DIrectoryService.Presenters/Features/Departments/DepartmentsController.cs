@@ -1,5 +1,6 @@
 ﻿using DirectoryService.Application.Features.Departments;
 using DirectoryService.Contracts.Departments;
+using DirectoryService.Application.Abstractions;
 using DirectoryService.Presenters.EndpointResults;
 using Microsoft.AspNetCore.Mvc;
 
@@ -30,6 +31,17 @@ public class DepartmentsController
         return await updateLocationsHandler.Handle(command, cancellationToken);
     }
 
+    [HttpPatch("{departmentId}/positions")]
+    public async Task<EndpointResult<Guid>> UpdatePositions(
+        [FromServices] UpdatePositionsHandler updatePositionsHandler,
+        [FromBody] UpdatePositionsRequest request,
+        [FromRoute] Guid departmentId,
+        CancellationToken cancellationToken)
+    {
+        UpdatePositionsCommand command = new(departmentId, request);
+        return await updatePositionsHandler.Handle(command, cancellationToken);
+    }
+
     [HttpPut("{departmentId}/parent")]
     public async Task<EndpointResult<Guid>> UpdateParent(
         [FromServices] UpdateParentHandler updateParentHandler,
@@ -39,5 +51,26 @@ public class DepartmentsController
     {
         UpdateParentCommand command = new(departmentId, request);
         return await updateParentHandler.Handle(command, cancellationToken);
+    }
+
+    [HttpDelete("{departmentId}")]
+    public async Task<EndpointResult<Guid>> Delete(
+        [FromServices] ICommandHandler<Guid, DeleteDepartmentCommand> handler,
+        [FromRoute] Guid departmentId,
+        CancellationToken cancellationToken)
+    {
+        DeleteDepartmentCommand command = new(departmentId);
+        return await handler.Handle(command, cancellationToken);
+    }
+
+    [HttpDelete("{departmentId}/locations/{locationId}")]
+    public async Task<EndpointResult<Guid>> DeleteLocation(
+        [FromServices] ICommandHandler<Guid, DeleteLocationCommand> handler,
+        [FromRoute] Guid departmentId,
+        [FromRoute] Guid locationId,
+        CancellationToken cancellationToken)
+    {
+        DeleteLocationCommand command = new(departmentId, locationId);
+        return await handler.Handle(command, cancellationToken);      
     }
 }

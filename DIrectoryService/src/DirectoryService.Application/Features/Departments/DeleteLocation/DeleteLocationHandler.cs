@@ -1,0 +1,41 @@
+﻿using CSharpFunctionalExtensions;
+using DirectoryService.Application.Abstractions;
+using DirectoryService.Application.Database;
+using DirectoryService.Application.Features.Locations;
+using DirectoryService.Domain.Departments;
+using Microsoft.Extensions.Logging;
+using Shared;
+
+namespace DirectoryService.Application.Features.Departments;
+
+public class DeleteLocationHandler(
+    IDepartmentsRepository departmentsRepository,
+    ILocationsRepository locationsRepository,
+    ITransactionManager transactionManager,
+    ILogger<DeleteLocationHandler> logger)
+    : ICommandHandler<Guid, DeleteLocationCommand>
+{
+    public async Task<Result<Guid, Errors>> Handle(DeleteLocationCommand command, CancellationToken cancellationToken)
+    {
+        Result<Department, Errors> getDepartmentResult = await departmentsRepository.GetByIdWithLocations(command.DepartmentId, cancellationToken);
+        if (getDepartmentResult.IsFailure)
+        {
+            logger.LogError("Error getting department with id {id} while updating locations", command.DepartmentId);
+            return getDepartmentResult.Error;
+        }
+        
+        Department department = getDepartmentResult.Value;
+        if (!department.IsActive)
+        {
+            logger.LogError("Department with {name} is inactive while deleting locations}", department.Name);
+            return GeneralErrors.Inactive("Department is inactive", department.Id).ToErrors();      
+        }
+        
+        department.RemoveLocation(command.LocationId);
+        
+        transactionManager.SaveChangesAsync(cancellationToken);
+
+        logger.LogInformation("Location with id {id} has been deleted from department with id {departmentId}", command.LocationId, command.DepartmentId);
+        return command.DepartmentId;
+    }
+}

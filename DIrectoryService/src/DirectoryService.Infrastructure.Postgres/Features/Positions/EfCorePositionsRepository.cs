@@ -78,6 +78,36 @@ public class EfCorePositionsRepository : IPositionsRepository
         }
     }
 
+    public async Task<Result<bool, Errors>> AllExist(IEnumerable<Guid> ids, bool active, CancellationToken cancellationToken)
+    {
+        try
+        {
+            if (ids.Distinct().Count() != ids.Count())
+            {
+                return GeneralErrors.Dublicate(message: "Ids must be unique").ToErrors();
+            }
+
+            IQueryable<Position> query = _dbContext.Positions.Where(p => ids.Contains(p.Id));
+            if (active)
+                query = query.Where(p => p.IsActive);
+
+            int existingCount = await query
+                .CountAsync(cancellationToken: cancellationToken);
+
+            return existingCount == ids.Count();
+        }
+        catch (OperationCanceledException)
+        {
+            _logger.LogWarning("Operation cancelled while checking if positions exist");
+            return GeneralErrors.OperationCancelled().ToErrors();
+        }
+        catch (Exception exception)
+        {
+            _logger.LogError(exception, "Database error while checking if positions exist");
+            return PositionsErrors.DatabaseError().ToErrors();
+        }
+    }
+
     public async Task<Result<Guid, Errors>> Delete(Position position)
     {
         try

@@ -19,4 +19,14 @@ public class LocationsController : ControllerBase
         CreateLocationCommand createLocationCommand = new(createLocationRequest);
         return await createLocationHandler.Handle(createLocationCommand, cancellationToken);
     }
+
+    [HttpDelete("{locationId}")]
+    public async Task<EndpointResult<Guid>> Delete(
+        [FromServices] ICommandHandler<Guid, DeleteLocationCommand> handler,
+        [FromRoute] Guid locationId,
+        CancellationToken cancellationToken)
+    {
+        DeleteLocationCommand command = new(locationId);
+        return await handler.Handle(command, cancellationToken);
+    }
 }
