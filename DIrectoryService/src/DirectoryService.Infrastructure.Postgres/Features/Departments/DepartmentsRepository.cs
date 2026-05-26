@@ -100,6 +100,34 @@ public class DepartmentsRepository : IDepartmentsRepository
         }
     }
 
+    public async Task<Result<Department, Errors>> GetByIdWithPositions(Guid id, CancellationToken cancellationToken)
+    {
+        try
+        {
+            Department? department = await _dbContext.Departments
+                .Include(d => d.Positions)
+                .FirstOrDefaultAsync(d => d.Id == id, cancellationToken);
+            
+            if (department != null)
+            {
+                return department;
+            }
+
+            _logger.LogWarning("Department not found with id {id}", id);
+            return GeneralErrors.NotFound("Department not found", id).ToErrors();
+        }
+        catch (OperationCanceledException)
+        {
+            _logger.LogWarning("Operation cancelled while getting department with id {id}", id);
+            return GeneralErrors.OperationCancelled().ToErrors();
+        }
+        catch (Exception exception)
+        {
+            _logger.LogError(exception, "Database error while getting department with id {id}", id);
+            return DepartmentsErrors.DatabaseError().ToErrors();
+        }
+    }
+
     public async Task<Result<bool, Errors>> Exists(Guid id, bool active, CancellationToken cancellationToken)
     {
         try

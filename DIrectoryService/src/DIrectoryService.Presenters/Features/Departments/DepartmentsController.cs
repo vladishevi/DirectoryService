@@ -31,6 +31,17 @@ public class DepartmentsController
         return await updateLocationsHandler.Handle(command, cancellationToken);
     }
 
+    [HttpPatch("{departmentId}/positions")]
+    public async Task<EndpointResult<Guid>> UpdatePositions(
+        [FromServices] UpdatePositionsHandler updatePositionsHandler,
+        [FromBody] UpdatePositionsRequest request,
+        [FromRoute] Guid departmentId,
+        CancellationToken cancellationToken)
+    {
+        UpdatePositionsCommand command = new(departmentId, request);
+        return await updatePositionsHandler.Handle(command, cancellationToken);
+    }
+
     [HttpPut("{departmentId}/parent")]
     public async Task<EndpointResult<Guid>> UpdateParent(
         [FromServices] UpdateParentHandler updateParentHandler,
