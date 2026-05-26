@@ -62,4 +62,15 @@ public class DepartmentsController
         DeleteDepartmentCommand command = new(departmentId);
         return await handler.Handle(command, cancellationToken);
     }
+
+    [HttpDelete("{departmentId}/locations/{locationId}")]
+    public async Task<EndpointResult<Guid>> DeleteLocation(
+        [FromServices] ICommandHandler<Guid, DeleteLocationCommand> handler,
+        [FromRoute] Guid departmentId,
+        [FromRoute] Guid locationId,
+        CancellationToken cancellationToken)
+    {
+        DeleteLocationCommand command = new(departmentId, locationId);
+        return await handler.Handle(command, cancellationToken);      
+    }
 }
