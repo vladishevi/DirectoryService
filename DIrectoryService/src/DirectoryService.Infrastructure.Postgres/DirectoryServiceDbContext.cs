@@ -18,6 +18,7 @@ public class DirectoryServiceDbContext : DbContext, IReadDbContext
     public DbSet<Position> Positions => Set<Position>();
     
     public IQueryable<Location> LocationsRead => Locations.AsNoTracking();
+    public IQueryable<Department> DepartmentsRead => Departments.AsNoTracking();
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
