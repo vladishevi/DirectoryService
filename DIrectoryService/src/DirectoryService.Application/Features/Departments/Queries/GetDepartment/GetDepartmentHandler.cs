@@ -25,7 +25,7 @@ public class GetDepartmentHandler(
                 Id = d.Id,
                 Name = d.Name.Value,
                 Identifier = d.Identifier.Value,
-                ParentDepartmentId = d.ParentDepartment.Id,
+                ParentDepartmentId = d.ParentDepartment == null ? null : d.ParentDepartment.Id,
                 Path = d.Path.Value,
                 IsActive = d.IsActive,
                 CreatedAt = d.CreatedAt,
@@ -38,6 +38,7 @@ public class GetDepartmentHandler(
         if (departmentDto == null)
         {
             logger.LogWarning("Department not found with id {id}", query.DepartmentId);
+            return GeneralErrors.NotFound($"Department with id {query.DepartmentId} not found").ToErrors();
         }
 
         return departmentDto;
