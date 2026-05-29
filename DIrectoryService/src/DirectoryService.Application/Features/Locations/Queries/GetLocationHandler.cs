@@ -2,7 +2,6 @@ using CSharpFunctionalExtensions;
 using DirectoryService.Application.Abstractions;
 using DirectoryService.Application.Database;
 using DirectoryService.Contracts.Locations;
-using DirectoryService.Domain.Locations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Shared;
@@ -17,31 +16,31 @@ public class GetLocationHandler(
 
     public async Task<Result<GetLocationDto, Errors>> Handle(GetLocationQuery query, CancellationToken ctx)
     {
-        Location? location = await readDbContext.LocationsRead
+        GetLocationDto? locationDto = await readDbContext.LocationsRead
             .Where(l => l.Id == query.LocationId)
             .Include(l => l.Departments)
+            .Select(l => new GetLocationDto
+            {
+                DepartmentsIds = l.Departments.Select(d => d.Id).ToList(),
+                Id = l.Id,
+                Name = l.Name.Value,
+                City = l.Address.City,
+                Street = l.Address.Street,
+                Building = l.Address.Building,
+                Postcode = l.Address.Postcode,
+                Timezone = l.Timezone.Code,
+                IsActive = l.IsActive,
+                CreatedAt = l.CreatedAt,
+                UpdatedAt = l.UpdatedAt
+            })
             .FirstOrDefaultAsync(cancellationToken: ctx);
 
-        if (location == null)
+        if (locationDto == null)
         {
             return GeneralErrors.NotFound($"Location by id {query.LocationId} not found").ToErrors();
         }
-
         
-        logger.LogInformation("Location {name} retrieved", location.Name);
-        return new GetLocationDto
-        {
-            DepartmentsIds = location.Departments.Select(d => d.Id).ToList(),
-            Id = location.Id,
-            Name = location.Name.Value,
-            City = location.Address.City,
-            Street = location.Address.Street,
-            Building = location.Address.Building,
-            Postcode = location.Address.Postcode,
-            Timezone = location.Timezone.Code,
-            IsActive = location.IsActive,
-            CreatedAt = location.CreatedAt,
-            UpdatedAt = location.UpdatedAt
-        };
+        logger.LogInformation("Location {name} retrieved", locationDto.Name);
+        return locationDto;
     }
 }
