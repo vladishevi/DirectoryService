@@ -47,6 +47,8 @@ public static class DependencyInjection
             }
             options.UseLoggerFactory(loggerFactory);
         });
+
+        services.AddScoped<IReadDbContext>(s => s.GetRequiredService<DirectoryServiceDbContext>());
     }
 
     private static void AddTransactionExceptionHandlers(IServiceCollection services)

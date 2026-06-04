@@ -1,6 +1,7 @@
 ﻿using DirectoryService.Application.Features.Departments;
 using DirectoryService.Contracts.Departments;
 using DirectoryService.Application.Abstractions;
+using DirectoryService.Application.Features.Departments.Queries.GetDepartment;
 using DirectoryService.Presenters.EndpointResults;
 using Microsoft.AspNetCore.Mvc;
 
@@ -72,5 +73,15 @@ public class DepartmentsController
     {
         DeleteLocationCommand command = new(departmentId, locationId);
         return await handler.Handle(command, cancellationToken);      
+    }
+
+    [HttpGet("{departmentId}")]
+    public async Task<EndpointResult<GetDepartmentDto>> Get(
+        [FromServices] IQueryHandler<GetDepartmentDto, GetDepartmentQuery> handler,
+        [FromRoute] Guid departmentId,
+        CancellationToken cancellationToken)
+    {
+        GetDepartmentQuery query = new(departmentId);
+        return await handler.Handle(query, cancellationToken);     
     }
 }
