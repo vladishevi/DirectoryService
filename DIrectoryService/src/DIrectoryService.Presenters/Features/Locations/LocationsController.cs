@@ -39,4 +39,12 @@ public class LocationsController : ControllerBase
         GetLocationQuery query = new(locationId);
         return await handler.Handle(query, ct);
     }
+
+    [HttpGet("top")]
+    public async Task<EndpointResult<DepartmentsCountDto[]>> Get(
+        [FromServices] IQueryHandler<DepartmentsCountDto[]> handler,
+        CancellationToken ct)
+    {
+        return await handler.Handle(ct);
+    }
 }

@@ -35,7 +35,6 @@ public static class DependencyInjection
     {
         app.UseExceptionMiddleware();
         app.UseSerilogRequestLogging();
-        app.UseHttpLogging();
         
         if (app.Environment.IsDevelopment())
         {
