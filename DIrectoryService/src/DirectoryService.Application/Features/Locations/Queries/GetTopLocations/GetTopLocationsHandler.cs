@@ -23,22 +23,26 @@ public class GetTopLocationsHandler(
         try
         {
             using IDbConnection dbConnection = await dbConnectionFactory.CreateConnectionAsync(ct);
-            IEnumerable<LocationTopDto> dto =
-                await dbConnection.QueryAsync<LocationTopDto, AddressDto, LocationTopDto>("""
-                        SELECT l.id, l.name, COUNT(dp.department_id) departmentsCount, l.city, l.street, l.building, l.postcode 
-                        FROM locations l 
+            CommandDefinition command = new("""
+                        SELECT l.id, l.name, COUNT(dp.department_id) departmentsCount, l.city, l.street, l.building, l.postcode
+                        FROM locations l
                             LEFT JOIN department_locations dp ON l.id = dp.location_id
                         GROUP BY l.id, l.name, l.city, l.street, l.building, l.postcode
                         ORDER BY departmentsCount DESC
                         LIMIT 5
                         """,
+                cancellationToken: ct);
+
+            IEnumerable<LocationTopDto> dto =
+                await dbConnection.QueryAsync<LocationTopDto, AddressDto, LocationTopDto>(
+                    command,
                     (l, a) => l with{ AddressDto = a},
                     splitOn: "city");
-            
+
             return dto.ToList();
 
         }
-        catch (TaskCanceledException)
+        catch (OperationCanceledException)
         {
             logger.LogWarning("Operation cancelled while getting top locations");
             return GeneralErrors.OperationCancelled().ToErrors();
