@@ -51,6 +51,6 @@ public class GetTopLocationsHandler(
         {
             logger.LogError($"Database error while getting top locations. {ex.Message}");
             return GeneralErrors.DatabaseError().ToErrors();
-        }       
+        }
     }
 }
