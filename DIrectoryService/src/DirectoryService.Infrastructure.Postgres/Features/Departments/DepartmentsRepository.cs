@@ -1,6 +1,7 @@
 using System.Data;
 using CSharpFunctionalExtensions;
 using Dapper;
+using DirectoryService.Application.Database;
 using DirectoryService.Application.Features.Departments;
 using DirectoryService.Domain.Departments;
 using DirectoryService.Infrastructure.Postgres.Database;
@@ -13,12 +14,12 @@ namespace DirectoryService.Infrastructure.Postgres.Features.Departments;
 public class DepartmentsRepository : IDepartmentsRepository
 {
     private readonly DirectoryServiceDbContext _dbContext;
-    private readonly DbConnectionFactory _dbConnectionFactory;
+    private readonly IDbConnectionFactory _dbConnectionFactory;
     private readonly ILogger<DepartmentsRepository> _logger;
 
     public DepartmentsRepository(
         DirectoryServiceDbContext dbContext,
-        DbConnectionFactory dbConnectionFactory,
+        IDbConnectionFactory dbConnectionFactory,
         ILogger<DepartmentsRepository> logger)
     {
         _dbContext = dbContext;
@@ -166,7 +167,7 @@ public class DepartmentsRepository : IDepartmentsRepository
                                SELECT @descendantPath::ltree <@ @ancestorPath::ltree
                                """;
             
-            using IDbConnection connection = await _dbConnectionFactory.CreateConnection();
+            using IDbConnection connection = await _dbConnectionFactory.CreateConnectionAsync(ct);
             return await connection.QuerySingleAsync<bool>(new CommandDefinition(
                 sql,
                 new { descendantPath = descendant.Path.Value, ancestorPath = ancestor.Path.Value },

@@ -21,7 +21,7 @@ public static class DependencyInjection
         AddRepositories(services);
         AddTransactionExceptionHandlers(services);
         services.AddScoped<ITransactionManager, TransactionManager>();
-        services.AddSingleton<DbConnectionFactory>();
+        services.AddSingleton<IDbConnectionFactory, DbConnectionFactory>();
         return services;
     }
 

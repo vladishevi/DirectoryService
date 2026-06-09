@@ -35,6 +35,7 @@ public static class DependencyInjection
     {
         app.UseExceptionMiddleware();
         app.UseSerilogRequestLogging();
+        Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
         
         if (app.Environment.IsDevelopment())
         {
