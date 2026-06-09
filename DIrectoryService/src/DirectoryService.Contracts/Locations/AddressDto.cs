@@ -1,3 +1,10 @@
 namespace DirectoryService.Contracts.Locations;
 
-public record AddressDto(string City, string Street, int Building, string Postcode);
+
+public record AddressDto
+{
+    public string City { get; init; }
+    public string Street { get; init; }
+    public int Building { get; init; }
+    public string Postcode { get; init; }
+}
