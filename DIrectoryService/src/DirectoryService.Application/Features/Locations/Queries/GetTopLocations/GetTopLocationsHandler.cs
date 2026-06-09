@@ -4,9 +4,6 @@ using Dapper;
 using DirectoryService.Application.Abstractions;
 using DirectoryService.Application.Database;
 using DirectoryService.Contracts.Locations;
-using Microsoft.AspNetCore.Connections;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Logging;
 using Shared;
 
@@ -49,7 +46,7 @@ public class GetTopLocationsHandler(
         }
         catch (Exception ex)
         {
-            logger.LogError($"Database error while getting top locations. {ex.Message}");
+            logger.LogError(ex, "Database error while getting top locations");
             return GeneralErrors.DatabaseError().ToErrors();
         }
     }
