@@ -1,8 +1,10 @@
-﻿using DirectoryService.Application.Abstractions;
+﻿using CSharpFunctionalExtensions;
+using DirectoryService.Application.Abstractions;
 using DirectoryService.Application.Features.Locations;
 using DirectoryService.Contracts.Locations;
 using DirectoryService.Presenters.EndpointResults;
 using Microsoft.AspNetCore.Mvc;
+using Shared;
 
 namespace DirectoryService.Presenters.Features.Locations;
 
@@ -38,5 +40,13 @@ public class LocationsController : ControllerBase
     {
         GetLocationQuery query = new(locationId);
         return await handler.Handle(query, ct);
+    }
+
+    [HttpGet("top")]
+    public async Task<EndpointResult<List<LocationTopDto>>> Get(
+        [FromServices] IQueryHandler<List<LocationTopDto>> handler,
+        CancellationToken ct)
+    {
+        return await handler.Handle(ct);
     }
 }

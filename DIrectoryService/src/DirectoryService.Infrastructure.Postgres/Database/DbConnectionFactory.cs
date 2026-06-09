@@ -1,11 +1,12 @@
 ﻿using System.Data;
+using DirectoryService.Application.Database;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Npgsql;
 
 namespace DirectoryService.Infrastructure.Postgres.Database;
 
-public class DbConnectionFactory : IDisposable, IAsyncDisposable
+public class DbConnectionFactory : IDisposable, IAsyncDisposable, IDbConnectionFactory
 {
     private readonly NpgsqlDataSource _dataSource;
 
@@ -18,9 +19,9 @@ public class DbConnectionFactory : IDisposable, IAsyncDisposable
         _dataSource = dataSourceBuilder.Build();
     }
 
-    public async Task<IDbConnection> CreateConnection()
+    public async Task<IDbConnection> CreateConnectionAsync(CancellationToken ct)
     {
-        return await _dataSource.OpenConnectionAsync();
+        return await _dataSource.OpenConnectionAsync(ct);
     }
 
 
