@@ -3,7 +3,7 @@
 public record LocationTopDto()
 {
     public Guid Id { get; init; }
-    public string Name { get; init; }
-    public AddressDto AddressDto { get; init; }
+    public required string Name { get; init; }
+    public required AddressDto Address { get; init; }
     public int DepartmentsCount { get; init; }
 }

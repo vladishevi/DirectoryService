@@ -36,7 +36,7 @@ public class GetTopLocationsHandler(
             IEnumerable<LocationTopDto> dto =
                 await dbConnection.QueryAsync<LocationTopDto, AddressDto, LocationTopDto>(
                     command,
-                    (l, a) => l with{ AddressDto = a},
+                    (l, a) => l with { Address = a },
                     splitOn: "city");
 
             return dto.ToList();
