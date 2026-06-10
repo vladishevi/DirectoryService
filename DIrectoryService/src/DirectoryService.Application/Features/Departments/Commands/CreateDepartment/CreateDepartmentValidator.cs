@@ -3,7 +3,7 @@ using DirectoryService.Domain.Departments;
 using FluentValidation;
 using Shared;
 
-namespace DirectoryService.Application.Features.Departments;
+namespace DirectoryService.Application.Features.Departments.Commands;
 
 public class CreateDepartmentValidator : AbstractValidator<CreateDepartmentCommand>
 {

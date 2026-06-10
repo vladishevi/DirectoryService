@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace DirectoryService.Application.Features.Departments;
+namespace DirectoryService.Application.Features.Departments.Commands;
 
 public class UpdateParentValidator : AbstractValidator<UpdateParentCommand>
 {

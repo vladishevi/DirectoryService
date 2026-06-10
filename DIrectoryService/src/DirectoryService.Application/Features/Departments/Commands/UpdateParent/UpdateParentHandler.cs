@@ -8,7 +8,7 @@ using FluentValidation.Results;
 using Microsoft.Extensions.Logging;
 using Shared;
 
-namespace DirectoryService.Application.Features.Departments;
+namespace DirectoryService.Application.Features.Departments.Commands;
 
 public class UpdateParentHandler : ICommandHandler<Guid, UpdateParentCommand>
 {
