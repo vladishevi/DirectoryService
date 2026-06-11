@@ -1,3 +1,3 @@
 ﻿namespace DirectoryService.Contracts.Common;
 
-public record PaginationRequest(int Page, int PageSize);
+public record PaginationRequest(int Page = 1, int PageSize = 20);
