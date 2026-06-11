@@ -35,7 +35,7 @@ public class GetDepartmentsHandler(
             
             //search
             if (!string.IsNullOrWhiteSpace(query.Request.Search)) 
-                queryable = queryable.Where(d => EF.Functions.Like(((string)(object)d.Name), $"%{query.Request.Search}%"));
+                queryable = queryable.Where(d => EF.Functions.ILike((string)(object)d.Name, $"%{query.Request.Search}%"));
 
             //sort
             if (string.Equals(query.Request.SortBy, "Name", StringComparison.InvariantCultureIgnoreCase))
