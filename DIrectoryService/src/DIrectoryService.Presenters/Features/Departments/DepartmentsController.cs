@@ -1,5 +1,4 @@
-﻿using DirectoryService.Application.Features.Departments;
-using DirectoryService.Contracts.Departments;
+﻿using DirectoryService.Contracts.Departments;
 using DirectoryService.Application.Abstractions;
 using DirectoryService.Application.Features.Departments.Commands;
 using DirectoryService.Application.Features.Departments.Queries.GetDepartment;
