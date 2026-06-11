@@ -32,19 +32,24 @@ public class GetDepartmentsHandler(
             }
         
             IQueryable<Department> queryable = readDbContext.DepartmentsRead;
+            
+            //search
             if (!string.IsNullOrWhiteSpace(query.Request.Search)) 
-                queryable = queryable.Where(d => d.Name.Value.Contains(query.Request.Search));
+                queryable = queryable.Where(d => EF.Functions.Like(((string)(object)d.Name), $"%{query.Request.Search}%"));
 
-            queryable = query.Request.SortBy switch
+            //sort
+            if (string.Equals(query.Request.SortBy, "Name", StringComparison.InvariantCultureIgnoreCase))
             {
-                "Name" => query.Request.SortDir == "Asc"
-                    ? queryable.OrderBy(d => d.Name.Value)
-                    : queryable.OrderByDescending(d => d.Name.Value),
-                "CreatedAt" => query.Request.SortDir == "Asc"
+                queryable = string.Equals(query.Request.SortDir, "Asc", StringComparison.CurrentCultureIgnoreCase)
+                    ? queryable.OrderBy(d => d.Name)
+                    : queryable.OrderByDescending(d => d.Name);
+            }
+            else if (string.Equals(query.Request.SortBy, "CreatedAt", StringComparison.InvariantCultureIgnoreCase))
+            {
+                queryable = string.Equals(query.Request.SortDir, "Asc", StringComparison.InvariantCultureIgnoreCase)
                     ? queryable.OrderBy(d => d.CreatedAt)
-                    : queryable.OrderByDescending(d => d.CreatedAt),
-                _ => queryable
-            };
+                    : queryable.OrderByDescending(d => d.CreatedAt);
+            }
 
             int totalCount = await queryable.CountAsync(ct);
         
@@ -60,7 +65,7 @@ public class GetDepartmentsHandler(
                     Id = d.Id, Name = d.Name.Value, Path = d.Path.Value, CreatedAt = d.CreatedAt
                 }).ToListAsync(ct);
 
-
+            logger.LogInformation("Successfully got departments");
             return new GetDepartmentsDto(departments, totalCount);
         }
         catch (OperationCanceledException)

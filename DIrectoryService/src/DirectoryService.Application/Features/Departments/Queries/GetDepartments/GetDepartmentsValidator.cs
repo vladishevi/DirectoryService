@@ -19,11 +19,13 @@ public class GetDepartmentsValidator : AbstractValidator<GetDepartmentsQuery>
             .WithError(GeneralErrors.ValueIsInvalid("PageSize", "Page size must be between 1 and 100"));
 
         RuleFor(d => d.Request.SortBy)
-            .Must(s => string.Equals(s, "Name") || string.Equals(s, "CreatedAt"))
+            .Must(s => string.Equals(s, "Name", StringComparison.InvariantCultureIgnoreCase) ||
+                       string.Equals(s, "CreatedAt", StringComparison.InvariantCultureIgnoreCase))
             .WithError(GeneralErrors.ValueIsInvalid("SortBy", "SortBy must be either Name or CreatedAt"));
         
         RuleFor(d => d.Request.SortDir)
-            .Must(s => string.Equals(s, "Asc") || string.Equals(s, "Desc"))
+            .Must(s => string.Equals(s, "Asc", StringComparison.InvariantCultureIgnoreCase) ||
+                       string.Equals(s, "Desc", StringComparison.InvariantCultureIgnoreCase))
             .WithError(GeneralErrors.ValueIsInvalid("SortDir", "SortDir must be either Asc or Desc"));       
     }
 }
