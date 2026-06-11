@@ -40,7 +40,7 @@ public class GetDepartmentsHandler(
             //sort
             if (string.Equals(query.Request.SortBy, "Name", StringComparison.InvariantCultureIgnoreCase))
             {
-                queryable = string.Equals(query.Request.SortDir, "Asc", StringComparison.CurrentCultureIgnoreCase)
+                queryable = string.Equals(query.Request.SortDir, "Asc", StringComparison.InvariantCultureIgnoreCase)
                     ? queryable.OrderBy(d => d.Name)
                     : queryable.OrderByDescending(d => d.Name);
             }
