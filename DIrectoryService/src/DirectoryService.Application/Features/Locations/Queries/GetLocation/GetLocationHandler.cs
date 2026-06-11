@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Shared;
 
-namespace DirectoryService.Application.Features.Locations;
+namespace DirectoryService.Application.Features.Locations.GetLocation;
 
 public class GetLocationHandler(
     IReadDbContext readDbContext, 

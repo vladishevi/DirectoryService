@@ -6,7 +6,7 @@ using DirectoryService.Domain.Departments;
 using Microsoft.Extensions.Logging;
 using Shared;
 
-namespace DirectoryService.Application.Features.Departments;
+namespace DirectoryService.Application.Features.Departments.Commands;
 
 public class DeleteLocationHandler(
     IDepartmentsRepository departmentsRepository,

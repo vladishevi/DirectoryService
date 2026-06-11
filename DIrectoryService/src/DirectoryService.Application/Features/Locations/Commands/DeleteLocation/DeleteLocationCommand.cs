@@ -1,5 +1,5 @@
 using DirectoryService.Application.Abstractions;
 
-namespace DirectoryService.Application.Features.Locations;
+namespace DirectoryService.Application.Features.Locations.Commands;
 
 public record DeleteLocationCommand(Guid Id) : ICommand;

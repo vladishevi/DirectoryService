@@ -18,14 +18,14 @@ public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
         builder.Property(d => d.Name)
             .HasColumnName("name")
             .HasColumnType("citext")
-            .HasConversion(d => d.Value, d => Name.Create(d).Value)
+            .HasConversion(name => name.Value, value => Name.Create(value).Value)
             .IsRequired()
             .HasMaxLength(Name.MAX_LENGHT);
         
         builder.Property(d => d.Identifier)
             .HasColumnName("identifier")
             .HasColumnType("citext")
-            .HasConversion(d => d.Value, d => Identifier.Create(d).Value)
+            .HasConversion(identifier => identifier.Value, d => Identifier.Create(d).Value)
             .IsRequired()
             .HasMaxLength(Identifier.MAX_LENGHT);
         

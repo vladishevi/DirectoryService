@@ -14,3 +14,13 @@ public record GetDepartmentDto
     public IEnumerable<Guid> Positions { get; init; }
 
 }
+
+public record GetDepartmentsDto(List<DepartmentListItemDto> Departments, int totalCount);
+
+public record DepartmentListItemDto
+{
+    public Guid Id { get; init; }
+    public string Name { get; init; }
+    public string Path { get; init; }
+    public DateTime CreatedAt  { get; init; }
+}

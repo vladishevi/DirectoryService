@@ -1,7 +1,8 @@
-﻿using DirectoryService.Application.Features.Departments;
-using DirectoryService.Contracts.Departments;
+﻿using DirectoryService.Contracts.Departments;
 using DirectoryService.Application.Abstractions;
+using DirectoryService.Application.Features.Departments.Commands;
 using DirectoryService.Application.Features.Departments.Queries.GetDepartment;
+using DirectoryService.Application.Features.Departments.Queries.GetDepartments;
 using DirectoryService.Presenters.EndpointResults;
 using Microsoft.AspNetCore.Mvc;
 
@@ -83,5 +84,15 @@ public class DepartmentsController
     {
         GetDepartmentQuery query = new(departmentId);
         return await handler.Handle(query, cancellationToken);     
+    }
+
+    [HttpGet]
+    public async Task<EndpointResult<GetDepartmentsDto>> Get(
+        [FromServices] IQueryHandler<GetDepartmentsDto, GetDepartmentsQuery> handler,
+        [FromQuery] GetDepartmentsRequest request,
+        CancellationToken ct)
+    {
+        GetDepartmentsQuery query = new(request);
+        return await handler.Handle(query, ct);
     }
 }

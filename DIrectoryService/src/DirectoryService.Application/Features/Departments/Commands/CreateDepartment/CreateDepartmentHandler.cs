@@ -3,16 +3,14 @@ using DirectoryService.Application.Abstractions;
 using DirectoryService.Application.Database;
 using DirectoryService.Application.Features.Locations;
 using DirectoryService.Application.Validation;
-using DirectoryService.Contracts.Departments;
 using DirectoryService.Domain.Departments;
-using DirectoryService.Domain.Locations;
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.Extensions.Logging;
 using Shared;
 using Name = DirectoryService.Domain.Departments.Name;
 
-namespace DirectoryService.Application.Features.Departments;
+namespace DirectoryService.Application.Features.Departments.Commands;
 
 public class CreateDepartmentHandler : ICommandHandler<Guid,CreateDepartmentCommand>
 {
