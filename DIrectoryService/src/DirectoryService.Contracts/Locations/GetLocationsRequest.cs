@@ -1,3 +1,8 @@
-﻿namespace DirectoryService.Contracts.Locations;
+﻿using DirectoryService.Contracts.Common;
 
-public record GetLocationsRequest();
+namespace DirectoryService.Contracts.Locations;
+
+public record GetLocationsRequest
+{
+    public PaginationRequest Pagination { get; init; } = new();
+}

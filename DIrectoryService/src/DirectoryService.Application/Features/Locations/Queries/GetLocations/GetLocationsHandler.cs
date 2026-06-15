@@ -1,4 +1,5 @@
-﻿using CSharpFunctionalExtensions;
+﻿using System.Data;
+using CSharpFunctionalExtensions;
 using Dapper;
 using DirectoryService.Application.Abstractions;
 using DirectoryService.Application.Database;
@@ -29,9 +30,14 @@ public class GetLocationsHandler(
                 return result.ToErrors();
             }
 
+            DynamicParameters parameters = new();
+            parameters.Add("limit", query.Request.Pagination.PageSize, DbType.Int32);
+            parameters.Add("offset", query.Request.Pagination.Page - 1, DbType.Int32);
+            
             string command = """
                              SELECT id, name, city, street, building, postcode, created_at, count(*) OVER () as total
                              FROM locations
+                             LIMIT @limit OFFSET @offset;
                              """;
             using var connection = await dbConnectionFactory.CreateConnectionAsync(ct);
             long? totalCount = null;
@@ -41,7 +47,8 @@ public class GetLocationsHandler(
                         totalCount ??= count;
                         return location;
                     },
-                    splitOn: "total") 
+                    splitOn: "total",
+                    param: parameters) 
                 as List<GetLocationsItemDto>;
             return new GetLocationsDto(itemDto, totalCount ?? 0);
         }
