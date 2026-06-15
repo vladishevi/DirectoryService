@@ -51,7 +51,7 @@ public class GetDepartmentsHandler(
                     : queryable.OrderByDescending(d => d.CreatedAt);
             }
 
-            int totalCount = await queryable.CountAsync(ct);
+            long totalCount = await queryable.CountAsync(ct);
         
             //pagination
             PaginationRequest pagination = query.Request.Pagination;

@@ -88,7 +88,17 @@ public class DepartmentsController
 
     [HttpGet]
     public async Task<EndpointResult<GetDepartmentsDto>> Get(
-        [FromServices] IQueryHandler<GetDepartmentsDto, GetDepartmentsQuery> handler,
+        [FromServices] GetDepartmentsHandler handler,
+        [FromQuery] GetDepartmentsRequest request,
+        CancellationToken ct)
+    {
+        GetDepartmentsQuery query = new(request);
+        return await handler.Handle(query, ct);
+    }
+    
+    [HttpGet("dapper")]
+    public async Task<EndpointResult<GetDepartmentsDto>> Get(
+        [FromServices] GetDepartmentsHandlerDapper handler,
         [FromQuery] GetDepartmentsRequest request,
         CancellationToken ct)
     {
