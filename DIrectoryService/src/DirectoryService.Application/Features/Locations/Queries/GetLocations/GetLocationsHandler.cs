@@ -30,15 +30,27 @@ public class GetLocationsHandler(
                 return result.ToErrors();
             }
 
+            List<string> conditions = [];
+
             DynamicParameters parameters = new();
             parameters.Add("limit", query.Request.Pagination.PageSize, DbType.Int32);
             parameters.Add("offset", query.Request.Pagination.Page - 1, DbType.Int32);
-            
-            string command = """
+
+            if (query.Request.Search != null)
+            {
+                conditions.Add("name ILIKE '%' || @search || '%'");
+                parameters.Add("search", query.Request.Search, DbType.String);
+            }
+
+            string whereClause = conditions.Count > 0 ? "WHERE " + string.Join(" AND ", conditions) : "";
+            string command = $"""
                              SELECT id, name, city, street, building, postcode, created_at, count(*) OVER () as total
                              FROM locations
+                             {whereClause}
+                             ORDER BY {query.Request.SortBy.ToLowerInvariant()} {query.Request.SortDir}
                              LIMIT @limit OFFSET @offset;
                              """;
+            
             using var connection = await dbConnectionFactory.CreateConnectionAsync(ct);
             long? totalCount = null;
             List<GetLocationsItemDto> itemDto = await connection.QueryAsync<GetLocationsItemDto, long, GetLocationsItemDto>(command,
