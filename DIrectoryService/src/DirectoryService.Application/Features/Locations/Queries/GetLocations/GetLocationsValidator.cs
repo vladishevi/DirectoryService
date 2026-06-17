@@ -24,8 +24,9 @@ public class GetLocationsValidator : AbstractValidator<GetLocationsQuery>
 
         RuleFor(l => l.Request.SortBy)
             .Must(s => string.Equals(s, "name", StringComparison.InvariantCultureIgnoreCase) ||
-                       string.Equals(s, "created_at", StringComparison.InvariantCultureIgnoreCase))
-            .WithError(GeneralErrors.ValueIsInvalid("SortBy", "SortBy must be either Name or CreatedAt"));
+                       string.Equals(s, "created_at", StringComparison.InvariantCultureIgnoreCase) ||
+                       string.Equals(s, "departmentsCount", StringComparison.InvariantCultureIgnoreCase))
+            .WithError(GeneralErrors.ValueIsInvalid("SortBy", "SortBy must be either name, created_at or departmentsCount"));
         
         RuleFor(l => l.Request.SortDir)
             .Must(s => string.Equals(s, "asc", StringComparison.InvariantCultureIgnoreCase) ||
