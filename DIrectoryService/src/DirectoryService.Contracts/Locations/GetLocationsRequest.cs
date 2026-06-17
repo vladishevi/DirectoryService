@@ -8,4 +8,5 @@ public record GetLocationsRequest
     public string SortBy { get; init; } = "Name";
     public string SortDir { get; init; } = "Asc";
     public PaginationRequest Pagination { get; init; } = new();
+    public int MinDepartmentCount { get; set; }
 }

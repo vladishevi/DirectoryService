@@ -6,4 +6,5 @@ public record GetLocationsItemDto
     public string Name { get; init; }
     public DateTime CreatedAt { get; init; }
     public AddressDto Address { get; init; }
+    public int DepartmentsCount { get; init; }
 }

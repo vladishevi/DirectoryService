@@ -44,22 +44,26 @@ public class GetLocationsHandler(
 
             string whereClause = conditions.Count > 0 ? "WHERE " + string.Join(" AND ", conditions) : "";
             string command = $"""
-                             SELECT id, name, city, street, building, postcode, created_at, count(*) OVER () as total
-                             FROM locations
-                             {whereClause}
-                             ORDER BY {query.Request.SortBy.ToLowerInvariant()} {query.Request.SortDir}
-                             LIMIT @limit OFFSET @offset;
-                             """;
+                              SELECT locations.id, locations.name, created_at, count(department_locations.department_id) departmentsCount,
+                                     locations.city, locations.street, locations.building, locations.postcode, count(*) OVER () as totalCount
+                              FROM locations
+                              LEFT JOIN department_locations ON locations.id = department_locations.location_id
+                              {whereClause}
+                              GROUP BY locations.id, locations.name, locations.city, locations.street, locations.building, locations.postcode, created_at
+                              HAVING COUNT(department_locations.department_id) >= {query.Request.MinDepartmentCount}
+                              ORDER BY {query.Request.SortBy.ToLowerInvariant()} {query.Request.SortDir}
+                              LIMIT @limit OFFSET @offset;
+                              """;
             
             using var connection = await dbConnectionFactory.CreateConnectionAsync(ct);
             long? totalCount = null;
-            List<GetLocationsItemDto> itemDto = await connection.QueryAsync<GetLocationsItemDto, long, GetLocationsItemDto>(command,
-                    map: (location, count) =>
+            List<GetLocationsItemDto> itemDto = await connection.QueryAsync<GetLocationsItemDto, AddressDto, long, GetLocationsItemDto>(command,
+                    map: (location, address, count) =>
                     {
                         totalCount ??= count;
-                        return location;
+                        return location with { Address = address };
                     },
-                    splitOn: "total",
+                    splitOn: "city, totalCount",
                     param: parameters) 
                 as List<GetLocationsItemDto>;
             return new GetLocationsDto(itemDto, totalCount ?? 0);
