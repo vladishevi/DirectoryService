@@ -26,7 +26,7 @@ public class GetLocationsHandler(
             ValidationResult result = await validator.ValidateAsync(query, ct);
             if (!result.IsValid)
             {
-                logger.LogError("Validation failed for GetDepartmentsQuery");
+                logger.LogError("Validation failed for get locations query");
                 return result.ToErrors();
             }
 
@@ -34,7 +34,8 @@ public class GetLocationsHandler(
 
             DynamicParameters parameters = new();
             parameters.Add("limit", query.Request.Pagination.PageSize, DbType.Int32);
-            parameters.Add("offset", query.Request.Pagination.Page - 1, DbType.Int32);
+            parameters.Add("offset", query.Request.Pagination.PageSize * (query.Request.Pagination.Page - 1), DbType.Int32);
+            parameters.Add("minDepartmentCount", query.Request.MinDepartmentCount, DbType.Int32);
 
             if (query.Request.Search != null)
             {
@@ -42,6 +43,14 @@ public class GetLocationsHandler(
                 parameters.Add("search", query.Request.Search, DbType.String);
             }
 
+            var sortByResult = MapSortBy(query.Request.SortBy);
+            if (sortByResult.IsFailure)
+                return sortByResult.Error;
+            
+            var sortDirResult = MapSortDir(query.Request.SortDir);
+            if (sortDirResult.IsFailure)
+                return sortDirResult.Error;
+            
             string whereClause = conditions.Count > 0 ? "WHERE " + string.Join(" AND ", conditions) : "";
             string command = $"""
                               SELECT locations.id, locations.name, created_at, count(department_locations.department_id) departmentsCount,
@@ -50,8 +59,8 @@ public class GetLocationsHandler(
                               LEFT JOIN department_locations ON locations.id = department_locations.location_id
                               {whereClause}
                               GROUP BY locations.id, locations.name, locations.city, locations.street, locations.building, locations.postcode, created_at
-                              HAVING COUNT(department_locations.department_id) >= {query.Request.MinDepartmentCount}
-                              ORDER BY {query.Request.SortBy.ToLowerInvariant()} {query.Request.SortDir}
+                              HAVING COUNT(department_locations.department_id) >= @minDepartmentCount
+                              ORDER BY {sortByResult.Value} {sortDirResult.Value}
                               LIMIT @limit OFFSET @offset;
                               """;
             
@@ -78,5 +87,29 @@ public class GetLocationsHandler(
             logger.LogError(ex, "Database error while getting locations");       
             return GeneralErrors.DatabaseError().ToErrors();       
         }
+    }
+    
+    
+    private Result<string, Errors> MapSortBy(string sortByInput)
+    {
+        return sortByInput.ToLower() switch
+        {
+            "name" => "locations.name",
+            "departmentscount" => "departmentsCount",
+            "createdat" => "created_at",
+            _ => GeneralErrors.ValueIsInvalid("SortBy", "SortBy must be either name, departmentsCount or createdAt")
+                .ToErrors()
+        };
+    }
+    
+    
+    private Result<string, Errors> MapSortDir(string sortDirInput)
+    {
+        return sortDirInput.ToLower() switch
+        {
+            "asc" => "ASC",
+            "desc" => "DESC",
+            _ => GeneralErrors.ValueIsInvalid("SortDir", "SortDir must be either Asc or Desc").ToErrors()
+        };
     }
 }
