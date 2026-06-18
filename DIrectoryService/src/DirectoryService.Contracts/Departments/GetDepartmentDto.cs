@@ -15,7 +15,7 @@ public record GetDepartmentDto
 
 }
 
-public record GetDepartmentsDto(List<DepartmentListItemDto> Departments, int totalCount);
+public record GetDepartmentsDto(List<DepartmentListItemDto> Departments, long totalCount);
 
 public record DepartmentListItemDto
 {
