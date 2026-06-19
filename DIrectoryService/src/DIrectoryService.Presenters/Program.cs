@@ -35,3 +35,8 @@ finally
 {
     Log.CloseAndFlush();
 }
+
+namespace DirectoryService.API
+{
+    public partial class Program;
+}
