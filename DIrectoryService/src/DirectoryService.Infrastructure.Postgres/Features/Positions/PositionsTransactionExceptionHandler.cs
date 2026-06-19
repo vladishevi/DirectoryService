@@ -20,7 +20,7 @@ public class PositionsTransactionExceptionHandler : ITransactionExceptionHandler
                 return true;
             }
         }
-        result = null;
+        result = default;
         return false;
     }
 }

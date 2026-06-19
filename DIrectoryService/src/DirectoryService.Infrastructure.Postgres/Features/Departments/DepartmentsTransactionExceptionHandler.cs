@@ -25,7 +25,7 @@ public class DepartmentsTransactionExceptionHandler : ITransactionExceptionHandl
                 return true;
             }
         }
-        result = null;
+        result = default;
         return false;
     }
 }

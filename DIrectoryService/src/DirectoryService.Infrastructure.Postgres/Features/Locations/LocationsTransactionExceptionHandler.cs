@@ -36,7 +36,7 @@ public class LocationsTransactionExceptionHandler : ITransactionExceptionHandler
             }
         }
 
-        result = null;
+        result = default;
         return false;
     }
 }
