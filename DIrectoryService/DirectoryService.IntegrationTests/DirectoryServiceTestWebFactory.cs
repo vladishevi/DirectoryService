@@ -1,4 +1,5 @@
-﻿using DirectoryService.Application.Database;
+﻿using System.Data.Common;
+using DirectoryService.Application.Database;
 using DirectoryService.Infrastructure.Postgres;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -8,6 +9,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Npgsql;
+using Respawn;
 using Testcontainers.PostgreSql;
 
 namespace DirectoryService.IntegrationTests;
@@ -19,6 +22,9 @@ public class DirectoryServiceTestWebFactory : WebApplicationFactory<Program>, IA
         .WithUsername("postgres")
         .WithPassword("postgres")
         .Build();
+
+    private Respawner _respawner;
+    private DbConnection _dbConnection;
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
@@ -51,10 +57,33 @@ public class DirectoryServiceTestWebFactory : WebApplicationFactory<Program>, IA
         var dbContext = scope.ServiceProvider.GetRequiredService<DirectoryServiceDbContext>();
         await dbContext.Database.EnsureDeletedAsync();
         await dbContext.Database.EnsureCreatedAsync();
+
+        await CreateDatabaseConnectionAsync();
+        await InitializeRespawnerAsync();
+    }
+
+    private async Task CreateDatabaseConnectionAsync()
+    {
+        var dataSourceBuilder = new NpgsqlDataSourceBuilder(_postgresContainer.GetConnectionString());
+        var dataSource = dataSourceBuilder.Build();
+        _dbConnection = await dataSource.OpenConnectionAsync();
+    }
+
+    public async Task ResetDbAsync()
+    {
+        await _respawner.ResetAsync(_dbConnection);
+    }
+
+    private async Task InitializeRespawnerAsync()
+    {
+        _respawner = await Respawner.CreateAsync(_dbConnection,
+            new RespawnerOptions { DbAdapter = DbAdapter.Postgres, SchemasToInclude = ["public"] });
     }
 
     public new async Task DisposeAsync()
     {
+        await _dbConnection.CloseAsync();
+        await _dbConnection.DisposeAsync();
         await _postgresContainer.StopAsync();
         await _postgresContainer.DisposeAsync();
     }
