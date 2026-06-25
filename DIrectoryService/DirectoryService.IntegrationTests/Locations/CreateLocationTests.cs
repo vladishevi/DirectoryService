@@ -2,6 +2,7 @@
 using DirectoryService.Contracts.Locations;
 using Microsoft.EntityFrameworkCore;
 using Shared;
+using Shared.Errors;
 
 namespace DirectoryService.IntegrationTests.Locations;
 
@@ -87,5 +88,26 @@ public class CreateLocationTests(DirectoryServiceTestWebFactory factory) : Direc
         Assert.NotNull(envelope.Errors);
         Assert.False(envelope.IsSuccess);
         Assert.False(anyLocationExists);
+    }
+    
+    [Fact]
+    public async Task CreateLocation_with_existing_name_should_fail()
+    {
+        //arrange
+        var request = new CreateLocationRequest("My locfatgion test",
+            new AddressDto { City = "my city", Street = "my strgeet", Building = 12, Postcode = "952" }, "Europe/London");
+        
+        //act
+        await Client.PostAsJsonAsync("api/locations", request);
+        HttpResponseMessage response = await Client.PostAsJsonAsync("api/locations", request);
+        var envelope = await response.Content.ReadFromJsonAsync<Envelope<object>>();
+        int count = await ExecuteInDbAsync(async dbContext => await dbContext.LocationsRead.CountAsync());
+
+        //assert
+        Assert.False(response.IsSuccessStatusCode);
+        Assert.NotNull(envelope.Errors);
+        Assert.False(envelope.IsSuccess);
+        Assert.True(envelope.Errors.Any(e => e.Type == ErrorType.CONFLICT));
+        Assert.True(count == 1);
     }
 }
