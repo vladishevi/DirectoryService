@@ -5,6 +5,7 @@ using DirectoryService.Contracts.Locations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Shared;
+using Shared.Errors;
 
 namespace DirectoryService.Application.Features.Locations.GetLocation;
 

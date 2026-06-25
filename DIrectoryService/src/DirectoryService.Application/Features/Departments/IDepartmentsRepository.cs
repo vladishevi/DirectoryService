@@ -2,6 +2,7 @@
 using DirectoryService.Application.Database;
 using DirectoryService.Domain.Departments;
 using Shared;
+using Shared.Errors;
 
 namespace DirectoryService.Application.Features.Departments;
 

@@ -2,6 +2,7 @@
 using System.Text.Json.Serialization;
 using FluentValidation.Results;
 using Shared;
+using Shared.Errors;
 
 namespace DirectoryService.Application.Validation;
 

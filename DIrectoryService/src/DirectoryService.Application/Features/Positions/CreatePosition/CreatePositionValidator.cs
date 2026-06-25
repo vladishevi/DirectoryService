@@ -2,6 +2,7 @@
 using DirectoryService.Domain.Positions;
 using FluentValidation;
 using Shared;
+using Shared.Errors;
 
 namespace DirectoryService.Application.Features.Positions;
 

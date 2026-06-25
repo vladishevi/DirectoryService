@@ -4,6 +4,7 @@ using DirectoryService.Application.Database;
 using DirectoryService.Domain.Positions;
 using Microsoft.Extensions.Logging;
 using Shared;
+using Shared.Errors;
 
 namespace DirectoryService.Application.Features.Positions;
 

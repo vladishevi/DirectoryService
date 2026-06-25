@@ -36,7 +36,7 @@ finally
     Log.CloseAndFlush();
 }
 
-namespace DirectoryService.API
+namespace DirectoryService.Presenters
 {
     public partial class Program;
 }

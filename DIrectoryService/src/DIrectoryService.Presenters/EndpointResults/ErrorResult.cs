@@ -1,4 +1,5 @@
 ﻿using Shared;
+using Shared.Errors;
 
 namespace DirectoryService.Presenters.EndpointResults;
 
@@ -18,7 +19,7 @@ public record ErrorResult : IResult
         httpContext.Response.ContentType = "application/json";
         httpContext.Response.StatusCode = GetStatusCode();        
 
-        Envelope envelope = Envelope.Error(_errors);
+        Envelope<object> envelope = Envelope<object>.Error(_errors);
         return httpContext.Response.WriteAsJsonAsync(envelope);
     }
 

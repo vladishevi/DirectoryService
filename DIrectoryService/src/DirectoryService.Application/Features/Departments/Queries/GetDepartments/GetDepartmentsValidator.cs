@@ -2,6 +2,7 @@
 using DirectoryService.Contracts.Departments;
 using FluentValidation;
 using Shared;
+using Shared.Errors;
 
 namespace DirectoryService.Application.Features.Departments.Queries.GetDepartments;
 
