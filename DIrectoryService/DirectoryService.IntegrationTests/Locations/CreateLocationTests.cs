@@ -115,8 +115,148 @@ public class CreateLocationTests(DirectoryServiceTestWebFactory factory) : Direc
         Assert.False(response.IsSuccessStatusCode);
         Assert.NotNull(envelope.Errors);
         Assert.False(envelope.IsSuccess);
-        Assert.True(envelope.Errors.Any(e => e.Type == ErrorType.CONFLICT));
+        Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+        Assert.NotNull(envelope);
+        Assert.False(envelope.IsSuccess);
+        Assert.NotNull(envelope.Errors);
+        Assert.Contains(envelope.Errors, e => e.Type == ErrorType.CONFLICT);
         Assert.True(count == 1);
+    }
+
+    [Fact]
+    public async Task CreateLocation_with_existing_name_different_case_should_fail()
+    {
+        //arrange
+        var firstRequest = new CreateLocationRequest("London Office",
+            new AddressDto { City = "London", Street = "Baker Street", Building = 221, Postcode = "NW1" },
+            "Europe/London");
+        var duplicateRequest = new CreateLocationRequest("london office",
+            new AddressDto { City = "London", Street = "Fleet Street", Building = 1, Postcode = "EC4" },
+            "Europe/London");
+
+        //act
+        await Client.PostAsJsonAsync("api/locations", firstRequest);
+        HttpResponseMessage response = await Client.PostAsJsonAsync("api/locations", duplicateRequest);
+        var envelope = await response.Content.ReadFromJsonAsync<Envelope<object>>();
+        int count = await ExecuteInDbAsync(async dbContext => await dbContext.LocationsRead.CountAsync());
+
+        //assert
+        Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+        Assert.NotNull(envelope);
+        Assert.False(envelope.IsSuccess);
+        Assert.NotNull(envelope.Errors);
+        Assert.Contains(envelope.Errors, e => e.Type == ErrorType.CONFLICT);
+        Assert.Equal(1, count);
+    }
+
+    [Fact]
+    public async Task CreateLocation_with_existing_address_should_fail()
+    {
+        //arrange
+        var firstRequest = new CreateLocationRequest("London Office",
+            new AddressDto { City = "London", Street = "Baker Street", Building = 221, Postcode = "NW1" },
+            "Europe/London");
+        var duplicateRequest = new CreateLocationRequest("London Branch",
+            new AddressDto { City = "London", Street = "Baker Street", Building = 221, Postcode = "NW1" },
+            "Europe/London");
+
+        //act
+        await Client.PostAsJsonAsync("api/locations", firstRequest);
+        HttpResponseMessage response = await Client.PostAsJsonAsync("api/locations", duplicateRequest);
+        var envelope = await response.Content.ReadFromJsonAsync<Envelope<object>>();
+        int count = await ExecuteInDbAsync(async dbContext => await dbContext.LocationsRead.CountAsync());
+
+        //assert
+        Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+        Assert.NotNull(envelope);
+        Assert.False(envelope.IsSuccess);
+        Assert.NotNull(envelope.Errors);
+        Assert.Contains(envelope.Errors, e => e.Type == ErrorType.CONFLICT);
+        Assert.Equal(1, count);
+    }
+
+    [Fact]
+    public async Task CreateLocation_with_two_character_name_should_fail()
+    {
+        //arrange
+        var request = new CreateLocationRequest("ab",
+            new AddressDto { City = "my city", Street = "my street", Building = 1, Postcode = "92" }, "Europe/London");
+
+        //act
+        HttpResponseMessage response = await Client.PostAsJsonAsync("api/locations", request);
+        var envelope = await response.Content.ReadFromJsonAsync<Envelope<object>>();
+        bool anyLocationExists = await ExecuteInDbAsync(async dbContext => await dbContext.LocationsRead.AnyAsync());
+
+        //assert
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.NotNull(envelope);
+        Assert.False(envelope.IsSuccess);
+        Assert.NotNull(envelope.Errors);
+        Assert.Contains(envelope.Errors, e => e.Type == ErrorType.VALIDATION);
+        Assert.False(anyLocationExists);
+    }
+
+    [Fact]
+    public async Task CreateLocation_with_three_character_name_should_succeed()
+    {
+        //arrange
+        var request = new CreateLocationRequest("abc",
+            new AddressDto { City = "my city", Street = "my street", Building = 1, Postcode = "92" }, "Europe/London");
+
+        //act
+        HttpResponseMessage response = await Client.PostAsJsonAsync("api/locations", request);
+        Envelope<Guid> envelope = await response.Content.ReadFromJsonAsync<Envelope<Guid>>();
+        bool locationExists = await ExecuteInDbAsync(async dbContext =>
+            await dbContext.LocationsRead.AnyAsync(l => l.Id == envelope.Result));
+
+        //assert
+        Assert.True(response.IsSuccessStatusCode);
+        Assert.Null(envelope.Errors);
+        Assert.True(envelope.IsSuccess);
+        Assert.NotEqual(Guid.Empty, envelope.Result);
+        Assert.True(locationExists);
+    }
+
+    [Fact]
+    public async Task CreateLocation_with_120_character_name_should_succeed()
+    {
+        //arrange
+        var request = new CreateLocationRequest(new string('a', 120),
+            new AddressDto { City = "my city", Street = "my street", Building = 1, Postcode = "92" }, "Europe/London");
+
+        //act
+        HttpResponseMessage response = await Client.PostAsJsonAsync("api/locations", request);
+        Envelope<Guid> envelope = await response.Content.ReadFromJsonAsync<Envelope<Guid>>();
+        bool locationExists = await ExecuteInDbAsync(async dbContext =>
+            await dbContext.LocationsRead.AnyAsync(l => l.Id == envelope.Result));
+
+        //assert
+        Assert.True(response.IsSuccessStatusCode);
+        Assert.Null(envelope.Errors);
+        Assert.True(envelope.IsSuccess);
+        Assert.NotEqual(Guid.Empty, envelope.Result);
+        Assert.True(locationExists);
+    }
+
+    [Fact]
+    public async Task CreateLocation_with_121_character_name_should_fail()
+    {
+        //arrange
+        var request = new CreateLocationRequest(new string('a', 121),
+            new AddressDto { City = "my city", Street = "my street", Building = 1, Postcode = "92" }, "Europe/London");
+
+        //act
+        HttpResponseMessage response = await Client.PostAsJsonAsync("api/locations", request);
+        var envelope = await response.Content.ReadFromJsonAsync<Envelope<object>>();
+        bool anyLocationExists = await ExecuteInDbAsync(async dbContext => await dbContext.LocationsRead.AnyAsync());
+
+        //assert
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.NotNull(envelope);
+        Assert.False(envelope.IsSuccess);
+        Assert.NotNull(envelope.Errors);
+        Assert.Contains(envelope.Errors, e => e.Type == ErrorType.VALIDATION);
+        Assert.False(anyLocationExists);
     }
 
     [Fact]
