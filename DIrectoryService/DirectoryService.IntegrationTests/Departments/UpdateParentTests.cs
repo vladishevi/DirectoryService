@@ -5,6 +5,7 @@ using DirectoryService.Domain.Departments;
 using DirectoryService.IntegrationTests.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Shared;
+using Shared.Errors;
 
 namespace DirectoryService.IntegrationTests.Departments;
 
@@ -123,5 +124,44 @@ public class UpdateParentTests(DirectoryServiceTestWebFactory factory) : Directo
         Assert.NotNull(department.ParentDepartment);
         Assert.NotEqual(department.Depth, 0);
         Assert.True(department.ParentDepartment.Id == parentId);
+    }
+    
+    [Fact]
+    public async Task UpdateParent_add_empty_parent_should_fail()
+    {
+        //arrange
+        //create locations
+        var request = new CreateLocationRequest("My locfatgion test",
+            new AddressDto { City = "my city", Street = "my strgeet", Building = 1, Postcode = "92" }, "Europe/London");
+        var createLocationEnvelope =
+            await Client.PostAndReadAsJsonAsync<Envelope<Guid>, CreateLocationRequest>("api/locations", request);
+        var locationId = createLocationEnvelope.Result;
+        
+        //create department
+        var createDepartmentRequest = new CreateDepartmentRequest(Name: "Test Department",
+            Identifier: "test", null, LocationIds: [locationId]);
+        var createDepartmentEnvelope = await Client.PostAndReadAsJsonAsync<Envelope<Guid>, CreateDepartmentRequest>("api/departments",
+            createDepartmentRequest);
+        var departmentId = createDepartmentEnvelope.Result;
+
+        var updateParentRequest = new UpdateParentRequest(Guid.NewGuid());
+
+        //act
+        var response = await Client.PutAsJsonAsync($"api/departments/{departmentId}/parent", updateParentRequest);
+        var updateParentEnvelope = await response.Content.ReadFromJsonAsync<Envelope<object>>();
+        var department = await ExecuteInDbAsync(async dbContext =>
+        {
+            return await dbContext.DepartmentsRead
+                .Include(d => d.ParentDepartment)
+                .FirstAsync(d => d.Id == departmentId);
+        });
+        
+        //assert
+        Assert.False(updateParentEnvelope.IsSuccess);
+        Assert.False(response.IsSuccessStatusCode);
+        Assert.NotNull(updateParentEnvelope.Errors);
+        Assert.True(updateParentEnvelope.Errors.Any(e => e.Type == ErrorType.NOT_FOUND));
+        Assert.Null(department.ParentDepartment);
+        Assert.Equal(department.Depth, 0);
     }
 }
