@@ -39,9 +39,12 @@ public class UpdateParentTests(DirectoryServiceTestWebFactory factory) : Directo
             Identifier: "test", ParentId: parentId, LocationIds: [secondLocationId]);
         var createDepartmentEnvelope = await Client.PostAndReadAsJsonAsync<Envelope<Guid>, CreateDepartmentRequest>("api/departments",
             createDepartmentRequest);
+        var departmentId = createDepartmentEnvelope.Result;
         var department = await ExecuteInDbAsync(async dbContext =>
         {
-            return await dbContext.DepartmentsRead.FirstAsync(d => d.Id == createDepartmentEnvelope.Result);
+            return await dbContext.DepartmentsRead
+                .Include(d => d.ParentDepartment)
+                .FirstAsync(d => d.Id == departmentId);
         });
 
         var updateParentRequest = new UpdateParentRequest(null);
@@ -49,11 +52,18 @@ public class UpdateParentTests(DirectoryServiceTestWebFactory factory) : Directo
         //act
         var response = await Client.PutAsJsonAsync($"api/departments/{department.Id}/parent", updateParentRequest);
         var updateParentEnvelope = await response.Content.ReadFromJsonAsync<Envelope<Guid>>();
+        department = await ExecuteInDbAsync(async dbContext =>
+        {
+            return await dbContext.DepartmentsRead
+                .Include(d => d.ParentDepartment)
+                .FirstAsync(d => d.Id == departmentId);
+        });
         
         //assert
         Assert.True(updateParentEnvelope.IsSuccess);
         Assert.True(response.IsSuccessStatusCode);
         Assert.Null(updateParentEnvelope.Errors);
         Assert.Null(department.ParentDepartment);
+        Assert.Equal(department.Depth, 0);
     }
 }
