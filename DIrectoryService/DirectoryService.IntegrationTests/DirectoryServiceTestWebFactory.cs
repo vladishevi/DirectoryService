@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
@@ -35,6 +36,7 @@ public class DirectoryServiceTestWebFactory : WebApplicationFactory<Program>, IA
             services.AddDbContext<DirectoryServiceDbContext>((sp, options) =>
             {
                 options.UseNpgsql(_postgresContainer.GetConnectionString());
+                options.ConfigureWarnings(warnings => warnings.Ignore(RelationalEventId.PendingModelChangesWarning));
 
                 ILoggerFactory loggerFactory = sp.GetRequiredService<ILoggerFactory>();
                 if (sp.GetRequiredService<IHostEnvironment>().IsDevelopment())
@@ -56,6 +58,7 @@ public class DirectoryServiceTestWebFactory : WebApplicationFactory<Program>, IA
         await using var scope = Services.CreateAsyncScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<DirectoryServiceDbContext>();
         await dbContext.Database.EnsureDeletedAsync();
+        await dbContext.Database.MigrateAsync();
         await dbContext.Database.EnsureCreatedAsync();
 
         await CreateDatabaseConnectionAsync();
@@ -82,6 +85,7 @@ public class DirectoryServiceTestWebFactory : WebApplicationFactory<Program>, IA
 
     public new async Task DisposeAsync()
     {
+        await base.DisposeAsync();
         await _dbConnection.CloseAsync();
         await _dbConnection.DisposeAsync();
         await _postgresContainer.StopAsync();
