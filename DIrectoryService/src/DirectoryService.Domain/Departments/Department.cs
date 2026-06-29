@@ -1,4 +1,5 @@
-﻿using CSharpFunctionalExtensions;
+﻿using System.Text.Json.Serialization;
+using CSharpFunctionalExtensions;
 using DirectoryService.Domain.Locations;
 using Shared;
 using Shared.Errors;
@@ -10,6 +11,7 @@ public sealed class Department
     // EF Core
     private Department() { }
     
+    [JsonConstructor]
     private Department(Name name, 
         Identifier identifier,
         Department? parentDepartment)

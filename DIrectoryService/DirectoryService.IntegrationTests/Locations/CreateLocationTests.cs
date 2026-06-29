@@ -176,6 +176,55 @@ public class CreateLocationTests(DirectoryServiceTestWebFactory factory) : Direc
     }
 
     [Fact]
+    public async Task CreateLocation_with_concurrent_duplicate_requests_should_create_only_one_location()
+    {
+        //arrange
+        const int requestsCount = 8;
+
+        var requests = Enumerable.Range(0, requestsCount)
+            .Select(_ => new CreateLocationRequest("Race Location",
+                new AddressDto { City = "London", Street = "Baker Street", Building = 221, Postcode = "NW1" },
+                "Europe/London"))
+            .ToList();
+
+        //act
+        HttpResponseMessage[] responses = await Task.WhenAll(
+            requests.Select(request => Client.PostAsJsonAsync("api/locations", request)));
+
+        Envelope<Guid>[] successEnvelopes = await Task.WhenAll(
+            responses
+                .Where(response => response.IsSuccessStatusCode)
+                .Select(response => response.Content.ReadFromJsonAsync<Envelope<Guid>>()));
+
+        Envelope<object>[] conflictEnvelopes = await Task.WhenAll(
+            responses
+                .Where(response => response.StatusCode == HttpStatusCode.Conflict)
+                .Select(response => response.Content.ReadFromJsonAsync<Envelope<object>>()));
+
+        int count = await ExecuteInDbAsync(async dbContext => await dbContext.LocationsRead.CountAsync());
+
+        //assert
+        Assert.Single(responses, response => response.IsSuccessStatusCode);
+        Assert.Equal(requestsCount - 1, responses.Count(response => response.StatusCode == HttpStatusCode.Conflict));
+        Assert.Single(successEnvelopes);
+        Assert.All(successEnvelopes, envelope =>
+        {
+            Assert.NotNull(envelope);
+            Assert.True(envelope.IsSuccess);
+            Assert.Null(envelope.Errors);
+            Assert.NotEqual(Guid.Empty, envelope.Result);
+        });
+        Assert.All(conflictEnvelopes, envelope =>
+        {
+            Assert.NotNull(envelope);
+            Assert.False(envelope.IsSuccess);
+            Assert.NotNull(envelope.Errors);
+            Assert.Contains(envelope.Errors, e => e.Type == ErrorType.CONFLICT);
+        });
+        Assert.Equal(1, count);
+    }
+
+    [Fact]
     public async Task CreateLocation_with_two_character_name_should_fail()
     {
         //arrange
