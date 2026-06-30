@@ -35,3 +35,8 @@ finally
 {
     Log.CloseAndFlush();
 }
+
+namespace DirectoryService.Presenters
+{
+    public partial class Program;
+}

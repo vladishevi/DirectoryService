@@ -8,6 +8,7 @@ using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.Extensions.Logging;
 using Shared;
+using Shared.Errors;
 using Name = DirectoryService.Domain.Positions.Name;
 
 namespace DirectoryService.Application.Features.Positions;

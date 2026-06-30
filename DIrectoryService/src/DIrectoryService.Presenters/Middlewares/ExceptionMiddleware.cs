@@ -1,4 +1,5 @@
 ﻿using Shared;
+using Shared.Errors;
 
 namespace DirectoryService.Presenters.Middlewares;
 
@@ -26,7 +27,7 @@ public class ExceptionMiddleware
             httpContext.Response.ContentType = "application/json";
             httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
             
-            Envelope envelope = Envelope.Error(GeneralErrors.Failure("Something went wrong").ToErrors());
+            Envelope<object> envelope = Envelope<object>.Error(GeneralErrors.Failure("Something went wrong").ToErrors());
             await httpContext.Response.WriteAsJsonAsync(envelope);
         }
     }

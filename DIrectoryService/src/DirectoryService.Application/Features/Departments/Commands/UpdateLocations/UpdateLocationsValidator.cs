@@ -1,6 +1,7 @@
 ﻿using DirectoryService.Application.Validation;
 using FluentValidation;
 using Shared;
+using Shared.Errors;
 
 namespace DirectoryService.Application.Features.Departments.Commands;
 

@@ -4,6 +4,7 @@ using DirectoryService.Infrastructure.Postgres.Transaction;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using Shared;
+using Shared.Errors;
 
 namespace DirectoryService.Infrastructure.Postgres.Features.Departments;
 
@@ -25,7 +26,7 @@ public class DepartmentsTransactionExceptionHandler : ITransactionExceptionHandl
                 return true;
             }
         }
-        result = null;
+        result = default;
         return false;
     }
 }

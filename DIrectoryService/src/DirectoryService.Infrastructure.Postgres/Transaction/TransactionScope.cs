@@ -3,6 +3,7 @@ using DirectoryService.Application.Database;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 using Shared;
+using Shared.Errors;
 
 namespace DirectoryService.Infrastructure.Postgres.Transaction;
 

@@ -1,12 +1,14 @@
-﻿using System.Collections;
+using System.Collections;
+using System.Text.Json.Serialization;
 
-namespace Shared;
+namespace Shared.Errors;
 
+[JsonConverter(typeof(ErrorsJsonConverter))]
 public record Errors : IEnumerable<Error>
 {
     private readonly IEnumerable<Error> _errors;
 
-    public Errors(IEnumerable<Error> errors)
+    public Errors(List<Error> errors)
     {
         _errors = [.. errors];
     }
