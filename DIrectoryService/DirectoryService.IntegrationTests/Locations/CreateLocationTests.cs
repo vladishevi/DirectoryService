@@ -38,7 +38,7 @@ public class CreateLocationTests(DirectoryServiceTestWebFactory factory) : Direc
         Assert.Equal(request.Address.Building, location.Address.Building);
         Assert.Equal(request.Address.Postcode, location.Address.Postcode);
         Assert.Equal(request.Timezone, location.Timezone.Code);
-        Assert.True(location.IsActive);
+        Assert.False(location.IsDeleted);
     }
     
     [Fact]

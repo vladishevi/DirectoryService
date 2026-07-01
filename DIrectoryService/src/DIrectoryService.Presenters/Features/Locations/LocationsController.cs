@@ -1,5 +1,6 @@
 ﻿using DirectoryService.Application.Abstractions;
 using DirectoryService.Application.Features.Locations.Commands;
+using DirectoryService.Application.Features.Locations.Commands.SoftDeleteLocation;
 using DirectoryService.Application.Features.Locations.GetLocation;
 using DirectoryService.Application.Features.Locations.GetLocations;
 using DirectoryService.Contracts.Locations;
@@ -24,14 +25,14 @@ public class LocationsController : ControllerBase
 
     [HttpDelete("{locationId}")]
     public async Task<EndpointResult<Guid>> Delete(
-        [FromServices] ICommandHandler<Guid, DeleteLocationCommand> handler,
+        [FromServices] ICommandHandler<Guid, SoftDeleteLocationCommand> handler,
         [FromRoute] Guid locationId,
         CancellationToken cancellationToken)
     {
-        DeleteLocationCommand command = new(locationId);
+        SoftDeleteLocationCommand command = new(locationId);
         return await handler.Handle(command, cancellationToken);
     }
-
+    
     [HttpGet("{locationId:guid}")]
     public async Task<EndpointResult<GetLocationDto>> Get(
         [FromServices] IQueryHandler<GetLocationDto, GetLocationQuery> handler,

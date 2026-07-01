@@ -49,8 +49,8 @@ public class LocationConfiguration : IEntityTypeConfiguration<Location>
             .HasConversion(l => l.Code, l => Timezone.Create(l).Value)
             .IsRequired();
         
-        builder.Property(l => l.IsActive)
-            .HasColumnName("is_active")
+        builder.Property(l => l.IsDeleted)
+            .HasColumnName("is_deleted")
             .IsRequired();
         
         builder.Property(l => l.CreatedAt)
@@ -61,6 +61,9 @@ public class LocationConfiguration : IEntityTypeConfiguration<Location>
             .HasColumnName("updated_at")
             .ValueGeneratedOnUpdate()
             .IsRequired();
+
+        builder.Property(l => l.DeletedAt)
+            .HasColumnName("deleted_at");
 
         builder.HasIndex(l => l.Name)
             .IsUnique()

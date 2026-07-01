@@ -93,7 +93,7 @@ public class EfCoreLocationsRepository : ILocationsRepository
 
             IQueryable<Location> query = _dbContext.Locations.Where(l => ids.Contains(l.Id));
             if (active)
-                query = query.Where(l => l.IsActive);
+                query = query.Where(l => !l.IsDeleted);
 
             int existingCount = await query
                 .CountAsync(cancellationToken: cancellationToken);
