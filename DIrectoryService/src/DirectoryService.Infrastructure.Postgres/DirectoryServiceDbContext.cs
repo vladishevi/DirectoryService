@@ -28,5 +28,12 @@ public class DirectoryServiceDbContext : DbContext, IReadDbContext
     {
         modelBuilder.HasPostgresExtension("ltree");
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(DirectoryServiceDbContext).Assembly);
+        
+        ApplyQueryFilters(modelBuilder);
+    }
+
+    private static void ApplyQueryFilters(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Location>().HasQueryFilter(l => !l.IsDeleted);
     }
 }
