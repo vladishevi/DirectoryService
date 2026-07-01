@@ -118,6 +118,11 @@ public class LocationEndpointTests(DirectoryServiceTestWebFactory factory) : Dir
         var location = await ExecuteInDbAsync(async dbContext =>
             await dbContext
                 .LocationsRead
+                .FirstOrDefaultAsync(l => l.Id == locationId));
+        
+        var locationIgnoreFilters = await ExecuteInDbAsync(async dbContext =>
+            await dbContext
+                .LocationsRead
                 .IgnoreQueryFilters()
                 .FirstOrDefaultAsync(l => l.Id == locationId));
 
@@ -125,8 +130,9 @@ public class LocationEndpointTests(DirectoryServiceTestWebFactory factory) : Dir
         Assert.NotNull(envelope);
         Assert.True(envelope.IsSuccess);
         Assert.Equal(locationId, envelope.Result);
-        Assert.NotNull(location);
-        Assert.True(location.IsDeleted);
+        Assert.Null(location);
+        Assert.NotNull(locationIgnoreFilters);
+        Assert.True(locationIgnoreFilters.IsDeleted);
     }
 
     [Fact]

@@ -20,7 +20,7 @@ public class GetLocationHandler(
         try
         {
             GetLocationDto? locationDto = await readDbContext.LocationsRead
-                .Where(l => l.Id == query.LocationId && !l.IsDeleted)
+                .Where(l => l.Id == query.LocationId)
                 .Include(l => l.Departments)
                 .Select(l => new GetLocationDto
                 {
