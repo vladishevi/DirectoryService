@@ -115,14 +115,18 @@ public class LocationEndpointTests(DirectoryServiceTestWebFactory factory) : Dir
 
         HttpResponseMessage response = await Client.DeleteAsync($"api/locations/{locationId}");
         var envelope = await response.Content.ReadFromJsonAsync<Envelope<Guid>>();
-        bool locationExists = await ExecuteInDbAsync(async dbContext =>
-            await dbContext.LocationsRead.AnyAsync(l => l.Id == locationId));
+        var location = await ExecuteInDbAsync(async dbContext =>
+            await dbContext
+                .LocationsRead
+                .IgnoreQueryFilters()
+                .FirstOrDefaultAsync(l => l.Id == locationId));
 
         Assert.True(response.IsSuccessStatusCode);
         Assert.NotNull(envelope);
         Assert.True(envelope.IsSuccess);
         Assert.Equal(locationId, envelope.Result);
-        Assert.False(locationExists);
+        Assert.NotNull(location);
+        Assert.True(location.IsDeleted);
     }
 
     [Fact]

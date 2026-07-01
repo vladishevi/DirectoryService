@@ -31,7 +31,7 @@ public class GetLocationsHandler(
                 return result.ToErrors();
             }
 
-            List<string> conditions = [];
+            List<string> conditions = ["is_deleted = false"];
 
             DynamicParameters parameters = new();
             parameters.Add("limit", query.Request.Pagination.PageSize, DbType.Int32);
@@ -52,7 +52,7 @@ public class GetLocationsHandler(
             if (sortDirResult.IsFailure)
                 return sortDirResult.Error;
             
-            string whereClause = conditions.Count > 0 ? "WHERE " + string.Join(" AND ", conditions) : "";
+            string whereClause = "WHERE " + string.Join(" AND ", conditions);
             string command = $"""
                               SELECT locations.id, locations.name, created_at, count(department_locations.department_id) departmentsCount,
                                      locations.city, locations.street, locations.building, locations.postcode, count(*) OVER () as totalCount
