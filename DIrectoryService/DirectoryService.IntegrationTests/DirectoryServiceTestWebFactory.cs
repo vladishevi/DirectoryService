@@ -31,6 +31,7 @@ public class DirectoryServiceTestWebFactory : WebApplicationFactory<Program>, IA
     {
         builder.ConfigureTestServices(services =>
         {
+            services.RemoveAll<IHostedService>();
             services.RemoveAll<DirectoryServiceDbContext>();
 
             services.AddDbContext<DirectoryServiceDbContext>((sp, options) =>

@@ -22,7 +22,7 @@ public class CleanupServiceTests(DirectoryServiceTestWebFactory factory) : Direc
                 .Where(l => l.Id == locationId)
                 .ExecuteUpdateAsync(setters =>
                 {
-                    setters.SetProperty(l => l.DeletedAt, DateTime.UtcNow.AddDays(7));
+                    setters.SetProperty(l => l.DeletedAt, DateTime.UtcNow.AddDays(-7));
                 });
         });
         
