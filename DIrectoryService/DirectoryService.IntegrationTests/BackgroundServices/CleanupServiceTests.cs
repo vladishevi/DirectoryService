@@ -1,6 +1,7 @@
 ﻿using DirectoryService.Infrastructure.Postgres.BackgroundServices;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace DirectoryService.IntegrationTests.BackgroundServices;
 
@@ -10,8 +11,11 @@ public class CleanupServiceTests(DirectoryServiceTestWebFactory factory) : Direc
     public async Task Cleanup_expired_location_should_succeed()
     {
         //ARRANGE
+        await using var scope = factory.Services.CreateAsyncScope();
+        
         //create location
         var locationId = await CreateLocationAsync("Cleanup location");
+        var cleanupOptions = scope.ServiceProvider.GetRequiredService<IOptions<CleanupOptions>>();
 
         //mark location as deleted
         await Client.DeleteAsync($"api/locations/{locationId}");
@@ -22,12 +26,12 @@ public class CleanupServiceTests(DirectoryServiceTestWebFactory factory) : Direc
                 .Where(l => l.Id == locationId)
                 .ExecuteUpdateAsync(setters =>
                 {
-                    setters.SetProperty(l => l.DeletedAt, DateTime.UtcNow.AddDays(-7));
+                    DateTime expiredDate = DateTime.UtcNow.Add(-cleanupOptions.Value.RetentionPeriod);
+                    setters.SetProperty(l => l.DeletedAt, expiredDate);
                 });
         });
         
         //create service
-        await using var scope = factory.Services.CreateAsyncScope();
         var service = scope.ServiceProvider.GetRequiredService<CleanupService>();
 
         //ACT
