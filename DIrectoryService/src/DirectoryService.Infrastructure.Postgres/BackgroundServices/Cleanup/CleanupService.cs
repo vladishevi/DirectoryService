@@ -19,6 +19,11 @@ public class CleanupService(
             IgnoreQueryFilters()
             .Where(l => l.IsDeleted && l.DeletedAt < cutoff)
             .ExecuteDeleteAsync();
+
+        deleted += await dbContext.Positions
+            .IgnoreQueryFilters()
+            .Where(p => p.IsDeleted && p.DeletedAt < cutoff)
+            .ExecuteDeleteAsync();
         
         logger.LogInformation("{deleted} rows have been deleted", deleted);
         

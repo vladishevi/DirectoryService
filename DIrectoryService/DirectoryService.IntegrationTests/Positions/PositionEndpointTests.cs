@@ -91,14 +91,21 @@ public class PositionEndpointTests(DirectoryServiceTestWebFactory factory) : Dir
 
         HttpResponseMessage response = await Client.DeleteAsync($"api/positions/{positionId}");
         var envelope = await response.Content.ReadFromJsonAsync<Envelope<Guid>>();
-        bool positionExists = await ExecuteInDbAsync(async dbContext =>
-            await dbContext.Positions.AsNoTracking().AnyAsync(p => p.Id == positionId));
+        var position = await ExecuteInDbAsync(async dbContext =>
+            await dbContext.Positions.AsNoTracking().FirstOrDefaultAsync(p => p.Id == positionId));
+        var positionIgnoreFilters = await ExecuteInDbAsync(async dbContext =>
+            await dbContext.Positions
+                .IgnoreQueryFilters()
+                .AsNoTracking()
+                .FirstOrDefaultAsync(p => p.Id == positionId));
 
         Assert.True(response.IsSuccessStatusCode);
         Assert.NotNull(envelope);
         Assert.True(envelope.IsSuccess);
         Assert.Equal(positionId, envelope.Result);
-        Assert.False(positionExists);
+        Assert.Null(position);
+        Assert.NotNull(positionIgnoreFilters);
+        Assert.True(positionIgnoreFilters.IsDeleted);
     }
 
     [Fact]

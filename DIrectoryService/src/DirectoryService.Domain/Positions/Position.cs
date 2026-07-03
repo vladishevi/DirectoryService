@@ -23,8 +23,10 @@ public sealed class Position
     public Name Name { get; private set; }
     public Description? Description { get; private set; }
     public bool IsActive { get; private set; }
+    public bool IsDeleted { get; private set; }
     public DateTime CreatedAt  { get; private set; }
     public DateTime UpdatedAt  { get; private set; }
+    public DateTime DeletedAt  { get; private set; }
     public uint xmin { get; private set; }
     
     public IReadOnlyCollection<DepartmentPosition> Departments => _departments;
@@ -38,4 +40,10 @@ public sealed class Position
     }
 
     public void UpdateName(Name name) => Name = name;
+
+    public void SoftDelete()
+    {
+        IsDeleted = true;
+        DeletedAt = DateTime.UtcNow;
+    }
 }
