@@ -3,6 +3,7 @@ using DirectoryService.Application.Database;
 using DirectoryService.Application.Features.Departments;
 using DirectoryService.Application.Features.Locations;
 using DirectoryService.Application.Features.Positions;
+using DirectoryService.Infrastructure.Postgres.BackgroundServices;
 using DirectoryService.Infrastructure.Postgres.Database;
 using DirectoryService.Infrastructure.Postgres.Transaction;
 using Microsoft.EntityFrameworkCore;
@@ -20,6 +21,7 @@ public static class DependencyInjection
         AddDb(services, configuration);
         AddRepositories(services);
         AddTransactionExceptionHandlers(services);
+        AddBackgroundServices(services);
         services.AddScoped<ITransactionManager, TransactionManager>();
         services.AddSingleton<IDbConnectionFactory, DbConnectionFactory>();
         return services;
@@ -59,5 +61,11 @@ public static class DependencyInjection
                 .AssignableToAny(typeof(ITransactionExceptionHandler)))
             .AsSelfWithInterfaces()
             .WithScopedLifetime());
+    }
+
+    private static void AddBackgroundServices(IServiceCollection services)
+    {
+        services.AddHostedService<CleanupBackgroundService>();
+        services.AddScoped<CleanupService>();
     }
 }
