@@ -22,7 +22,7 @@ public class CleanupBackgroundService(
             {
                 try
                 {
-                    var scope = scopeFactory.CreateScope();
+                    using var scope = scopeFactory.CreateScope();
                     var service = scope.ServiceProvider.GetRequiredService<CleanupService>();
                     await service.CleanupAsync(stoppingToken);
                 }
