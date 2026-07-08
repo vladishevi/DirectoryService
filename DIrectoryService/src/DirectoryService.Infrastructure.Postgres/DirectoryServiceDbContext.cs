@@ -35,6 +35,7 @@ public class DirectoryServiceDbContext : DbContext, IReadDbContext
     private static void ApplyQueryFilters(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Location>().HasQueryFilter(l => !l.IsDeleted);
+        modelBuilder.Entity<Department>().HasQueryFilter(d => !d.IsDeleted);
         modelBuilder.Entity<Position>().HasQueryFilter(p => !p.IsDeleted);
     }
 }

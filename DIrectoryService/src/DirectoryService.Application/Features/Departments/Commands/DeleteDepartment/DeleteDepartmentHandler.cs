@@ -3,7 +3,6 @@ using DirectoryService.Application.Abstractions;
 using DirectoryService.Application.Database;
 using DirectoryService.Domain.Departments;
 using Microsoft.Extensions.Logging;
-using Shared;
 using Shared.Errors;
 
 namespace DirectoryService.Application.Features.Departments.Commands;
@@ -16,41 +15,24 @@ public class DeleteDepartmentHandler(
 {
     public async Task<Result<Guid, Errors>> Handle(DeleteDepartmentCommand command, CancellationToken cancellationToken)
     {
-        Result<ITransactionScope, Errors> transactionResult = await transactionManager.BeginAsync(cancellationToken);
-        if (transactionResult.IsFailure)
-        {
-            logger.LogError("Error starting transaction while deleting department");
-            return transactionResult.Error;
-        }
-
-        using ITransactionScope transaction = transactionResult.Value;
-
         Result<Department, Errors> getDepartmentResult = await departmentsRepository.GetById(command.Id, cancellationToken);
         if (getDepartmentResult.IsFailure)
         {
-            logger.LogError("Error getting department with id {id} while deleting department", command.Id);
-            await transaction.Rollback(cancellationToken);
+            logger.LogError("Error getting department with id {id} while soft deleting department", command.Id);
             return getDepartmentResult.Error;
         }
 
-        Result<Guid, Errors> deleteResult = departmentsRepository.Delete(getDepartmentResult.Value);
-        if (deleteResult.IsFailure)
-        {
-            logger.LogError("Error deleting department with id {id}", command.Id);
-            await transaction.Rollback(cancellationToken);
-            return deleteResult.Error;
-        }
+        var department = getDepartmentResult.Value;
+        department.SoftDelete();
 
         UnitResult<Errors> saveResult = await transactionManager.SaveChangesAsync(cancellationToken);
         if (saveResult.IsFailure)
         {
             logger.LogError("Error saving changes to database");
-            await transaction.Rollback(cancellationToken);
             return saveResult.Error;
         }
 
-        await transaction.Commit(cancellationToken);
-
-        return deleteResult.Value;
+        logger.LogInformation("Department with id {id} has been soft deleted", command.Id);
+        return department.Id;
     }
 }
