@@ -70,6 +70,8 @@ public class UpdateParentHandler : ICommandHandler<Guid, UpdateParentCommand>
                 transaction.Rollback(ct);
                 return getParentWithLockResult.Error;
             }
+
+            parentDepartment = getParentWithLockResult.Value;
         }
 
         //lock descendants

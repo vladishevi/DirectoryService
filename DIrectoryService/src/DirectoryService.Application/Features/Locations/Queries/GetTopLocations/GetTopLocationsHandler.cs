@@ -26,7 +26,7 @@ public class GetTopLocationsHandler(
                                             FROM locations l
                                                 LEFT JOIN department_locations dl ON l.id = dl.location_id
                                                 LEFT JOIN departments d ON dl.department_id =  d.id
-                                                WHERE d.is_deleted IS NOT TRUE
+                                                WHERE l.is_deleted = false AND d.is_deleted IS NOT TRUE
                                             GROUP BY l.id, l.name, l.city, l.street, l.building, l.postcode
                                             ORDER BY departmentsCount DESC
                                             LIMIT 5

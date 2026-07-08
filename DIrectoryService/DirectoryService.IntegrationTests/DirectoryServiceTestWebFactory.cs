@@ -1,11 +1,13 @@
 ﻿using System.Data.Common;
 using DirectoryService.Application.Database;
 using DirectoryService.Infrastructure.Postgres;
+using DirectoryService.Infrastructure.Postgres.Database;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
@@ -29,6 +31,15 @@ public class DirectoryServiceTestWebFactory : WebApplicationFactory<Program>, IA
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
+        builder.ConfigureAppConfiguration((context, config) =>
+        {
+            config.AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                [$"ConnectionStrings:{Constants.DATABASE}"] =
+                    _postgresContainer.GetConnectionString()
+            });
+        });
+        
         builder.ConfigureTestServices(services =>
         {
             services.RemoveAll<IHostedService>();

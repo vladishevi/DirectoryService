@@ -17,7 +17,14 @@ public class GetTopLocationsTests(DirectoryServiceTestWebFactory factory) : Dire
     [Fact]
     public async Task GetTopLocations_should_succeed()
     {
-        await CreateLocationAsync("Top Location");
+        await CreateLocationAsync();
+        var locationDelete = await CreateLocationAsync();
+        await Client.DeleteAsync($"api/locations/{locationDelete}");
+        var locationss = await ExecuteInDbAsync(async dbContext =>
+            await dbContext
+                .LocationsRead
+                .IgnoreQueryFilters()
+                .ToListAsync());
 
         HttpResponseMessage response = await Client.GetAsync("api/locations/top");
         var envelope = await response.Content.ReadFromJsonAsync<Envelope<List<LocationTopDto>>>();
@@ -26,6 +33,7 @@ public class GetTopLocationsTests(DirectoryServiceTestWebFactory factory) : Dire
         var locations = await ExecuteInDbAsync(async dbContext =>
             await dbContext
                 .LocationsRead
+                .IgnoreQueryFilters()
                 .Where(l => ids.Contains(l.Id))
                 .ToListAsync());
 
