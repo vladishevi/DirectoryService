@@ -22,13 +22,15 @@ public class GetTopLocationsHandler(
         {
             using IDbConnection dbConnection = await dbConnectionFactory.CreateConnectionAsync(ct);
             CommandDefinition command = new("""
-                        SELECT l.id, l.name, COUNT(dp.department_id) departmentsCount, l.city, l.street, l.building, l.postcode
-                        FROM locations l
-                            LEFT JOIN department_locations dp ON l.id = dp.location_id
-                        GROUP BY l.id, l.name, l.city, l.street, l.building, l.postcode
-                        ORDER BY departmentsCount DESC
-                        LIMIT 5
-                        """,
+                                            SELECT l.id, l.name, COUNT(dl.department_id) departmentsCount, l.city, l.street, l.building, l.postcode
+                                            FROM locations l
+                                                LEFT JOIN department_locations dl ON l.id = dl.location_id
+                                                LEFT JOIN departments d ON dl.department_id =  d.id
+                                                WHERE d.is_deleted IS NOT TRUE
+                                            GROUP BY l.id, l.name, l.city, l.street, l.building, l.postcode
+                                            ORDER BY departmentsCount DESC
+                                            LIMIT 5
+                                            """,
                 cancellationToken: ct);
 
             IEnumerable<LocationTopDto> dto =
