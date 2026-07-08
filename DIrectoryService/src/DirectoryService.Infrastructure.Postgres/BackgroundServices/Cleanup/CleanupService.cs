@@ -44,6 +44,20 @@ public class CleanupService(
             if (deleted < options.Value.BatchSize)
                 break;
         }
+        
+        while (!stoppingToken.IsCancellationRequested)
+        {
+            int deleted = await dbContext.DepartmentsRead
+                .IgnoreQueryFilters()
+                .Where(p => p.IsDeleted && p.DeletedAt < cutoff)
+                .Take(options.Value.BatchSize)
+                .ExecuteDeleteAsync(stoppingToken);
+
+            totalDeleted += deleted;
+            
+            if (deleted < options.Value.BatchSize)
+                break;
+        }
 
         logger.LogInformation("{deleted} rows have been deleted", totalDeleted);
     } 
