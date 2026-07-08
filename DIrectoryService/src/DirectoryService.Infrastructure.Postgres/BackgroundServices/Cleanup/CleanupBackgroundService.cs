@@ -24,7 +24,7 @@ public class CleanupBackgroundService(
                 {
                     var scope = scopeFactory.CreateScope();
                     var service = scope.ServiceProvider.GetRequiredService<CleanupService>();
-                    await service.CleanupAsync();
+                    await service.CleanupAsync(stoppingToken);
                 }
                 catch (OperationCanceledException)
                     when (stoppingToken.IsCancellationRequested)

@@ -10,22 +10,41 @@ public class CleanupService(
     IOptions<CleanupOptions> options,
     ILogger<CleanupService> logger)
 {
-    public async Task CleanupAsync()
+    public async Task CleanupAsync(CancellationToken stoppingToken = default)
     {
         logger.LogInformation("Cleaning up database");
 
         var cutoff = DateTime.UtcNow - options.Value.RetentionPeriod;
-        int deleted = await dbContext.Locations.
-            IgnoreQueryFilters()
-            .Where(l => l.IsDeleted && l.DeletedAt < cutoff)
-            .ExecuteDeleteAsync();
+        int totalDeleted = 0;
 
-        deleted += await dbContext.Positions
-            .IgnoreQueryFilters()
-            .Where(p => p.IsDeleted && p.DeletedAt < cutoff)
-            .ExecuteDeleteAsync();
+        while (!stoppingToken.IsCancellationRequested)
+        {
+            int deleted = await dbContext.Positions
+                .IgnoreQueryFilters()
+                .Where(p => p.IsDeleted && p.DeletedAt < cutoff)
+                .Take(options.Value.BatchSize)
+                .ExecuteDeleteAsync(stoppingToken);
+
+            totalDeleted += deleted;
+            
+            if (deleted < options.Value.BatchSize)
+                break;
+        }
         
-        logger.LogInformation("{deleted} rows have been deleted", deleted);
-        
+        while (!stoppingToken.IsCancellationRequested)
+        {
+            int deleted = await dbContext.Locations
+                .IgnoreQueryFilters()
+                .Where(p => p.IsDeleted && p.DeletedAt < cutoff)
+                .Take(options.Value.BatchSize)
+                .ExecuteDeleteAsync(stoppingToken);
+
+            totalDeleted += deleted;
+            
+            if (deleted < options.Value.BatchSize)
+                break;
+        }
+
+        logger.LogInformation("{deleted} rows have been deleted", totalDeleted);
     } 
 }
