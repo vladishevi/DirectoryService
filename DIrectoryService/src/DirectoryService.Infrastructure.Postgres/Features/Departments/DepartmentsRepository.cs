@@ -130,15 +130,11 @@ public class DepartmentsRepository : IDepartmentsRepository
         }
     }
 
-    public async Task<Result<bool, Errors>> Exists(Guid id, bool active, CancellationToken cancellationToken)
+    public async Task<Result<bool, Errors>> Exists(Guid id, CancellationToken cancellationToken)
     {
         try
         {
-            IQueryable<Department> query = _dbContext.Departments.Where(d => d.Id == id);
-            if (active)
-                query = query.Where(d => d.IsActive);
-
-            return await query.AnyAsync(cancellationToken);
+            return await _dbContext.Departments.Where(d => d.Id == id).AnyAsync(cancellationToken);
         }
         catch (OperationCanceledException)
         {

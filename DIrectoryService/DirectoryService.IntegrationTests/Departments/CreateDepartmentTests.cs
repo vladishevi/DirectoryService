@@ -43,7 +43,7 @@ public class CreateDepartmentTests(DirectoryServiceTestWebFactory factory) : Dir
         Assert.Equal(request.Identifier, department.Identifier.Value);
         Assert.Null(department.ParentDepartment);
         Assert.Equal(0, department.Depth);
-        Assert.True(department.IsActive);
+        Assert.False(department.IsDeleted);
         Assert.Single(department.Locations);
         Assert.Contains(department.Locations, location => location.LocationId == createLocationEnvelope.Result);
     }
@@ -103,7 +103,7 @@ public class CreateDepartmentTests(DirectoryServiceTestWebFactory factory) : Dir
         Assert.Equal(createParentDepartmentEnvelope.Result, department.ParentDepartment.Id);
         Assert.Equal(1, department.Depth);
         Assert.Equal("engineering.platform", department.Path.Value);
-        Assert.True(department.IsActive);
+        Assert.False(department.IsDeleted);
         Assert.Single(department.Locations);
         Assert.Contains(department.Locations, location => location.LocationId == createChildLocationEnvelope.Result);
     }

@@ -37,12 +37,6 @@ public class UpdatePositionsHandler(
         }
         
         Department department = getDepartmentResult.Value;
-        if (!department.IsActive)
-        {
-            logger.LogError("Department with {name} is inactive while updating positions}", department.Name);
-            return GeneralErrors.Inactive("Department is inactive", department.Id).ToErrors();      
-        }
-        
         Result<bool, Errors> positionsExistResult = await positionsRepository.AllExist(command.Request.PositionIds, active: true, cancellationToken);
         if (positionsExistResult.IsFailure)
         {

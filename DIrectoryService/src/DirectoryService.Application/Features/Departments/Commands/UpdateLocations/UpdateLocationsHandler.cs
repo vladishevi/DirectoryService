@@ -53,11 +53,6 @@ public class UpdateLocationsHandler : ICommandHandler<Guid, UpdateLocationsComma
         }
         
         Department department = getDepartmentResult.Value;
-        if (!department.IsActive)
-        {
-            _logger.LogError("Department with {name} is inactive while updating locations}", department.Name);
-            return GeneralErrors.Inactive("Department is inactive", department.Id).ToErrors();      
-        }
         
         //check if locations exist
         Result<bool, Errors> locationsExistResult = await _locationsRepository.AllExist(command.Request.LocationIds, cancellationToken);

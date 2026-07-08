@@ -58,12 +58,6 @@ public class UpdateParentHandler : ICommandHandler<Guid, UpdateParentCommand>
             return getDepartmentWithLockResult.Error;
         }
         Department department = getDepartmentWithLockResult.Value;
-        if (!department.IsActive)
-        {
-            _logger.LogError("Department with name {name} is inactive while updating parent", department.Name);
-            transaction.Rollback(ct);
-            return GeneralErrors.Inactive("Department is inactive", department.Id).ToErrors();
-        }
         
         //get parent with lock and check for active
         Department? parentDepartment = null;
@@ -75,13 +69,6 @@ public class UpdateParentHandler : ICommandHandler<Guid, UpdateParentCommand>
                 _logger.LogError("Error getting parent department with id {id} while updating parent", command.Request.ParentId);
                 transaction.Rollback(ct);
                 return getParentWithLockResult.Error;
-            }
-            parentDepartment = getParentWithLockResult.Value;
-            if (!parentDepartment.IsActive)
-            {
-                _logger.LogError("Parent department with name {name} is inactive while updating parent", parentDepartment.Name);
-                transaction.Rollback(ct);
-                return GeneralErrors.Inactive("Parent department is inactive", parentDepartment.Id).ToErrors();
             }
         }
 

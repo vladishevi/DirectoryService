@@ -38,10 +38,6 @@ public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
             .HasColumnName("depth")
             .IsRequired();
         
-        builder.Property(d => d.IsActive)
-            .HasColumnName("is_active")
-            .IsRequired();
-
         builder.Property(d => d.IsDeleted)
             .HasColumnName("is_deleted")
             .IsRequired();

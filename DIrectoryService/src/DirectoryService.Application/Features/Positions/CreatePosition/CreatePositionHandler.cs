@@ -52,7 +52,7 @@ public class CreatePositionHandler : ICommandHandler<Guid, CreatePositionCommand
         //check if departments exist
         foreach (Guid departmentId in command.Request.DepartmentIds)
         {
-            Result<bool, Errors> departmentExistsResult = await _departmentsRepository.Exists(departmentId, active: true, cancellationToken);
+            Result<bool, Errors> departmentExistsResult = await _departmentsRepository.Exists(departmentId, cancellationToken);
             if (departmentExistsResult.IsFailure)
             {
                 _logger.LogError("Error getting department with id {id} while creating position with name {name}",
