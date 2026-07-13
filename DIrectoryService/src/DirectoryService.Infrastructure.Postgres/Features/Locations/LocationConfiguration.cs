@@ -15,7 +15,6 @@ public class LocationConfiguration : IEntityTypeConfiguration<Location>
 
         builder.Property(l => l.Name)
             .HasColumnName("name")
-            .HasColumnType("citext")
             .HasConversion(l => l.Value, l => Name.Create(l).Value)
             .IsRequired()
             .HasMaxLength(Name.MAX_LENGHT);
@@ -62,11 +61,15 @@ public class LocationConfiguration : IEntityTypeConfiguration<Location>
             .ValueGeneratedOnUpdate()
             .IsRequired();
 
-        builder.Property(l => l.DeletedAt)
-            .HasColumnName("deleted_at");
-
         builder.HasIndex(l => l.Name)
             .IsUnique()
             .HasDatabaseName(Constants.Indexes.LOCATION_NAME);
+
+        builder.HasIndex(l => l.IsDeleted)
+            .HasDatabaseName("ix_locations_is_deleted")
+            .HasFilter("is_deleted = true");
+
+        builder.HasIndex(l => l.CreatedAt)
+            .HasDatabaseName("ix_locations_created_at");
     }
 }

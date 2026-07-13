@@ -40,7 +40,7 @@ public class GetLocationsHandler(
 
             if (query.Request.Search != null)
             {
-                conditions.Add("name ILIKE '%' || @search || '%'");
+                conditions.Add("name::text ILIKE '%' || @search || '%'");
                 parameters.Add("search", query.Request.Search, DbType.String);
             }
 
