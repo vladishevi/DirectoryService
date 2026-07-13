@@ -51,6 +51,9 @@ public class LocationConfiguration : IEntityTypeConfiguration<Location>
         builder.Property(l => l.IsDeleted)
             .HasColumnName("is_deleted")
             .IsRequired();
+
+        builder.Property(l => l.DeletedAt)
+            .HasColumnName("deleted_at");
         
         builder.Property(l => l.CreatedAt)
             .HasColumnName("created_at")
