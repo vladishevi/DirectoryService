@@ -13,7 +13,6 @@ public sealed class Location
         Name = name;
         Address = address;
         Timezone = timezone;
-        IsActive = true;
         CreatedAt = DateTime.UtcNow;
         UpdatedAt = DateTime.UtcNow;
     }
@@ -24,9 +23,16 @@ public sealed class Location
     public Name Name { get; private set; }
     public Address Address { get; private set; }
     public Timezone Timezone { get; private set; }
-    public bool IsActive { get; private set; }
+    public bool IsDeleted { get; private set; }
     public DateTime CreatedAt  { get; private set; }
     public DateTime UpdatedAt  { get; private set; }
+    public DateTime DeletedAt  { get; private set; }
     
     private readonly List<DepartmentLocation> _departments = [];
+
+    public void SoftDelete()
+    {
+        IsDeleted = true;
+        DeletedAt = DateTime.UtcNow;
+    }
 }

@@ -32,6 +32,10 @@ public class PositionConfiguration : IEntityTypeConfiguration<Position>
             .HasColumnName("is_active")
             .IsRequired();
 
+        builder.Property(p => p.IsDeleted)
+            .HasColumnName("is_deleted")
+            .IsRequired();
+
         builder.Property(p => p.CreatedAt)
             .HasColumnName("created_at")
             .IsRequired();
@@ -39,6 +43,9 @@ public class PositionConfiguration : IEntityTypeConfiguration<Position>
         builder.Property(p => p.UpdatedAt)
             .HasColumnName("updated_at")
             .IsRequired();
+
+        builder.Property(p => p.DeletedAt)
+            .HasColumnName("deleted_at");
         
         builder.Property(p => p.xmin)
             .IsRowVersion();

@@ -26,12 +26,6 @@ public class DeleteLocationHandler(
         }
         
         Department department = getDepartmentResult.Value;
-        if (!department.IsActive)
-        {
-            logger.LogError("Department with {name} is inactive while deleting locations}", department.Name);
-            return GeneralErrors.Inactive("Department is inactive", department.Id).ToErrors();      
-        }
-        
         department.RemoveLocation(command.LocationId);
         
         transactionManager.SaveChangesAsync(cancellationToken);

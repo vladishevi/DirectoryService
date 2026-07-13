@@ -15,7 +15,6 @@ public class LocationConfiguration : IEntityTypeConfiguration<Location>
 
         builder.Property(l => l.Name)
             .HasColumnName("name")
-            .HasColumnType("citext")
             .HasConversion(l => l.Value, l => Name.Create(l).Value)
             .IsRequired()
             .HasMaxLength(Name.MAX_LENGHT);
@@ -49,8 +48,8 @@ public class LocationConfiguration : IEntityTypeConfiguration<Location>
             .HasConversion(l => l.Code, l => Timezone.Create(l).Value)
             .IsRequired();
         
-        builder.Property(l => l.IsActive)
-            .HasColumnName("is_active")
+        builder.Property(l => l.IsDeleted)
+            .HasColumnName("is_deleted")
             .IsRequired();
         
         builder.Property(l => l.CreatedAt)
@@ -65,5 +64,12 @@ public class LocationConfiguration : IEntityTypeConfiguration<Location>
         builder.HasIndex(l => l.Name)
             .IsUnique()
             .HasDatabaseName(Constants.Indexes.LOCATION_NAME);
+
+        builder.HasIndex(l => l.IsDeleted)
+            .HasDatabaseName("ix_locations_is_deleted")
+            .HasFilter("is_deleted = true");
+
+        builder.HasIndex(l => l.CreatedAt)
+            .HasDatabaseName("ix_locations_created_at");
     }
 }

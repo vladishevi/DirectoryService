@@ -32,7 +32,7 @@ public class GetLocationHandler(
                     Building = l.Address.Building,
                     Postcode = l.Address.Postcode,
                     Timezone = l.Timezone.Code,
-                    IsActive = l.IsActive,
+                    IsDeleted = l.IsDeleted,
                     CreatedAt = l.CreatedAt,
                     UpdatedAt = l.UpdatedAt
                 })

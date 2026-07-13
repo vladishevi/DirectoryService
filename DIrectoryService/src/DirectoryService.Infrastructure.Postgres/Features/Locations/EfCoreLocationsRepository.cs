@@ -82,7 +82,7 @@ public class EfCoreLocationsRepository : ILocationsRepository
         }
     }
 
-    public async Task<Result<bool, Errors>> AllExist(IEnumerable<Guid> ids, bool active, CancellationToken cancellationToken)
+    public async Task<Result<bool, Errors>> AllExist(IEnumerable<Guid> ids, CancellationToken cancellationToken)
     {
         try
         {
@@ -92,8 +92,6 @@ public class EfCoreLocationsRepository : ILocationsRepository
             }
 
             IQueryable<Location> query = _dbContext.Locations.Where(l => ids.Contains(l.Id));
-            if (active)
-                query = query.Where(l => l.IsActive);
 
             int existingCount = await query
                 .CountAsync(cancellationToken: cancellationToken);

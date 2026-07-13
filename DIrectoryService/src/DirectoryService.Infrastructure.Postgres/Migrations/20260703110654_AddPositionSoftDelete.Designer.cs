@@ -3,6 +3,7 @@ using System;
 using DirectoryService.Infrastructure.Postgres;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DirectoryService.Infrastructure.Postgres.Migrations
 {
     [DbContext(typeof(DirectoryServiceDbContext))]
-    partial class DirectoryServiceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260703110654_AddPositionSoftDelete")]
+    partial class AddPositionSoftDelete
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -22,7 +25,6 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
 
             NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "citext");
             NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "ltree");
-            NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "pg_trgm");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("DirectoryService.Domain.Departments.Department", b =>
@@ -36,10 +38,6 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
-                    b.Property<DateTime>("DeletedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("deleted_at");
-
                     b.Property<short>("Depth")
                         .HasColumnType("smallint")
                         .HasColumnName("depth");
@@ -50,9 +48,9 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
                         .HasColumnType("citext")
                         .HasColumnName("identifier");
 
-                    b.Property<bool>("IsDeleted")
+                    b.Property<bool>("IsActive")
                         .HasColumnType("boolean")
-                        .HasColumnName("is_deleted");
+                        .HasColumnName("is_active");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -155,7 +153,8 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
                         .HasColumnName("created_at");
 
                     b.Property<DateTime>("DeletedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean")
@@ -180,23 +179,9 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
                     b.HasKey("Id")
                         .HasName("pk_locations");
 
-                    b.HasIndex("CreatedAt")
-                        .HasDatabaseName("ix_locations_created_at");
-
-                    b.HasIndex("IsDeleted")
-                        .HasDatabaseName("ix_locations_is_deleted")
-                        .HasFilter("is_deleted = true");
-
                     b.HasIndex("Name")
                         .IsUnique()
                         .HasDatabaseName("ix_locations_name");
-
-                    b.HasIndex(new[] { "Name" }, "ix_locations_name_trgm")
-                        .HasDatabaseName("ix_locations_name_trgm")
-                        .HasAnnotation("Npgsql:IndexExpression", "name::text");
-
-                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex(new[] { "Name" }, "ix_locations_name_trgm"), "gin");
-                    NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex(new[] { "Name" }, "ix_locations_name_trgm"), new[] { "gin_trgm_ops" });
 
                     b.ToTable("locations", (string)null);
                 });

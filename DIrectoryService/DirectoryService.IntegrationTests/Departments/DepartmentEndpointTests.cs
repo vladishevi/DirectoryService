@@ -112,12 +112,20 @@ public class DepartmentEndpointTests(DirectoryServiceTestWebFactory factory) : D
         var envelope = await response.Content.ReadFromJsonAsync<Envelope<Guid>>();
         bool departmentExists = await ExecuteInDbAsync(async dbContext =>
             await dbContext.DepartmentsRead.AnyAsync(d => d.Id == departmentId));
+        
+        var departmetmentIgnoreFilters = await ExecuteInDbAsync(async dbContext =>
+            await dbContext
+                .DepartmentsRead
+                .IgnoreQueryFilters()
+                .FirstOrDefaultAsync(d => d.Id == departmentId));
 
         Assert.True(response.IsSuccessStatusCode);
         Assert.NotNull(envelope);
         Assert.True(envelope.IsSuccess);
         Assert.Equal(departmentId, envelope.Result);
         Assert.False(departmentExists);
+        Assert.NotNull(departmetmentIgnoreFilters);
+        Assert.True(departmetmentIgnoreFilters.IsDeleted);
     }
 
     [Fact]

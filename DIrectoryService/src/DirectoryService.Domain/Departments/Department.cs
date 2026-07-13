@@ -20,7 +20,6 @@ public sealed class Department
         short depth = GetDepth(parentDepartment);
         
         Id = Guid.NewGuid();
-        IsActive = true;
         CreatedAt = DateTime.UtcNow;
         UpdatedAt = DateTime.UtcNow;
         Name = name;
@@ -36,9 +35,10 @@ public sealed class Department
     public Department? ParentDepartment { get; private set; }
     public Path Path { get; private set; }
     public short Depth { get; private set; }
-    public bool IsActive { get; private set; }
+    public bool IsDeleted { get; private set; }
     public DateTime CreatedAt  { get; private set; }
     public DateTime UpdatedAt  { get; private set; }
+    public DateTime DeletedAt  { get; private set; }
 
     public IReadOnlyCollection<DepartmentLocation> Locations => _locations;
     public IReadOnlyCollection<DepartmentPosition> Positions => _positions;
@@ -72,6 +72,12 @@ public sealed class Department
     {
         _positions.Clear();
         _positions.AddRange(positionsIds.Select(positionId => new DepartmentPosition(Id, positionId)));
+    }
+
+    public void SoftDelete()
+    {
+        IsDeleted = true;
+        DeletedAt = DateTime.UtcNow;
     }
 
     private static short GetDepth(Department? parentDepartment)

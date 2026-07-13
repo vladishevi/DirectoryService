@@ -28,7 +28,6 @@ public class GetDepartmentHandler(
                 Identifier = d.Identifier.Value,
                 ParentDepartmentId = d.ParentDepartment == null ? null : d.ParentDepartment.Id,
                 Path = d.Path.Value,
-                IsActive = d.IsActive,
                 CreatedAt = d.CreatedAt,
                 UpdatedAt = d.UpdatedAt,
                 Locations = d.Locations.Select(l => l.Id),

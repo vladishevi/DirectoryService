@@ -23,15 +23,14 @@ public class GetDepartmentsHandlerDapper(
         parameters.Add("limit", query.Request.Pagination.PageSize, DbType.Int32);
         parameters.Add("offset", query.Request.Pagination.Page - 1, DbType.Int32);
 
-        List<string> conditions = null;
+        List<string> conditions = ["is_deleted = false"];
         if (query.Request.Search != null)
         {
-            conditions ??= [];
             conditions.Add("name ILIKE '%' || @search || '%'");
             parameters.Add("search", query.Request.Search, DbType.String);
         }
 
-        string whereClause = conditions != null ? "WHERE " + string.Join(" AND ", conditions) : "";
+        string whereClause = "WHERE " + string.Join(" AND ", conditions);
         string command = $"""
                          SELECT id, name, path, created_at, COUNT(*) OVER() AS total
                          FROM departments

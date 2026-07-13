@@ -27,6 +27,16 @@ public class DirectoryServiceDbContext : DbContext, IReadDbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.HasPostgresExtension("ltree");
+        modelBuilder.HasPostgresExtension("pg_trgm");
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(DirectoryServiceDbContext).Assembly);
+        
+        ApplyQueryFilters(modelBuilder);
+    }
+
+    private static void ApplyQueryFilters(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Location>().HasQueryFilter(l => !l.IsDeleted);
+        modelBuilder.Entity<Department>().HasQueryFilter(d => !d.IsDeleted);
+        modelBuilder.Entity<Position>().HasQueryFilter(p => !p.IsDeleted);
     }
 }
