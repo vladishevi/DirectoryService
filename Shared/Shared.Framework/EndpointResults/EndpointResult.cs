@@ -1,5 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
-using Shared;
+using Microsoft.AspNetCore.Http;
 using Shared.Errors;
 using IResult = Microsoft.AspNetCore.Http.IResult;
 

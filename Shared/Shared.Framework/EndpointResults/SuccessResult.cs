@@ -1,4 +1,5 @@
-﻿using Shared;
+﻿using Microsoft.AspNetCore.Http;
+using Shared;
 
 namespace DirectoryService.Presenters.EndpointResults;
 

@@ -1,8 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
-using Shared;
-using Shared.Errors;
 
-namespace DirectoryService.Application.Abstractions;
+namespace Shared.Core.Abstractions;
 
 public interface ICommand;
 
@@ -13,7 +11,7 @@ public interface ICommand;
 /// <typeparam name="TCommand">The type of the command being handled, which must implement <see cref="ICommand"/>.</typeparam>
 public interface ICommandHandler<TResponse, in TCommand> where TCommand : ICommand
 {
-    Task<Result<TResponse, Errors>> Handle(TCommand command, CancellationToken cancellationToken);
+    Task<Result<TResponse, Errors.Errors>> Handle(TCommand command, CancellationToken cancellationToken);
 }
 
 /// <summary>
@@ -22,5 +20,5 @@ public interface ICommandHandler<TResponse, in TCommand> where TCommand : IComma
 /// <typeparam name="TCommand">The type of the command being handled, which must implement <see cref="ICommand"/>.</typeparam>
 public interface ICommandHandler<in TCommand> where TCommand : ICommand
 {
-    Task<UnitResult<Errors>> Handle(TCommand command, CancellationToken cancellationToken);
+    Task<UnitResult<Errors.Errors>> Handle(TCommand command, CancellationToken cancellationToken);
 }

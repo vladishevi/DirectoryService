@@ -2,11 +2,11 @@
 using FluentValidation.Results;
 using Shared.Errors;
 
-namespace DirectoryService.Application.Validation;
+namespace Shared.Core.Validation;
 
 public static class ValidationExtensions
 {
-    public static Errors ToErrors(this ValidationResult validationResult)
+    public static Errors.Errors ToErrors(this ValidationResult validationResult)
     {
         var errorsMessages = validationResult.Errors.Select(x => x.ErrorMessage).ToList();
         var errors = errorsMessages
@@ -14,6 +14,6 @@ public static class ValidationExtensions
                 new JsonSerializerOptions { PropertyNameCaseInsensitive = true })).Select(error => error.First())
             .ToList();
 
-        return new Errors(errors);
+        return new Errors.Errors(errors);
     }
 }
