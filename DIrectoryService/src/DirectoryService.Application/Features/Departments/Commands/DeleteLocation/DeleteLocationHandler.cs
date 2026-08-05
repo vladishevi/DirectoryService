@@ -5,6 +5,8 @@ using DirectoryService.Application.Features.Locations;
 using DirectoryService.Domain.Departments;
 using Microsoft.Extensions.Logging;
 using Shared;
+using Shared.Core.Abstractions;
+using Shared.Core.Database;
 using Shared.Errors;
 
 namespace DirectoryService.Application.Features.Departments.Commands;

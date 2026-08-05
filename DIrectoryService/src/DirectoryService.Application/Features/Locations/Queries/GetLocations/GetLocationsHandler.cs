@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Data;
 using CSharpFunctionalExtensions;
 using Dapper;
 using DirectoryService.Application.Abstractions;
@@ -9,6 +10,7 @@ using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.Extensions.Logging;
 using Shared;
+using Shared.Core.Abstractions;
 using Shared.Errors;
 
 namespace DirectoryService.Application.Features.Locations.GetLocations;

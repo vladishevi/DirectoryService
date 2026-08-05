@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using CSharpFunctionalExtensions;
 using DirectoryService.Application.Abstractions;
 using DirectoryService.Application.Database;
@@ -8,6 +9,8 @@ using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.Extensions.Logging;
 using Shared;
+using Shared.Core.Abstractions;
+using Shared.Core.Database;
 using Shared.Errors;
 
 namespace DirectoryService.Application.Features.Departments.Commands;

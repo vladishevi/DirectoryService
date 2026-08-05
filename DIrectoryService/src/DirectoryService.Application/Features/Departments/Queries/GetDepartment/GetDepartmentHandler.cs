@@ -5,6 +5,7 @@ using DirectoryService.Contracts.Departments;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Shared;
+using Shared.Core.Abstractions;
 using Shared.Errors;
 
 namespace DirectoryService.Application.Features.Departments.Queries.GetDepartment;
