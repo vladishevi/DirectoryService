@@ -4,10 +4,8 @@ using Dapper;
 using DirectoryService.Application.Database;
 using DirectoryService.Application.Features.Departments;
 using DirectoryService.Domain.Departments;
-using DirectoryService.Infrastructure.Postgres.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Shared;
 using Shared.Errors;
 
 namespace DirectoryService.Infrastructure.Postgres.Features.Departments;

@@ -1,5 +1,4 @@
-﻿using System.Windows.Input;
-using ICommand = DirectoryService.Application.Abstractions.ICommand;
+﻿using ICommand = Shared.Core.Abstractions.ICommand;
 
 namespace DirectoryService.Application.Features.Locations.Commands.SoftDeleteLocation;
 

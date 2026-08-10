@@ -1,7 +1,6 @@
 ﻿using System.Net.Http.Json;
 using DirectoryService.Contracts.Departments;
 using DirectoryService.Contracts.Locations;
-using DirectoryService.Domain.Departments;
 using DirectoryService.IntegrationTests.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Shared;

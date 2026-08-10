@@ -1,11 +1,11 @@
-﻿using DirectoryService.Application.Abstractions;
-using DirectoryService.Application.Features.Locations.Commands;
+﻿using DirectoryService.Application.Features.Locations.Commands;
 using DirectoryService.Application.Features.Locations.Commands.SoftDeleteLocation;
 using DirectoryService.Application.Features.Locations.GetLocation;
 using DirectoryService.Application.Features.Locations.GetLocations;
 using DirectoryService.Contracts.Locations;
 using DirectoryService.Presenters.EndpointResults;
 using Microsoft.AspNetCore.Mvc;
+using Shared.Core.Abstractions;
 
 namespace DirectoryService.Presenters.Features.Locations;
 

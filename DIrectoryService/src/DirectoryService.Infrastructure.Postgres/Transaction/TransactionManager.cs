@@ -1,11 +1,10 @@
 ﻿using System.Data.Common;
 using CSharpFunctionalExtensions;
-using DirectoryService.Application.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 using Npgsql;
-using Shared;
+using Shared.Core.Database;
 using Shared.Errors;
 
 namespace DirectoryService.Infrastructure.Postgres.Transaction;

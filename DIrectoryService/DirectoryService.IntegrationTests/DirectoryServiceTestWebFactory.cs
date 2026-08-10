@@ -1,7 +1,6 @@
 ﻿using System.Data.Common;
 using DirectoryService.Application.Database;
 using DirectoryService.Infrastructure.Postgres;
-using DirectoryService.Infrastructure.Postgres.Database;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;

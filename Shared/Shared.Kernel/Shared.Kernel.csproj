@@ -5,6 +5,13 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <RootNamespace>SharedKernel</RootNamespace>
+
+        <PackageId>Shared.Kernel</PackageId>
+        <Version>1.0.0</Version>
+        <Authors>vladishevi</Authors>
+        <Company>vladishevi</Company>
+        <PackageDescription>Shared.Kernel</PackageDescription>
+        <RepositoryUrl>https://github.com/vladishevi/DirectoryService</RepositoryUrl>
     </PropertyGroup>
     
     <ItemGroup>

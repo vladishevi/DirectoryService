@@ -1,10 +1,10 @@
-﻿using DirectoryService.Contracts.Departments;
-using DirectoryService.Application.Abstractions;
-using DirectoryService.Application.Features.Departments.Commands;
+﻿using DirectoryService.Application.Features.Departments.Commands;
 using DirectoryService.Application.Features.Departments.Queries.GetDepartment;
 using DirectoryService.Application.Features.Departments.Queries.GetDepartments;
+using DirectoryService.Contracts.Departments;
 using DirectoryService.Presenters.EndpointResults;
 using Microsoft.AspNetCore.Mvc;
+using Shared.Core.Abstractions;
 
 namespace DirectoryService.Presenters.Features.Departments;
 

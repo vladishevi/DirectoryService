@@ -1,7 +1,9 @@
-﻿using DirectoryService.Presenters.Middlewares;
+﻿using Dapper;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using Serilog.Exceptions;
+
+using DirectoryService.Presenters.Middlewares;
 
 namespace DirectoryService.Presenters;
 
@@ -36,7 +38,7 @@ public static class DependencyInjection
         app.UseExceptionMiddleware();
         app.UseSerilogRequestLogging();
         //app.UseHttpLogging();
-        Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+        DefaultTypeMap.MatchNamesWithUnderscores = true;
         
         if (app.Environment.IsDevelopment())
         {

@@ -26,5 +26,11 @@
     <ItemGroup>
       <Folder Include="Features\" />
     </ItemGroup>
+  
+    <ItemGroup>
+      <Reference Include="Shared.Core">
+        <HintPath>..\..\..\Shared\Shared.Core\bin\Debug\net10.0\Shared.Core.dll</HintPath>
+      </Reference>
+    </ItemGroup>
 
 </Project>

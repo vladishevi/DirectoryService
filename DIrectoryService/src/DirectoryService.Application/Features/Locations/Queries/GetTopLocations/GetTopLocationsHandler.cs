@@ -1,11 +1,9 @@
 ﻿using System.Data;
 using CSharpFunctionalExtensions;
 using Dapper;
-using DirectoryService.Application.Abstractions;
 using DirectoryService.Application.Database;
 using DirectoryService.Contracts.Locations;
 using Microsoft.Extensions.Logging;
-using Shared;
 using Shared.Core.Abstractions;
 using Shared.Errors;
 

@@ -1,6 +1,4 @@
 ﻿using CSharpFunctionalExtensions;
-using DirectoryService.Application.Abstractions;
-using DirectoryService.Application.Database;
 using DirectoryService.Domain.Locations;
 using Microsoft.Extensions.Logging;
 using Shared.Core.Abstractions;

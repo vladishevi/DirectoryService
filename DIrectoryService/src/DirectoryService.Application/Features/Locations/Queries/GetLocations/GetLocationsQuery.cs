@@ -1,5 +1,4 @@
-﻿using DirectoryService.Application.Abstractions;
-using DirectoryService.Contracts.Locations;
+﻿using DirectoryService.Contracts.Locations;
 using Shared.Core.Abstractions;
 
 namespace DirectoryService.Application.Features.Locations.GetLocations;
