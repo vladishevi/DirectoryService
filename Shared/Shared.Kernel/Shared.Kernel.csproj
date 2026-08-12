@@ -7,7 +7,7 @@
         <RootNamespace>SharedKernel</RootNamespace>
 
         <PackageId>Shared.Kernel</PackageId>
-        <Version>1.0.0</Version>
+        <Version>0.1.0</Version>
         <Authors>vladishevi</Authors>
         <Company>vladishevi</Company>
         <PackageDescription>Shared.Kernel</PackageDescription>
