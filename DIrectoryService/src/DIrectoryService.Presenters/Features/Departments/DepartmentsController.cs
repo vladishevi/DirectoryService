@@ -2,9 +2,9 @@
 using DirectoryService.Application.Features.Departments.Queries.GetDepartment;
 using DirectoryService.Application.Features.Departments.Queries.GetDepartments;
 using DirectoryService.Contracts.Departments;
-using DirectoryService.Presenters.EndpointResults;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Core.Abstractions;
+using Shared.Framework.EndpointResults;
 
 namespace DirectoryService.Presenters.Features.Departments;
 

@@ -2,8 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using Serilog.Exceptions;
-
-using DirectoryService.Presenters.Middlewares;
+using Shared.Framework.Middlewares;
 
 namespace DirectoryService.Presenters;
 
