@@ -1,14 +1,13 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Shared;
 using Shared.Errors;
 
-namespace DirectoryService.Presenters.EndpointResults;
+namespace Shared.Framework.EndpointResults;
 
 public record ErrorResult : IResult
 {
-    private readonly Errors _errors;
+    private readonly Errors.Errors _errors;
 
-    public ErrorResult(Errors errors)
+    public ErrorResult(Errors.Errors errors)
     {
         _errors = errors;
     }

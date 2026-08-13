@@ -1,15 +1,14 @@
 ﻿using CSharpFunctionalExtensions;
 using Microsoft.AspNetCore.Http;
-using Shared.Errors;
 using IResult = Microsoft.AspNetCore.Http.IResult;
 
-namespace DirectoryService.Presenters.EndpointResults;
+namespace Shared.Framework.EndpointResults;
 
 public record EndpointResult<TValue> : IResult
 {
     private readonly IResult _result;
 
-    private EndpointResult(Result<TValue, Errors> result)
+    private EndpointResult(Result<TValue, Errors.Errors> result)
     {
         _result = result.IsFailure
             ? new ErrorResult(result.Error)
@@ -19,5 +18,5 @@ public record EndpointResult<TValue> : IResult
     public Task ExecuteAsync(HttpContext httpContext) => 
         _result.ExecuteAsync(httpContext);
 
-    public static implicit operator EndpointResult<TValue>(Result<TValue, Errors> result) => new(result);
+    public static implicit operator EndpointResult<TValue>(Result<TValue, Errors.Errors> result) => new(result);
 }

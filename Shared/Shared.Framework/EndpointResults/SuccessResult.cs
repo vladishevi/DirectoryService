@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Shared;
 
-namespace DirectoryService.Presenters.EndpointResults;
+namespace Shared.Framework.EndpointResults;
 
 public record SuccessResult<TValue> : IResult
 {
