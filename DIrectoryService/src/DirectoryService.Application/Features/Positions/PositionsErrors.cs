@@ -1,5 +1,4 @@
-﻿using System.Runtime.InteropServices.JavaScript;
-using Shared.Errors;
+﻿using Shared.Errors;
 
 namespace DirectoryService.Application.Features.Positions;
 
