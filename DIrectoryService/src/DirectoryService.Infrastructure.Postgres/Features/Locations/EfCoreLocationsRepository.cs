@@ -3,7 +3,6 @@ using DirectoryService.Application.Features.Locations;
 using DirectoryService.Domain.Locations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Shared;
 using Shared.Errors;
 
 namespace DirectoryService.Infrastructure.Postgres.Features.Locations;

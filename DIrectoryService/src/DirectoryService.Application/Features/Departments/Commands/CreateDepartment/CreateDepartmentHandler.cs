@@ -1,13 +1,12 @@
 ﻿using CSharpFunctionalExtensions;
-using DirectoryService.Application.Abstractions;
-using DirectoryService.Application.Database;
 using DirectoryService.Application.Features.Locations;
-using DirectoryService.Application.Validation;
 using DirectoryService.Domain.Departments;
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.Extensions.Logging;
-using Shared;
+using Shared.Core.Abstractions;
+using Shared.Core.Database;
+using Shared.Core.Validation;
 using Shared.Errors;
 using Name = DirectoryService.Domain.Departments.Name;
 

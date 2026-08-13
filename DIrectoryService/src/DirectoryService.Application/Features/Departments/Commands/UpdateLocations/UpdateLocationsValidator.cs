@@ -1,6 +1,5 @@
-﻿using DirectoryService.Application.Validation;
-using FluentValidation;
-using Shared;
+﻿using FluentValidation;
+using Shared.Core.Validation;
 using Shared.Errors;
 
 namespace DirectoryService.Application.Features.Departments.Commands;

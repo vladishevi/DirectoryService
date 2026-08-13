@@ -1,7 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
 using DirectoryService.Application.Database;
-using DirectoryService.Contracts.Common;
 using DirectoryService.Contracts.Departments;
 using DirectoryService.Domain.Departments;
 using DirectoryService.IntegrationTests.Infrastructure;

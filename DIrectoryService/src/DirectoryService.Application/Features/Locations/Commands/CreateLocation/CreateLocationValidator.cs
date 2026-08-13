@@ -1,6 +1,6 @@
-using DirectoryService.Application.Validation;
 using DirectoryService.Domain.Locations;
 using FluentValidation;
+using Shared.Core.Validation;
 
 namespace DirectoryService.Application.Features.Locations.Commands;
 

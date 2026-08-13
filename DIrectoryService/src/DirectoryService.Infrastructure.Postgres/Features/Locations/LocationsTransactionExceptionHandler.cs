@@ -5,7 +5,6 @@ using DirectoryService.Infrastructure.Postgres.Transaction;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Npgsql;
-using Shared;
 using Shared.Errors;
 
 namespace DirectoryService.Infrastructure.Postgres.Features.Locations;

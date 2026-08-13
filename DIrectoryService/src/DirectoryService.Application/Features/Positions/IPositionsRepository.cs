@@ -1,8 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
-using DirectoryService.Application.Abstractions;
 using DirectoryService.Application.Database;
 using DirectoryService.Domain.Positions;
-using Shared;
 using Shared.Errors;
 
 namespace DirectoryService.Application.Features.Positions;

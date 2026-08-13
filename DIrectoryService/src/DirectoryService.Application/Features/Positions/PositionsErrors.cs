@@ -1,5 +1,4 @@
-﻿using Shared;
-using Shared.Errors;
+﻿using Shared.Errors;
 
 namespace DirectoryService.Application.Features.Positions;
 

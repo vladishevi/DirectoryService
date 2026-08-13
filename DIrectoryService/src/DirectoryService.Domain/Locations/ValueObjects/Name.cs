@@ -1,5 +1,4 @@
 ﻿using CSharpFunctionalExtensions;
-using Shared;
 using Shared.Errors;
 
 namespace DirectoryService.Domain.Locations;

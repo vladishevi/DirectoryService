@@ -1,8 +1,4 @@
-﻿using DirectoryService.Application.Abstractions;
-using DirectoryService.Application.Database;
-using DirectoryService.Application.Features.Departments;
-using DirectoryService.Application.Features.Locations;
-using DirectoryService.Application.Features.Positions;
+﻿using DirectoryService.Application.Database;
 using DirectoryService.Infrastructure.Postgres.BackgroundServices;
 using DirectoryService.Infrastructure.Postgres.Database;
 using DirectoryService.Infrastructure.Postgres.Transaction;
@@ -12,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Shared.Core.Database;
 
 namespace DirectoryService.Infrastructure.Postgres;
 

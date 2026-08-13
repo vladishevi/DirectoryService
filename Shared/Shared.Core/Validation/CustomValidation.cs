@@ -1,19 +1,18 @@
 ﻿using System.Text.Json;
 using CSharpFunctionalExtensions;
 using FluentValidation;
-using Shared;
 using Shared.Errors;
 
-namespace DirectoryService.Application.Validation;
+namespace Shared.Core.Validation;
 
 public static class CustomValidation
 {
     public static IRuleBuilderOptionsConditions<T, TElement> MustBeValueObject<T, TElement, TValueObject>(this
-        IRuleBuilder<T, TElement> ruleBuilder, Func<TElement, Result<TValueObject, Errors>> factoryMethod)
+        IRuleBuilder<T, TElement> ruleBuilder, Func<TElement, Result<TValueObject, Errors.Errors>> factoryMethod)
     {
         return ruleBuilder.Custom((value, context) =>
         {
-            Result<TValueObject, Errors> result = factoryMethod.Invoke(value);
+            Result<TValueObject, Errors.Errors> result = factoryMethod.Invoke(value);
             if (result.IsSuccess)
                 return;
 

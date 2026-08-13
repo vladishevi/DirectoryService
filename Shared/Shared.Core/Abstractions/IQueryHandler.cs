@@ -1,8 +1,6 @@
 using CSharpFunctionalExtensions;
-using Shared;
-using Shared.Errors;
 
-namespace DirectoryService.Application.Abstractions;
+namespace Shared.Core.Abstractions;
 
 public interface IQuery;
 
@@ -13,10 +11,10 @@ public interface IQuery;
 /// <typeparam name="TQuery">The type of the query being handled, which must implement <see cref="IQuery"/>.</typeparam>
 public interface IQueryHandler<TResponse, in TQuery> where TQuery : IQuery
 {
-    Task<Result<TResponse, Errors>> Handle(TQuery query, CancellationToken cancellationToken);
+    Task<Result<TResponse, Errors.Errors>> Handle(TQuery query, CancellationToken cancellationToken);
 }
 
 public interface IQueryHandler<TResponse>
 {
-    Task<Result<TResponse, Errors>> Handle(CancellationToken cancellationToken);
+    Task<Result<TResponse, Errors.Errors>> Handle(CancellationToken cancellationToken);
 }
